@@ -12,6 +12,7 @@ ASntpCharacterBase::ASntpCharacterBase()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	Weapon->SetupAttachment(GetMesh(), "WeaponHandSocket");
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 }
 
 // Called when the game starts or when spawned
