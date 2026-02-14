@@ -1,0 +1,45 @@
+# UE generate
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Build/
+
+**/Assets
+**/LevelPrototyping
+**/TopDown
+**/Variant_Strategy
+**/Variant_TwinStick
+**/Cursor
+**/Maps
+**/__ExternalActors__
+
+# Compiler 
+.idea/
+.vs/
+.vscode/
+*.sln.DotSettings
+*.user
+
+# Others
+*.log
+*.bak
+*.tmp
+*.VC.db
+*.opensdf
+*.opendb
+*.sdf
+*.sln
+*.suo
+*.xcodeproj
+*.xcworkspace
+Thumbs.db
+
+*.zip
+*.7z
+*.rar
+*.iso
+*.tar
+
+
+
