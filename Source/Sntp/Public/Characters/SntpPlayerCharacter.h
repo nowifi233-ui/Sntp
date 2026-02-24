@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputAction.h"
 #include "Characters/SntpCharacterBase.h"
 #include "SntpPlayerCharacter.generated.h"
 
@@ -13,5 +14,5 @@ UCLASS()
 class SNTP_API ASntpPlayerCharacter : public ASntpCharacterBase
 {
 	GENERATED_BODY()
-	
+
 };

@@ -17,11 +17,19 @@ class SNTP_API ASntpPlayerController : public APlayerController
 	
 public:
 	ASntpPlayerController();
-	
+	virtual void SetupInputComponent() override;
 protected:
 	virtual void BeginPlay() override;
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* MoveAction;
+	
+	void HandleMove(const FInputActionValue& InputValue);
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Input")
 	TSoftObjectPtr<UInputMappingContext> InputMapping;
+	
+	float Speed = 500.f;
+	
 };
