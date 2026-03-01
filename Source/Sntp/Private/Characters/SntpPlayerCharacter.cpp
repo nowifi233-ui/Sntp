@@ -20,6 +20,11 @@ void ASntpPlayerCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
+UAbilitySystemComponent* ASntpPlayerCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
 void ASntpPlayerCharacter::InitAbilityActorInfo()
 {
 	ASntpPlayerState* SntpPlayerState = GetPlayerState<ASntpPlayerState>();

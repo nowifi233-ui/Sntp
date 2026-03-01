@@ -11,12 +11,13 @@
  * 
  */
 UCLASS()
-class SNTP_API ASntpPlayerCharacter : public ASntpCharacterBase
+class SNTP_API ASntpPlayerCharacter : public ASntpCharacterBase, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 public:
 	virtual void PossessedBy(AController* byController) override;
 	virtual void OnRep_PlayerState() override;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 private:
 	void InitAbilityActorInfo();
