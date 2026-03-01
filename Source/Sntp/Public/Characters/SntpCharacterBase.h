@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemComponent.h"
 #include "GameFramework/Character.h"
 #include "SntpCharacterBase.generated.h"
 
@@ -17,6 +18,14 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	
+	// GAS
+	UPROPERTY(EditAnywhere, Category="GAS")
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	
+	UPROPERTY(EditAnywhere, Category="GAS")
+	TObjectPtr<UAttributeSet> AttributeSet;
+	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> Weapon;

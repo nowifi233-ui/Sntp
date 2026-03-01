@@ -3,6 +3,22 @@
 
 #include "Characters/SntpEnemyCharacter.h"
 
+#include "NavigationSystemTypes.h"
+#include "AbilitySystem/SntpAbilitySystemComponent.h"
+#include "AbilitySystem/SntpAttributeSet.h"
+
+ASntpEnemyCharacter::ASntpEnemyCharacter()
+{
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	
+	AbilitySystemComponent = CreateDefaultSubobject<USntpAbilitySystemComponent>("AbilitySystemComponent");
+	AbilitySystemComponent->SetIsReplicated(true);
+	
+	AttributeSet = CreateDefaultSubobject<USntpAttributeSet>("AttributeSet");
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+	AbilitySystemComponent->AddAttributeSetSubobject(AttributeSet.Get());
+}
+
 void ASntpEnemyCharacter::HighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(true);
@@ -16,4 +32,12 @@ void ASntpEnemyCharacter::UnHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
+}
+
+void ASntpEnemyCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	
 }

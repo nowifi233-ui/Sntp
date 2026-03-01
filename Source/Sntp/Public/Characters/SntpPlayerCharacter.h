@@ -14,5 +14,10 @@ UCLASS()
 class SNTP_API ASntpPlayerCharacter : public ASntpCharacterBase
 {
 	GENERATED_BODY()
-
+public:
+	virtual void PossessedBy(AController* byController) override;
+	virtual void OnRep_PlayerState() override;
+	
+private:
+	void InitAbilityActorInfo();
 };

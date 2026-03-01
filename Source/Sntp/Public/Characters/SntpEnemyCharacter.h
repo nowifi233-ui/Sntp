@@ -16,7 +16,10 @@ class SNTP_API ASntpEnemyCharacter : public ASntpCharacterBase, public IEnemyInt
 	GENERATED_BODY()
 	
 public:
+	ASntpEnemyCharacter();
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
+	
+	virtual void BeginPlay() override;
 	
 };
