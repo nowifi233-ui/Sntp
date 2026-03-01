@@ -4,11 +4,18 @@
 #include "Player/SntpPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Interaction/EnemyInterface.h"
 
 
 ASntpPlayerController::ASntpPlayerController()
 {
 	bReplicates = true;
+}
+
+void ASntpPlayerController::PlayerTick(float DeltaTime)
+{
+	Super::PlayerTick(DeltaTime);
+	CursorTrace();
 }
 
 void ASntpPlayerController::SetupInputComponent()
@@ -63,4 +70,27 @@ void ASntpPlayerController::HandleMove(const FInputActionValue& InputValue)
 		ControlledPawn->AddMovementInput(RightDirection, MoveInput.Y);
 	}
 	
+}
+
+void ASntpPlayerController::CursorTrace()
+{
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, Hit);
+	if (!Hit.bBlockingHit)
+	{
+		return;
+	}
+	LastActor = CurrentActor;
+	CurrentActor = Cast<IEnemyInterface>(Hit.GetActor());
+	if (CurrentActor != LastActor)
+	{
+		if (LastActor != nullptr)
+		{
+			LastActor->UnHighlightActor();
+		}
+		if (CurrentActor != nullptr)
+		{
+			CurrentActor->HighlightActor();
+		}
+	}
 }
