@@ -22,9 +22,12 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	
+	// Bind input actions and functions 
 	virtual void SetupInputComponent() override;
 	
 private:
+	// Enhanced Input Subsystem
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MoveAction;
 	
@@ -35,6 +38,7 @@ private:
 	
 	float Speed = 500.f;
 	
+	// Highlight enemies
 	void CursorTrace();
 	IEnemyInterface* CurrentActor;
 	IEnemyInterface* LastActor;
