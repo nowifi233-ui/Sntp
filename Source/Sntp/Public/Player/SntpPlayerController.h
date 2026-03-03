@@ -18,9 +18,8 @@ class SNTP_API ASntpPlayerController : public APlayerController
 	
 public:
 	ASntpPlayerController();
-	virtual void PlayerTick(float DeltaTime);
-	
-	
+	virtual void PlayerTick(const float DeltaTime) override;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;

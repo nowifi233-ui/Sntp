@@ -27,7 +27,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category="GAS")
 	TObjectPtr<UAttributeSet> AttributeSet;
 	
-	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
