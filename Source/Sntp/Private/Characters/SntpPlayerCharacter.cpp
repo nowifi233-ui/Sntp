@@ -4,7 +4,9 @@
 #include "Characters/SntpPlayerCharacter.h"
 
 #include "AbilitySystem/SntpAttributeSet.h"
+#include "Player/SntpPlayerController.h"
 #include "Player/SntpPlayerState.h"
+#include "UI/SntpHUD.h"
 
 void ASntpPlayerCharacter::PossessedBy(AController* byController)
 {
@@ -32,4 +34,14 @@ void ASntpPlayerCharacter::InitAbilityActorInfo()
 	SntpPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(SntpPlayerState, this);
 	AbilitySystemComponent = SntpPlayerState->GetAbilitySystemComponent();
 	AttributeSet = SntpPlayerState->GetAttributeSet();
+	
+	if (ASntpPlayerController* SntpPlayerController = Cast<ASntpPlayerController>(GetController()))
+	{
+		if (ASntpHUD* SntpHUD = Cast<ASntpHUD>(SntpPlayerController->GetHUD()))
+		{
+			SntpHUD->InitOverlay(SntpPlayerController, SntpPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
+	
+	
 }

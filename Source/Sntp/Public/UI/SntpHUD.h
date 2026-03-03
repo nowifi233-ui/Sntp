@@ -7,6 +7,10 @@
 #include "GameFramework/HUD.h"
 #include "SntpHUD.generated.h"
 
+class UAttributeSet;
+class UAbilitySystemComponent;
+struct FWidgetControllerParams;
+class UOverlayWidgetController;
 /**
  * 
  */
@@ -19,9 +23,21 @@ public:
 	UPROPERTY()
 	TObjectPtr<USntpUserWidget> OverlayWidget;
 	
-protected:
-	virtual void BeginPlay() override;	
+	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& Params);
+
+	UFUNCTION(BlueprintCallable)
+	void InitOverlay(APlayerController* PlayerController, APlayerState* PlayerState, UAbilitySystemComponent* AbilitySystemComponent, UAttributeSet* AttributeSet);
+
 private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<USntpUserWidget> OverlayWidgetClass;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UOverlayWidgetController> OverlayWidgetControllerClass; 
+	
+	UPROPERTY()
+	TObjectPtr<UOverlayWidgetController> OverlayWidgetController;
+
+	
+
 };

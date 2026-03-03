@@ -8,7 +8,7 @@
 #include "SntpWidgetController.generated.h"
 
 /**
- * 
+ * FWidgetControllerParams is used to set up the widget controller.
  */
 
 USTRUCT(BlueprintType)
@@ -33,6 +33,9 @@ struct FWidgetControllerParams
 	TObjectPtr<UAttributeSet> AttributeSet = nullptr;
 };
 
+/**
+ * 
+ */
 
 UCLASS()
 class SNTP_API USntpWidgetController : public UObject
@@ -43,6 +46,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetControllerParams(const FWidgetControllerParams& Params);
 	
+	// Override it in subclass to broadcast values.
+	virtual void BroadcastInitialValue() {};
 protected:
 	/**
 	 * Get information of player;
