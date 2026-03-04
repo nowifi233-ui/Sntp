@@ -13,10 +13,7 @@ void USntpAbilitySystemComponent::EffectApplied(UAbilitySystemComponent* ASC, co
 {
 	FGameplayTagContainer TagContainer;
 	EffectSpec.GetAllAssetTags(TagContainer);
-	for (const FGameplayTag& Tag : TagContainer)
-	{
-		// Broadcast the tag to widget controller
-		const FString Msg = FString::Printf(TEXT("GE Tag: %s"), *Tag.ToString());
-		GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Green, Msg);
-	}
+	OnEffectApplied.Broadcast(TagContainer);
+	
+
 }
