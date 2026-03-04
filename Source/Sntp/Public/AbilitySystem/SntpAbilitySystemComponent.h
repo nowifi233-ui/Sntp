@@ -13,5 +13,10 @@ UCLASS()
 class SNTP_API USntpAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
+public:
+	void AbilityActorInfoSet();
 	
+protected:
+	
+	void EffectApplied(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle EffectHandle);
 };

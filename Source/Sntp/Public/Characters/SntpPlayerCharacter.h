@@ -19,6 +19,6 @@ public:
 	virtual void OnRep_PlayerState() override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
-private:
-	void InitAbilityActorInfo();
+protected:
+	virtual void InitAbilityActorInfo() override;
 };

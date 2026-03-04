@@ -21,6 +21,10 @@ void ASntpCharacterBase::BeginPlay()
 	Super::BeginPlay();
 }
 
+void ASntpCharacterBase::InitAbilityActorInfo()
+{
+}
+
 // Called to bind functionality to input
 void ASntpCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

@@ -3,6 +3,7 @@
 
 #include "Characters/SntpPlayerCharacter.h"
 
+#include "AbilitySystem/SntpAbilitySystemComponent.h"
 #include "AbilitySystem/SntpAttributeSet.h"
 #include "Player/SntpPlayerController.h"
 #include "Player/SntpPlayerState.h"
@@ -33,6 +34,7 @@ void ASntpPlayerCharacter::InitAbilityActorInfo()
 	check(SntpPlayerState);
 	SntpPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(SntpPlayerState, this);
 	AbilitySystemComponent = SntpPlayerState->GetAbilitySystemComponent();
+	Cast<USntpAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 	AttributeSet = SntpPlayerState->GetAttributeSet();
 	
 	if (ASntpPlayerController* SntpPlayerController = Cast<ASntpPlayerController>(GetController()))
@@ -42,6 +44,4 @@ void ASntpPlayerCharacter::InitAbilityActorInfo()
 			SntpHUD->InitOverlay(SntpPlayerController, SntpPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
-	
-	
 }

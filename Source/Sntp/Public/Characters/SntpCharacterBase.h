@@ -29,7 +29,8 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> Weapon;
-
+	
+	virtual void InitAbilityActorInfo();
 public:	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
