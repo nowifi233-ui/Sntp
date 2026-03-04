@@ -8,6 +8,8 @@
 USntpAttributeSet::USntpAttributeSet()
 {
 	InitHealth(100.f);
+	InitMaxHealth(150.f);
+	InitMaxMana(100.f);
 	InitMana(50.f);
 }
 

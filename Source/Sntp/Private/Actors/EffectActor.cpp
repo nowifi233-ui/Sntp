@@ -2,7 +2,7 @@
 
 
 #include "Actors/EffectActor.h"
-
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "AbilitySystem/SntpAttributeSet.h"
@@ -12,38 +12,89 @@ AEffectActor::AEffectActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	SetRootComponent(Mesh);
 	
-	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
-	SphereComponent->SetupAttachment(Mesh);
+	SetRootComponent(CreateDefaultSubobject<USceneComponent>("SceneRoot"));
+	
 }
 
-void AEffectActor::OnOverlap(UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-	const FHitResult& SweepResult)
-{
-	if (IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(OtherActor))
+void AEffectActor::ApplyEffectToTarget(AActor* Target, TSubclassOf<UGameplayEffect> GameplayEffectClass)
+{	
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target);
+	if (TargetASC == nullptr)
 	{
-		const USntpAttributeSet* SntpAttributeSet = Cast<USntpAttributeSet>(ASCInterface->GetAbilitySystemComponent()->GetAttributeSet(USntpAttributeSet::StaticClass()));
-		// TODO: Change it.
-		USntpAttributeSet* UMutableAttributeSet = const_cast<USntpAttributeSet*>(SntpAttributeSet);
-		UMutableAttributeSet->SetHealth(SntpAttributeSet->GetHealth() + 20.f);
+		return;
+	}
+	check(GameplayEffectClass);
+	FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(this);
+	const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(GameplayEffectClass, 1.0f, EffectContextHandle);
+	const FActiveGameplayEffectHandle ActiveEffectHandle = TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+	
+	const bool bIsInfinite = EffectSpecHandle.Data.Get()->Def.Get()->DurationPolicy == EGameplayEffectDurationType::Infinite;
+	if (bIsInfinite)
+	{
+		ActiveEffectHandles.Add(ActiveEffectHandle, TargetASC);
+	}
+	
+	if (bDestroyOnApply)
+	{
+		Destroy();
 	}
 }
 
-void AEffectActor::EndOverlap(UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+
+void AEffectActor::OnOverlap(AActor* Target)
 {
+	if (InstantEffectApplyPolicy == EEffectApplyPolicy::ApplyOnOverlap)
+	{
+		ApplyEffectToTarget(Target, InstantGameplayEffectClass);
+	}
+	if (DurationEffectApplyPolicy == EEffectApplyPolicy::ApplyOnOverlap)
+	{
+		ApplyEffectToTarget(Target, DurationGameplayEffectClass);
+	}
+	if (InfiniteEffectApplyPolicy == EEffectApplyPolicy::ApplyOnOverlap)
+	{
+		ApplyEffectToTarget(Target, InfiniteGameplayEffectClass);
+	}
 }
 
-// Called when the game starts or when spawned
-void AEffectActor::BeginPlay()
+void AEffectActor::OnEndOverlap(AActor* Target)
 {
-	Super::BeginPlay();
-	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AEffectActor::OnOverlap);
-	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &AEffectActor::EndOverlap);
+	if (InstantEffectApplyPolicy == EEffectApplyPolicy::ApplyOnEndOverlap)
+	{
+		ApplyEffectToTarget(Target, InstantGameplayEffectClass);
+	}
+	if (DurationEffectApplyPolicy == EEffectApplyPolicy::ApplyOnEndOverlap)
+	{
+		ApplyEffectToTarget(Target, DurationGameplayEffectClass);
+	}
+	if (InfiniteEffectApplyPolicy == EEffectApplyPolicy::ApplyOnEndOverlap)
+	{
+		ApplyEffectToTarget(Target, InfiniteGameplayEffectClass);
+	}
+	if (InfiniteEffectRemovalPolicy == EEffectRemovalPolicy::Remove)
+	{
+		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target);
+		if (TargetASC == nullptr)
+		{
+			return;
+		}
+		TArray<FActiveGameplayEffectHandle> HandlesToRemove;
+		for (TTuple<FActiveGameplayEffectHandle, UAbilitySystemComponent*> tuple : ActiveEffectHandles)
+		{
+			if (TargetASC == tuple.Value)
+			{
+				TargetASC->RemoveActiveGameplayEffect(tuple.Key);
+				HandlesToRemove.Add(tuple.Key);
+			}
+		}
+		for (auto& Handle : HandlesToRemove)
+		{
+			ActiveEffectHandles.Remove(Handle);
+		}
+	}
 }
+
 
 

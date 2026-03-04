@@ -47,7 +47,8 @@ public:
 	void SetWidgetControllerParams(const FWidgetControllerParams& Params);
 	
 	// Override it in subclass to broadcast values.
-	virtual void BroadcastInitialValue() {};
+	virtual void BroadcastInitialValue() {}
+	virtual void BindCallbackToDependencies() {}
 protected:
 	/**
 	 * Get information of player;

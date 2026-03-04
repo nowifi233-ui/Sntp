@@ -20,10 +20,18 @@ class SNTP_API UOverlayWidgetController : public USntpWidgetController
 	
 public:
 	virtual void BroadcastInitialValue() override;
+	virtual void BindCallbackToDependencies() override;
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
 	FOnAttributeSignature OnHealthChanged;
 	
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnAttributeSignature OnMaxHealthChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
 	FOnAttributeSignature OnManaChanged;
+	
+private:
+	void OnHealthChangedFunc(const FOnAttributeChangeData& Data) const;
+	void OnMaxHealthChangedFunc(const FOnAttributeChangeData& Data) const;
 };

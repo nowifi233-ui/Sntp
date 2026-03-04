@@ -5,7 +5,26 @@
 #include "CoreMinimal.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
+#include "GameplayEffectTypes.h"
 #include "EffectActor.generated.h"
+
+class UAbilitySystemComponent;
+class UGameplayEffect;
+
+UENUM(BlueprintType)
+enum class EEffectApplyPolicy: uint8
+{
+	DoNotApply,
+	ApplyOnOverlap,
+	ApplyOnEndOverlap
+};
+
+UENUM(BlueprintType)
+enum class EEffectRemovalPolicy: uint8
+{
+	Remove,
+	DoNotRemove
+};
 
 UCLASS()
 class SNTP_API AEffectActor : public AActor
@@ -15,19 +34,49 @@ class SNTP_API AEffectActor : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AEffectActor();
+	
+	UPROPERTY(EditAnywhere, Category="GE", BlueprintReadOnly)
+	bool bDestroyOnApply = false;
+	/**
+	 * EffectClass, set in blueprints.
+	 */
+	UPROPERTY(EditAnywhere, Category="GE", BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> InstantGameplayEffectClass;
+	
+	UPROPERTY(EditAnywhere, Category="GE", BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> DurationGameplayEffectClass;
+	
+	UPROPERTY(EditAnywhere, Category="GE", BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> InfiniteGameplayEffectClass;
 
-	UFUNCTION()
-	virtual void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	/**
+	 * Gameplay Effect Policies, set it in blueprints
+	 */
+	UPROPERTY(EditAnywhere, Category="GE", BlueprintReadOnly)
+	EEffectApplyPolicy InstantEffectApplyPolicy;
 	
-	UFUNCTION()
-	virtual void EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	UPROPERTY(EditAnywhere, Category="GE", BlueprintReadOnly)
+	EEffectApplyPolicy DurationEffectApplyPolicy;
+	
+	UPROPERTY(EditAnywhere, Category="GE", BlueprintReadOnly)
+	EEffectApplyPolicy InfiniteEffectApplyPolicy;
+	
+	UPROPERTY(EditAnywhere, Category="GE", BlueprintReadOnly)
+	EEffectRemovalPolicy InfiniteEffectRemovalPolicy;
+
+	/**
+	 *  Call those functions in blueprints.
+	 */
+	UFUNCTION(BlueprintCallable)
+	void OnOverlap(AActor* Target);
+	
+	UFUNCTION(BlueprintCallable)
+	void OnEndOverlap(AActor* Target);
+	
+	TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> ActiveEffectHandles;
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USphereComponent> SphereComponent;
+	void ApplyEffectToTarget(AActor* Target, TSubclassOf<UGameplayEffect> GameplayEffectClass);
 	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> Mesh;
+	
 };

@@ -2,7 +2,6 @@
 
 
 #include "UI/SntpHUD.h"
-
 #include "UI/WidgetController/OverlayWidgetController.h"
 
 UOverlayWidgetController* ASntpHUD::GetOverlayWidgetController(const FWidgetControllerParams& Params)
@@ -25,6 +24,7 @@ void ASntpHUD::InitOverlay(APlayerController* PlayerController, APlayerState* Pl
 	
 	const FWidgetControllerParams WidgetControllerParams(PlayerController, PlayerState, AbilitySystemComponent, AttributeSet);
 	OverlayWidgetController = GetOverlayWidgetController(WidgetControllerParams);
+	OverlayWidgetController->BindCallbackToDependencies();
 	OverlayWidget->SetWidgetController(OverlayWidgetController);
 	
 	OverlayWidgetController->BroadcastInitialValue();
