@@ -37,6 +37,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category="GE", BlueprintReadOnly)
 	bool bDestroyOnApply = false;
+	
+	UPROPERTY(EditAnywhere, Category="GE", BlueprintReadOnly)
+	float ActorLevel = 1.0f;
 	/**
 	 * EffectClass, set in blueprints.
 	 */
