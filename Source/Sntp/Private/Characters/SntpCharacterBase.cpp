@@ -25,6 +25,22 @@ void ASntpCharacterBase::InitAbilityActorInfo()
 {
 }
 
+void ASntpCharacterBase::InitializePrimaryAttributes()
+{
+	FGameplayEffectContextHandle EffectContextHandle = AbilitySystemComponent->MakeEffectContext();
+	// EffectContextHandle.Get()->AddSourceObject(this);
+	FGameplayEffectSpecHandle EffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultPrimaryAttributes, 1.0f, EffectContextHandle);
+	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+}
+
+void ASntpCharacterBase::InitializeVitalAttributes()
+{
+	FGameplayEffectContextHandle EffectContextHandle = AbilitySystemComponent->MakeEffectContext();
+	// EffectContextHandle.Get()->AddSourceObject(this);
+	FGameplayEffectSpecHandle EffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultVitalAttributes, 1.0f, EffectContextHandle);
+	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+}
+
 // Called to bind functionality to input
 void ASntpCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

@@ -17,8 +17,18 @@ void UOverlayWidgetController::BroadcastInitialValue()
 void UOverlayWidgetController::BindCallbackToDependencies()
 {
 	const USntpAttributeSet* SntpAttributeSet = CastChecked<USntpAttributeSet>(AttributeSet);
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetHealthAttribute()).AddUObject(this, &UOverlayWidgetController::OnHealthChangedFunc);
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetMaxHealthAttribute()).AddUObject(this, &UOverlayWidgetController::OnMaxHealthChangedFunc);
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnHealthChanged.Broadcast(Data.NewValue);
+		});
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetMaxHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnMaxHealthChanged.Broadcast(Data.NewValue);
+		});
 
 	Cast<USntpAbilitySystemComponent>(AbilitySystemComponent)->OnEffectApplied.AddLambda(
 		[](const FGameplayTagContainer& TagContainer)
@@ -31,15 +41,4 @@ void UOverlayWidgetController::BindCallbackToDependencies()
 			}
 		});
 }
-
-void UOverlayWidgetController::OnHealthChangedFunc(const FOnAttributeChangeData& Data) const
-{
-	OnHealthChanged.Broadcast(Data.NewValue);
-}
-
-void UOverlayWidgetController::OnMaxHealthChangedFunc(const FOnAttributeChangeData& Data) const
-{
-	OnMaxHealthChanged.Broadcast(Data.NewValue);
-}
-
 

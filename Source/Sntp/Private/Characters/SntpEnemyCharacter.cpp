@@ -45,4 +45,6 @@ void ASntpEnemyCharacter::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<USntpAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
+	InitializePrimaryAttributes();
+	InitializeVitalAttributes();
 }

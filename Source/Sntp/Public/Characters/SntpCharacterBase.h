@@ -31,6 +31,15 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 	
 	virtual void InitAbilityActorInfo();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="GAS|DefaultAttribute")
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="GAS|DefaultAttribute")
+	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
+	
+	void InitializePrimaryAttributes();
+	void InitializeVitalAttributes();
 public:	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

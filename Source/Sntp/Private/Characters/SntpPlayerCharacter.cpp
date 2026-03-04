@@ -44,4 +44,7 @@ void ASntpPlayerCharacter::InitAbilityActorInfo()
 			SntpHUD->InitOverlay(SntpPlayerController, SntpPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
+	
+	InitializePrimaryAttributes();
+	InitializeVitalAttributes();
 }
