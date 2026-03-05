@@ -3,7 +3,9 @@
 
 #include "Player/SntpPlayerController.h"
 #include "EnhancedInputSubsystems.h"
-#include "EnhancedInputComponent.h"
+#include "Input/SntpInputComponent.h"
+#include "Components/InstancedStaticMeshComponent.h"
+#include "Input/SntpInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 
 
@@ -23,13 +25,16 @@ void ASntpPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 	
 	// Bind functions and Input Actions
-	if (UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(InputComponent))
-	{
-		if (MoveAction)
-		{
-			Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASntpPlayerController::HandleMove);
-		}
-	}
+
+	USntpInputComponent* SntpInputComponent = Cast<USntpInputComponent>(InputComponent);
+	SntpInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASntpPlayerController::HandleMove);
+	SntpInputComponent->BindAbilityActions(
+		InputConfig,
+		this,
+		&ThisClass::AbilityInputTagPressed,
+		&ThisClass::AbilityInputTagReleased,
+		&ThisClass::AbilityInputTagHeld);
+	
 }
 
 void ASntpPlayerController::BeginPlay()
@@ -74,6 +79,21 @@ void ASntpPlayerController::HandleMove(const FInputActionValue& InputValue)
 		ControlledPawn->AddMovementInput(RightDirection, MoveInput.Y);
 	}
 	
+}
+
+void ASntpPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, *InputTag.ToString());
+}
+
+void ASntpPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Blue, *InputTag.ToString());
+}
+
+void ASntpPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Green, *InputTag.ToString());
 }
 
 void ASntpPlayerController::CursorTrace()

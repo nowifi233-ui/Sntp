@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "SntpPlayerController.generated.h"
 
+class USntpInputConfig;
 class IEnemyInterface;
 /**
  * 
@@ -37,6 +38,13 @@ private:
 	TSoftObjectPtr<UInputMappingContext> InputMapping;
 	
 	float Speed = 500.f;
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<USntpInputConfig> InputConfig;
+	
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
 	
 	// Highlight enemies
 	void CursorTrace();

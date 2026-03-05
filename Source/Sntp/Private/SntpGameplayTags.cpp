@@ -8,11 +8,26 @@ FSntpGameplayTags FSntpGameplayTags::GameplayTags;
 
 void FSntpGameplayTags::InitializeNativeGameplayTags()
 {
+	/**
+	 * Vital Attributes
+	 * MaxHealth, Health, MaxMana, Mana;
+	 */
+	
 	 GameplayTags.Attributes_Vital_MaxHealth = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attributes.Vital.MaxHealth"),
-		FString("MaxHealth")
-	);
+		FString("MaxHealth"));
 	
+	GameplayTags.Attributes_Vital_Health = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Vital.Health"),
+		FString("Health"));
+	
+	GameplayTags.Attributes_Vital_MaxMana = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Vital.MaxMana"),
+		FString("Mana"));
+	
+	GameplayTags.Attributes_Vital_Mana = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Vital.Mana"),
+		FString("Mana"));
 	
 }
 
