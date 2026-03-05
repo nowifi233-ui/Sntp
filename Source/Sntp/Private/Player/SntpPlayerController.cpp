@@ -2,6 +2,8 @@
 
 
 #include "Player/SntpPlayerController.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "Input/SntpInputComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
@@ -93,7 +95,21 @@ void ASntpPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 
 void ASntpPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Green, *InputTag.ToString());
+	if (GetASC() == nullptr)
+	{
+		return;
+	}
+	GetASC()->AbilityInputTagHeld(InputTag);
+}
+
+USntpAbilitySystemComponent* ASntpPlayerController::GetASC()
+{
+	if (SntpAbilitySystemComponent == nullptr)
+	{
+		SntpAbilitySystemComponent = Cast<USntpAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+	}
+	return SntpAbilitySystemComponent;
+	
 }
 
 void ASntpPlayerController::CursorTrace()

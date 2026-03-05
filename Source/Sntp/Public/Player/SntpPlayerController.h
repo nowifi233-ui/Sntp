@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "InputMappingContext.h"
+#include "AbilitySystem/SntpAbilitySystemComponent.h"
 #include "SntpPlayerController.generated.h"
 
 class USntpInputConfig;
@@ -45,6 +46,11 @@ private:
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);
 	void AbilityInputTagHeld(FGameplayTag InputTag);
+	
+	UPROPERTY()
+	TObjectPtr<USntpAbilitySystemComponent> SntpAbilitySystemComponent;
+	
+	USntpAbilitySystemComponent* GetASC();
 	
 	// Highlight enemies
 	void CursorTrace();

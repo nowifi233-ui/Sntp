@@ -6,10 +6,11 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "Interaction/CombatInterface.h"
 #include "SntpCharacterBase.generated.h"
 
 UCLASS()
-class SNTP_API ASntpCharacterBase : public ACharacter
+class SNTP_API ASntpCharacterBase : public ACharacter, public ICombatInterface
 {
 	GENERATED_BODY()
 
@@ -31,8 +32,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category="GAS")
 	TObjectPtr<UAttributeSet> AttributeSet;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
+	FName WeaponSocketName;
+	
+	virtual FVector GetCombatSocketLocation() override;
 	
 	virtual void InitAbilityActorInfo();
 	

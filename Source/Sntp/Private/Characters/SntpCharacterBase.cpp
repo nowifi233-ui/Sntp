@@ -23,6 +23,11 @@ void ASntpCharacterBase::BeginPlay()
 	Super::BeginPlay();
 }
 
+FVector ASntpCharacterBase::GetCombatSocketLocation()
+{
+	return Weapon->GetSocketLocation(WeaponSocketName);
+}
+
 void ASntpCharacterBase::InitAbilityActorInfo()
 {
 }

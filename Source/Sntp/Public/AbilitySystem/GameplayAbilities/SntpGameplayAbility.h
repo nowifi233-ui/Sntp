@@ -13,5 +13,9 @@ UCLASS()
 class SNTP_API USntpGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
-	
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	FGameplayTag StartUpInputTag;
+
+
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "InputAction.h"
 #include "Characters/SntpCharacterBase.h"
+#include "Interaction/CombatInterface.h"
 #include "SntpPlayerCharacter.generated.h"
 
 /**

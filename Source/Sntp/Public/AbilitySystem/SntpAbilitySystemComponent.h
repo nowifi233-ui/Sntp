@@ -19,6 +19,7 @@ public:
 	FOnEffectAppliedDelegate OnEffectApplied;
 
 	void AddCharacterAbilities(TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
 protected:
 	
 	void EffectApplied(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle EffectHandle);
