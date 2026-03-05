@@ -13,6 +13,12 @@ void USntpProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	
+	SpawnProjectile();
+}
+
+void USntpProjectileSpell::SpawnProjectile()
+{
+	const FGameplayAbilityActivationInfo ActivationInfo = GetAvatarActorFromActorInfo();
 	const bool bIsServer = HasAuthority(&ActivationInfo);
 	if (!bIsServer)
 	{
@@ -38,11 +44,4 @@ void USntpProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 		
 		SntpProjectile->FinishSpawning(SpawnTransform);
 	}
-	
-	EndAbility(
-		Handle,
-		ActorInfo,
-		ActivationInfo,
-		true,
-		false);
 }
