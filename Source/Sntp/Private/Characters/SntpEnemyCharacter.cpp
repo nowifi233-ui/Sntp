@@ -25,7 +25,6 @@ void ASntpEnemyCharacter::HighlightActor()
 	GetMesh()->SetCustomDepthStencilValue(250);
 	Weapon->SetRenderCustomDepth(true);
 	Weapon->SetCustomDepthStencilValue(250);
-	
 }
 
 void ASntpEnemyCharacter::UnHighlightActor()
@@ -39,6 +38,7 @@ void ASntpEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	InitAbilityActorInfo();
+	AddCharacterAbilities();
 }
 
 void ASntpEnemyCharacter::InitAbilityActorInfo()

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SntpUserWidget.h"
+#include "UI/Widgets/SntpUserWidget.h"
 #include "GameFramework/HUD.h"
 #include "SntpHUD.generated.h"
 

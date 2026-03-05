@@ -3,6 +3,8 @@
 
 #include "Characters/SntpCharacterBase.h"
 
+#include "AbilitySystem/SntpAbilitySystemComponent.h"
+
 // Sets default values
 ASntpCharacterBase::ASntpCharacterBase()
 {
@@ -39,6 +41,16 @@ void ASntpCharacterBase::InitializeVitalAttributes()
 	// EffectContextHandle.Get()->AddSourceObject(this);
 	FGameplayEffectSpecHandle EffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultVitalAttributes, 1.0f, EffectContextHandle);
 	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+}
+
+void ASntpCharacterBase::AddCharacterAbilities()
+{
+	USntpAbilitySystemComponent* SntpASC = CastChecked<USntpAbilitySystemComponent>(AbilitySystemComponent);
+	if (!HasAuthority())
+	{
+		return;
+	}
+	SntpASC->AddCharacterAbilities(StartupAbilities);
 }
 
 // Called to bind functionality to input

@@ -16,6 +16,10 @@ class SNTP_API ASntpCharacterBase : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ASntpCharacterBase();
+	
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -40,8 +44,9 @@ protected:
 	
 	void InitializePrimaryAttributes();
 	void InitializeVitalAttributes();
+	
+	void AddCharacterAbilities();
 public:	
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	UPROPERTY(EditAnywhere, Category="GAS|Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 };

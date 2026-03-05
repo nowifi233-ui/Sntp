@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "UI/SntpWidgetController.h"
+#include "UI/WidgetController/SntpWidgetController.h"
 
 void USntpWidgetController::SetWidgetControllerParams(const FWidgetControllerParams& Params)
 {

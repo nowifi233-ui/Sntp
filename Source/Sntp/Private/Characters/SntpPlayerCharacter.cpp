@@ -14,6 +14,7 @@ void ASntpPlayerCharacter::PossessedBy(AController* byController)
 	Super::PossessedBy(byController);
 	// Server
 	InitAbilityActorInfo();
+	AddCharacterAbilities();
 }
 
 void ASntpPlayerCharacter::OnRep_PlayerState()

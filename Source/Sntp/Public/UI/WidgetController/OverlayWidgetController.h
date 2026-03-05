@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UI/SntpWidgetController.h"
+#include "UI/WidgetController/SntpWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
 

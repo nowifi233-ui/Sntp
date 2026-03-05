@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "UI/SntpUserWidget.h"
+#include "UI/Widgets/SntpUserWidget.h"
 
 void USntpUserWidget::SetWidgetController(UObject* Controller)
 {

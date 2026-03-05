@@ -17,7 +17,10 @@ class SNTP_API USntpAbilitySystemComponent : public UAbilitySystemComponent
 public:
 	void AbilityActorInfoSet();
 	FOnEffectAppliedDelegate OnEffectApplied;
+
+	void AddCharacterAbilities(TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
 protected:
 	
 	void EffectApplied(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle EffectHandle);
+	
 };
