@@ -3,6 +3,8 @@
 
 #include "AbilitySystem/GameplayAbilities/SntpProjectileSpell.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "Actors/SntpProjectile.h"
 #include "EntitySystem/MovieSceneEntitySystemRunner.h"
 #include "Interaction/CombatInterface.h"
@@ -13,10 +15,9 @@ void USntpProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	
-	SpawnProjectile();
 }
 
-void USntpProjectileSpell::SpawnProjectile()
+void USntpProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation)
 {
 	const FGameplayAbilityActivationInfo ActivationInfo = GetAvatarActorFromActorInfo();
 	const bool bIsServer = HasAuthority(&ActivationInfo);
@@ -24,6 +25,7 @@ void USntpProjectileSpell::SpawnProjectile()
 	{
 		return;
 	}
+	
 	ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo());
 	if (CombatInterface)
 	{	
@@ -32,6 +34,9 @@ void USntpProjectileSpell::SpawnProjectile()
 		SpawnTransform.SetLocation(SocketLocation);
 		
 		// TODO: Set Rotation
+		FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+		Rotation.Pitch = 0.f;
+		SpawnTransform.SetRotation(Rotation.Quaternion());
 		
 		ASntpProjectile* SntpProjectile = GetWorld()->SpawnActorDeferred<ASntpProjectile>(
 			ProjectileClass,
@@ -41,6 +46,10 @@ void USntpProjectileSpell::SpawnProjectile()
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 		
 		// TODO: Give the projectile a Gameplay Effect to Cause Damage;
+		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
+		const FGameplayEffectContextHandle EffectContext = SourceASC->MakeEffectContext();
+		const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContext);
+		SntpProjectile->DamageEffectSpecHandle = EffectSpecHandle;
 		
 		SntpProjectile->FinishSpawning(SpawnTransform);
 	}

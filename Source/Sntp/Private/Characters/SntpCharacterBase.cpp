@@ -4,6 +4,8 @@
 #include "Characters/SntpCharacterBase.h"
 
 #include "AbilitySystem/SntpAbilitySystemComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Sntp/Sntp.h"
 
 // Sets default values
 ASntpCharacterBase::ASntpCharacterBase()
@@ -11,10 +13,15 @@ ASntpCharacterBase::ASntpCharacterBase()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
+	GetMesh()->SetGenerateOverlapEvents(true);
+	
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	Weapon->SetupAttachment(GetMesh(), "WeaponHandSocket");
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
 }
 
 // Called when the game starts or when spawned

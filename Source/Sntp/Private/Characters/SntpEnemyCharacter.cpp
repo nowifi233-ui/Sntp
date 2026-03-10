@@ -6,6 +6,9 @@
 #include "NavigationSystemTypes.h"
 #include "AbilitySystem/SntpAbilitySystemComponent.h"
 #include "AbilitySystem/SntpAttributeSet.h"
+#include "Components/Widget.h"
+#include "Components/WidgetComponent.h"
+#include "UI/Widgets/SntpUserWidget.h"
 
 ASntpEnemyCharacter::ASntpEnemyCharacter()
 {
@@ -17,6 +20,9 @@ ASntpEnemyCharacter::ASntpEnemyCharacter()
 	AttributeSet = CreateDefaultSubobject<USntpAttributeSet>("AttributeSet");
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 	AbilitySystemComponent->AddAttributeSetSubobject(AttributeSet.Get());
+	
+	HealthBarComponent = CreateDefaultSubobject<UWidgetComponent>("HealthBarComponent");
+	HealthBarComponent->SetupAttachment(RootComponent);
 }
 
 void ASntpEnemyCharacter::HighlightActor()
@@ -39,6 +45,31 @@ void ASntpEnemyCharacter::BeginPlay()
 	
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
+	
+	USntpUserWidget* SntpUserWidget = Cast<USntpUserWidget>(HealthBarComponent->GetUserWidgetObject());
+	if (SntpUserWidget)
+	{
+		SntpUserWidget->SetWidgetController(this);
+	}
+	
+	USntpAttributeSet* SntpAttributeSet = Cast<USntpAttributeSet>(AttributeSet);
+	if (SntpAttributeSet)
+	{
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetMaxHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+			{
+				OnMaxHealthChange.Broadcast(Data.NewValue);
+			});
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnHealthChange.Broadcast(Data.NewValue);
+			});
+		OnHealthChange.Broadcast(SntpAttributeSet->GetHealth());
+		OnMaxHealthChange.Broadcast(SntpAttributeSet->GetMaxHealth());
+	}
+	
+	
 }
 
 void ASntpEnemyCharacter::InitAbilityActorInfo()

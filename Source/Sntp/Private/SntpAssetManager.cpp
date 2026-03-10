@@ -14,6 +14,6 @@ USntpAssetManager& USntpAssetManager::Get()
 void USntpAssetManager::StartInitialLoading()
 {
 	Super::StartInitialLoading();
-	
 	FSntpGameplayTags::InitializeNativeGameplayTags();
+	
 }

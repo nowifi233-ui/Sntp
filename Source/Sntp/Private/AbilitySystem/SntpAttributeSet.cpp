@@ -36,6 +36,7 @@ void USntpAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	{
 		const float NewHealth = FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth());
 		SetHealth(NewHealth);
+		UE_LOG(LogTemp, Warning, TEXT("Change Health on %s, Health = %f."), *Props.TargetAvatarActor->GetName(), GetHealth());
 		if (NewHealth <= 0.f)
 		{
 			// Character Die
