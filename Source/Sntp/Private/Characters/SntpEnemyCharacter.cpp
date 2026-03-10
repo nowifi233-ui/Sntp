@@ -5,6 +5,7 @@
 
 #include "NavigationSystemTypes.h"
 #include "AbilitySystem/SntpAbilitySystemComponent.h"
+#include "AbilitySystem/SntpAbilitySystemLibrary.h"
 #include "AbilitySystem/SntpAttributeSet.h"
 #include "Components/Widget.h"
 #include "Components/WidgetComponent.h"
@@ -76,6 +77,12 @@ void ASntpEnemyCharacter::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<USntpAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
-	InitializePrimaryAttributes();
-	InitializeVitalAttributes();
+	
+	InitializeDefaultAttributes();
+	
+}
+
+void ASntpEnemyCharacter::InitializeDefaultAttributes() const
+{
+	USntpAbilitySystemLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
 }

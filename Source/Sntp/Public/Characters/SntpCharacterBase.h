@@ -50,6 +50,7 @@ protected:
 	
 	void InitializePrimaryAttributes();
 	void InitializeVitalAttributes();
+	virtual void InitializeDefaultAttributes() const {};
 	
 	void AddCharacterAbilities();
 public:	

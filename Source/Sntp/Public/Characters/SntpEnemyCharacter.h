@@ -3,11 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Characters/SntpCharacterBase.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "SntpEnemyCharacter.generated.h"
 
+enum class ECharacterClass : uint8;
 class UWidgetComponent;
 /**
  * 
@@ -24,9 +26,7 @@ public:
 	
 	virtual void BeginPlay() override;
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TObjectPtr<UWidgetComponent> HealthBarComponent;
-	
+
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeSignature OnMaxHealthChange;
 	
@@ -35,4 +35,15 @@ public:
 	
 protected:
 	virtual void InitAbilityActorInfo() override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Character Class Default")
+	int32 Level = 1.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Character Class Default")
+	ECharacterClass CharacterClass = ECharacterClass::Warrior;
+	
+	virtual void InitializeDefaultAttributes() const override;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TObjectPtr<UWidgetComponent> HealthBarComponent;
 };

@@ -29,7 +29,6 @@ struct FCharacterClassDefaultInfo
 	
 	UPROPERTY(EditDefaultsOnly, Category="class default")
 	TSubclassOf<UGameplayEffect> PrimaryAttribute;
-	
 };
 
 /**
