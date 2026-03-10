@@ -34,7 +34,7 @@ void USntpProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 		const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
 		SpawnTransform.SetLocation(SocketLocation);
 		
-		// TODO: Set Rotation
+		// Set Rotation
 		FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
 		Rotation.Pitch = 0.f;
 		SpawnTransform.SetRotation(Rotation.Quaternion());
@@ -46,13 +46,15 @@ void USntpProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 			Cast<APawn>(GetAvatarActorFromActorInfo()),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 		
-		// TODO: Give the projectile a Gameplay Effect to Cause Damage;
+		// Give the projectile a Gameplay Effect to Cause Damage;
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
 		const FGameplayEffectContextHandle EffectContext = SourceASC->MakeEffectContext();
 		const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContext);
+
+		const FSntpGameplayTags GameplayTags = FSntpGameplayTags::Get();
+		const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
 		
-		FSntpGameplayTags GameplayTags = FSntpGameplayTags::Get();
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpecHandle, GameplayTags.Damage, 33.f);
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpecHandle, GameplayTags.Damage, ScaledDamage);
 		SntpProjectile->DamageEffectSpecHandle = EffectSpecHandle;
 		SntpProjectile->FinishSpawning(SpawnTransform);
 	}
