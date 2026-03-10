@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "SntpGameplayTags.h"
 #include "Actors/SntpProjectile.h"
 #include "EntitySystem/MovieSceneEntitySystemRunner.h"
 #include "Interaction/CombatInterface.h"
@@ -49,8 +50,10 @@ void USntpProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
 		const FGameplayEffectContextHandle EffectContext = SourceASC->MakeEffectContext();
 		const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContext);
-		SntpProjectile->DamageEffectSpecHandle = EffectSpecHandle;
 		
+		FSntpGameplayTags GameplayTags = FSntpGameplayTags::Get();
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpecHandle, GameplayTags.Damage, 33.f);
+		SntpProjectile->DamageEffectSpecHandle = EffectSpecHandle;
 		SntpProjectile->FinishSpawning(SpawnTransform);
 	}
 }

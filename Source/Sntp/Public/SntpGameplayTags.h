@@ -19,6 +19,8 @@ public:
 	FGameplayTag Attributes_Vital_Health;
 	FGameplayTag Attributes_Vital_MaxMana;
 	FGameplayTag Attributes_Vital_Mana;
+	
+	FGameplayTag Damage;
 private:
 	
 protected:

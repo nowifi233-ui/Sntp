@@ -2,6 +2,8 @@
 
 
 #include "SntpGameplayTags.h"
+
+#include "AssetTypeCategories.h"
 #include "GameplayTagsManager.h"
 
 FSntpGameplayTags FSntpGameplayTags::GameplayTags;
@@ -29,6 +31,9 @@ void FSntpGameplayTags::InitializeNativeGameplayTags()
 		FName("Attributes.Vital.Mana"),
 		FString("Mana"));
 	
+	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage"),
+		FString("Damage"));
 }
 
 

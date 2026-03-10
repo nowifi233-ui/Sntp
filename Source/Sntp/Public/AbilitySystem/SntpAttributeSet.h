@@ -73,6 +73,14 @@ public:
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, MaxMana)
 	
+	/**
+	 * Meta Attributes
+	 */
+	UPROPERTY(BlueprintReadOnly, Category="Meta Attributes")
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, IncomingDamage)
+	
+	
 	// OnReps
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldValue) const;
