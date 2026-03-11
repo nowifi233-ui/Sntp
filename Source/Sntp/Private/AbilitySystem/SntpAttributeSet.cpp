@@ -7,8 +7,9 @@
 #include "AbilitySystemComponent.h"
 #include "SntpGameplayTags.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
-
+#include "Player/SntpPlayerController.h"
 
 
 USntpAttributeSet::USntpAttributeSet()
@@ -60,6 +61,8 @@ void USntpAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				TagContainer.AddTag(SntpGameplayTags.Effects_HitReact);
 				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 			}
+			
+			ShowFloatingText(Props, LocalIncomingDamage);
 		}
 	}
 }
@@ -85,7 +88,7 @@ void USntpAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 		// Get source character
 		if (Props.SourceController)
 		{
-			ACharacter* SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());
+			Props.SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());
 		}
 	}
 	
@@ -94,11 +97,26 @@ void USntpAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 	{
 		Props.TargetAvatarActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
 		Props.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
-		if (Props.TargetController)
+		if (Props.TargetController == nullptr && Props.TargetAvatarActor != nullptr)
 		{
-			Props.TargetCharacter = Cast<ACharacter>(Props.TargetController->GetPawn());
+			if (APawn* Pawn = Cast<APawn>(Props.TargetAvatarActor))
+			{
+				Props.TargetController = Pawn->GetController();
+			}
 		}
+		Props.TargetCharacter = Cast<ACharacter>(Props.TargetController->GetPawn());
 		Props.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
+	}
+}
+
+void USntpAttributeSet::ShowFloatingText(const FEffectProperties& Props, const float Damage)
+{
+	if (Props.SourceCharacter != Props.TargetCharacter)
+	{
+		if (ASntpPlayerController* PC = Cast<ASntpPlayerController>(Props.SourceCharacter->Controller))
+		{
+			PC->ShowDamageNumber(Damage, Props.TargetCharacter);
+		}
 	}
 }
 

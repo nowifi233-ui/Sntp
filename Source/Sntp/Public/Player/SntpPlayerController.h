@@ -8,6 +8,7 @@
 #include "AbilitySystem/SntpAbilitySystemComponent.h"
 #include "SntpPlayerController.generated.h"
 
+class UDamageTextComponent;
 class USntpInputConfig;
 class IEnemyInterface;
 /**
@@ -22,9 +23,13 @@ public:
 	ASntpPlayerController();
 	virtual void PlayerTick(const float DeltaTime) override;
 
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter);
+	
 protected:
 	virtual void BeginPlay() override;
 	
+
 	// Bind input actions and functions 
 	virtual void SetupInputComponent() override;
 	
@@ -56,4 +61,8 @@ private:
 	void CursorTrace();
 	IEnemyInterface* CurrentActor;
 	IEnemyInterface* LastActor;
+	
+	// Damage Text
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
 };

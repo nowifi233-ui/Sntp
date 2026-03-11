@@ -7,8 +7,10 @@
 #include "EnhancedInputSubsystems.h"
 #include "Input/SntpInputComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
+#include "GameFramework/Character.h"
 #include "Input/SntpInputComponent.h"
 #include "Interaction/EnemyInterface.h"
+#include "UI/Widget/DamageTextComponent.h"
 
 
 ASntpPlayerController::ASntpPlayerController()
@@ -20,6 +22,22 @@ void ASntpPlayerController::PlayerTick(const float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 	CursorTrace();
+}
+
+void ASntpPlayerController::ShowDamageNumber_Implementation(const float DamageAmount, ACharacter* TargetCharacter)
+{
+	if (IsValid(TargetCharacter) && DamageTextComponentClass && IsLocalController())
+	{
+		UDamageTextComponent* DamageTextComponent = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextComponentClass);
+		DamageTextComponent->RegisterComponent();
+		DamageTextComponent->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
+		const FVector DamageWorldLocation = DamageTextComponent->GetComponentLocation();
+		const FRotator DamageWorldRotation = DamageTextComponent->GetComponentRotation();
+		
+		DamageTextComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		DamageTextComponent->SetWorldLocationAndRotation(DamageWorldLocation, DamageWorldRotation);
+		DamageTextComponent->SetDamageText(DamageAmount);
+	}
 }
 
 void ASntpPlayerController::SetupInputComponent()
@@ -64,6 +82,8 @@ void ASntpPlayerController::BeginPlay()
 		}
 	}
 }
+
+
 
 void ASntpPlayerController::HandleMove(const FInputActionValue& InputValue)
 {
