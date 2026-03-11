@@ -63,11 +63,17 @@ void ASntpCharacterBase::AddCharacterAbilities()
 		return;
 	}
 	SntpASC->AddCharacterAbilities(StartupAbilities);
+	
 }
 
 // Called to bind functionality to input
 void ASntpCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+UAnimMontage* ASntpCharacterBase::GetHitReacMontage_Implementation()
+{
+	return HitReactMontage;
 }
 

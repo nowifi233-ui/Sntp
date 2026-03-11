@@ -19,4 +19,7 @@ class SNTP_API USntpAbilitySystemLibrary : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable, Category="SntpAttributeSystemLibrary")
 	static void InitializeDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC);
+
+	UFUNCTION(BlueprintCallable, Category="SntpAttributeSystemLibrary")
+	static void GiveStartupAbilites(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
 };

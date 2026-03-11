@@ -4,11 +4,13 @@
 #include "Characters/SntpEnemyCharacter.h"
 
 #include "NavigationSystemTypes.h"
+#include "SntpGameplayTags.h"
 #include "AbilitySystem/SntpAbilitySystemComponent.h"
 #include "AbilitySystem/SntpAbilitySystemLibrary.h"
 #include "AbilitySystem/SntpAttributeSet.h"
 #include "Components/Widget.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "UI/Widgets/SntpUserWidget.h"
 
 ASntpEnemyCharacter::ASntpEnemyCharacter()
@@ -46,6 +48,7 @@ void ASntpEnemyCharacter::BeginPlay()
 	
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
+	USntpAbilitySystemLibrary::GiveStartupAbilites(this, AbilitySystemComponent);
 	
 	USntpUserWidget* SntpUserWidget = Cast<USntpUserWidget>(HealthBarComponent->GetUserWidgetObject());
 	if (SntpUserWidget)
@@ -66,10 +69,23 @@ void ASntpEnemyCharacter::BeginPlay()
 			{
 				OnHealthChange.Broadcast(Data.NewValue);
 			});
+		
+		FSntpGameplayTags SntpGameplayTags = FSntpGameplayTags::Get();
+		AbilitySystemComponent->RegisterGameplayTagEvent(SntpGameplayTags.Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
+			this,
+			&ASntpEnemyCharacter::HitReactTagChanged);
+		
 		OnHealthChange.Broadcast(SntpAttributeSet->GetHealth());
 		OnMaxHealthChange.Broadcast(SntpAttributeSet->GetMaxHealth());
 	}
 	
+	
+}
+
+void ASntpEnemyCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting? 0.f : BaseWalkSpeed;
 	
 }
 

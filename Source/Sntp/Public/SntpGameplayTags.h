@@ -21,6 +21,7 @@ public:
 	FGameplayTag Attributes_Vital_Mana;
 	
 	FGameplayTag Damage;
+	FGameplayTag Effects_HitReact;
 private:
 	
 protected:

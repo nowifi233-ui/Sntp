@@ -21,7 +21,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
+	virtual UAnimMontage* GetHitReacMontage_Implementation() override;
 protected:
 	virtual void BeginPlay() override;
 	
@@ -53,7 +53,10 @@ protected:
 	virtual void InitializeDefaultAttributes() const {};
 	
 	void AddCharacterAbilities();
-public:	
+private:
 	UPROPERTY(EditAnywhere, Category="GAS|Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+	
+	UPROPERTY(EditAnywhere, Category="Combat")
+	TObjectPtr<UAnimMontage> HitReactMontage;
 };

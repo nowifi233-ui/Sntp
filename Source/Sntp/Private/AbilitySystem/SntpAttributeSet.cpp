@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "SntpGameplayTags.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
 
@@ -52,9 +53,12 @@ void USntpAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			const float NewHealth = GetHealth() - LocalIncomingDamage;
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 			const bool bFatal = NewHealth <= 0.f;
-			if (bFatal)
+			if (!bFatal)
 			{
-				// Die
+				FGameplayTagContainer TagContainer;
+				FSntpGameplayTags SntpGameplayTags = FSntpGameplayTags::Get();
+				TagContainer.AddTag(SntpGameplayTags.Effects_HitReact);
+				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 			}
 		}
 	}

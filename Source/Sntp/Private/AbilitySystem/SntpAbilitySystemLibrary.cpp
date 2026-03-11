@@ -26,3 +26,18 @@ void USntpAbilitySystemLibrary::InitializeDefaultAttributes(const UObject* World
 	const FGameplayEffectSpecHandle VitalEffectSpecHandle = ASC->MakeOutgoingSpec(ClassInfo->VitalAttribute , Level, ASC->MakeEffectContext());
 	ASC->ApplyGameplayEffectSpecToSelf(*VitalEffectSpecHandle.Data.Get());
 }
+
+void USntpAbilitySystemLibrary::GiveStartupAbilites(const UObject* WorldContextObject, UAbilitySystemComponent* ASC)
+{
+	ASntpGameModeBase* SntpGameMode = Cast<ASntpGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (SntpGameMode == nullptr)
+	{
+		return;
+	}
+	UCharacterClassInfo* ClassInfo = SntpGameMode->CharacterClassInfo;
+	for (TSubclassOf<UGameplayAbility> AbilityClass : ClassInfo->CommonAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		ASC->GiveAbility(AbilitySpec);
+	}
+}
