@@ -20,6 +20,8 @@ public:
 	FGameplayTag Attributes_Vital_MaxMana;
 	FGameplayTag Attributes_Vital_Mana;
 	
+	FGameplayTag Attributes_Primary_CriticalChance;
+	
 	FGameplayTag Damage;
 	FGameplayTag Effects_HitReact;
 private:

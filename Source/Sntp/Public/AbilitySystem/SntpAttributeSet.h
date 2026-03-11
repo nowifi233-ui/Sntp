@@ -73,6 +73,10 @@ public:
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, MaxMana)
 	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana, Category="Primary Attributes")
+	FGameplayAttributeData CriticalChance;
+	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, CriticalChance)
+	
 	/**
 	 * Meta Attributes
 	 */
@@ -93,6 +97,9 @@ public:
 	
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldValue) const;
+	
+	UFUNCTION()
+	void OnRep_CriticalChance(const FGameplayAttributeData& OldValue) const;
 	
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props);

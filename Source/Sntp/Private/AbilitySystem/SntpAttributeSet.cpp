@@ -24,6 +24,7 @@ void USntpAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimePropert
 	DOREPLIFETIME_CONDITION_NOTIFY(USntpAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(USntpAttributeSet, Mana, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(USntpAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(USntpAttributeSet, CriticalChance, COND_None, REPNOTIFY_Always);
 }
 
 void USntpAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -60,6 +61,10 @@ void USntpAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				FSntpGameplayTags SntpGameplayTags = FSntpGameplayTags::Get();
 				TagContainer.AddTag(SntpGameplayTags.Effects_HitReact);
 				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
+			else
+			{
+				// Die
 			}
 			
 			ShowFloatingText(Props, LocalIncomingDamage);
@@ -138,6 +143,11 @@ void USntpAttributeSet::OnRep_Mana(const FGameplayAttributeData& OldValue) const
 void USntpAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(USntpAttributeSet, MaxMana, OldValue);
+}
+
+void USntpAttributeSet::OnRep_CriticalChance(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USntpAttributeSet, CriticalChance, OldValue);
 }
 
 

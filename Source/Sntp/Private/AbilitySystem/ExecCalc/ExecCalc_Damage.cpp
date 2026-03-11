@@ -5,13 +5,16 @@
 
 #include "SntpGameplayTags.h"
 #include "AbilitySystem/SntpAttributeSet.h"
+#include "Evaluation/IMovieSceneEvaluationHook.h"
 
 struct SntpDamageStatics
 {
 	DECLARE_ATTRIBUTE_CAPTUREDEF(MaxHealth);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalChance);
 	SntpDamageStatics()
 	{
 		DEFINE_ATTRIBUTE_CAPTUREDEF(USntpAttributeSet, MaxHealth, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(USntpAttributeSet, CriticalChance, Target, false);
 	}
 };
 
@@ -24,6 +27,7 @@ static const SntpDamageStatics& DamageStatics()
 UExecCalc_Damage::UExecCalc_Damage()
 {
 	RelevantAttributesToCapture.Add(DamageStatics().MaxHealthDef);
+	RelevantAttributesToCapture.Add(DamageStatics().CriticalChanceDef);
 }
 
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
@@ -33,7 +37,18 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	
 	FGameplayEffectSpec Spec = ExecutionParams.GetOwningSpec();
 	
+	FAggregatorEvaluateParameters EvaluationParameters;
+	EvaluationParameters.SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
+	EvaluationParameters.TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
+	
+	float CriticalChance = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalChanceDef, EvaluationParameters, CriticalChance);
+	
 	float Damage = Spec.GetSetByCallerMagnitude(FSntpGameplayTags::Get().Damage);
+	if (const int32 Temp = FMath::RandRange(0, 100); Temp < CriticalChance)
+	{
+		Damage = Damage * 2.f;
+	}
 	
 	FGameplayModifierEvaluatedData EvaluatedData(USntpAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, Damage);
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);
