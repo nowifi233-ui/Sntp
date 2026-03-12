@@ -37,6 +37,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	
 	FGameplayEffectSpec Spec = ExecutionParams.GetOwningSpec();
 	
+	auto Test = Spec.GetEffectContext();
+	
 	FAggregatorEvaluateParameters EvaluationParameters;
 	EvaluationParameters.SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
 	EvaluationParameters.TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
