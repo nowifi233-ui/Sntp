@@ -6,6 +6,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "SntpGameplayTags.h"
+#include "AbilitySystem/SntpAbilitySystemLibrary.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -67,7 +68,8 @@ void USntpAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				// Die
 			}
 			
-			ShowFloatingText(Props, LocalIncomingDamage);
+			const bool bCritical = USntpAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
+			ShowFloatingText(Props, LocalIncomingDamage, bCritical);
 		}
 	}
 }
@@ -75,8 +77,8 @@ void USntpAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 void USntpAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props)
 {
 	// Get information of Gameplay effect.
-	FGameplayEffectContextHandle EffectContextHandle = Data.EffectSpec.GetContext();
-	Props.SourceASC = EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
+	Props.EffectContextHandle = Data.EffectSpec.GetContext();
+	Props.SourceASC = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
 	if (IsValid(Props.SourceASC) && Props.SourceASC->AbilityActorInfo.IsValid() && Props.SourceASC->AbilityActorInfo->AvatarActor.IsValid())
 	{
 		// Get Source avatar actor
@@ -114,13 +116,13 @@ void USntpAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 	}
 }
 
-void USntpAttributeSet::ShowFloatingText(const FEffectProperties& Props, const float Damage)
+void USntpAttributeSet::ShowFloatingText(const FEffectProperties& Props, const float Damage, const bool bCritical)
 {
 	if (Props.SourceCharacter != Props.TargetCharacter)
 	{
 		if (ASntpPlayerController* PC = Cast<ASntpPlayerController>(Props.SourceCharacter->Controller))
 		{
-			PC->ShowDamageNumber(Damage, Props.TargetCharacter);
+			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bCritical);
 		}
 	}
 }

@@ -24,7 +24,7 @@ void ASntpPlayerController::PlayerTick(const float DeltaTime)
 	CursorTrace();
 }
 
-void ASntpPlayerController::ShowDamageNumber_Implementation(const float DamageAmount, ACharacter* TargetCharacter)
+void ASntpPlayerController::ShowDamageNumber_Implementation(const float DamageAmount, ACharacter* TargetCharacter, bool bCritical)
 {
 	if (IsValid(TargetCharacter) && DamageTextComponentClass && IsLocalController())
 	{
@@ -36,7 +36,7 @@ void ASntpPlayerController::ShowDamageNumber_Implementation(const float DamageAm
 		
 		DamageTextComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		DamageTextComponent->SetWorldLocationAndRotation(DamageWorldLocation, DamageWorldRotation);
-		DamageTextComponent->SetDamageText(DamageAmount);
+		DamageTextComponent->SetDamageText(DamageAmount, bCritical);
 	}
 }
 

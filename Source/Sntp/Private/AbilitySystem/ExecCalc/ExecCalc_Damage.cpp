@@ -2,7 +2,7 @@
 
 
 #include "AbilitySystem/ExecCalc/ExecCalc_Damage.h"
-
+#include "SntpAbilityTypes.h"
 #include "SntpGameplayTags.h"
 #include "AbilitySystem/SntpAttributeSet.h"
 #include "Evaluation/IMovieSceneEvaluationHook.h"
@@ -37,7 +37,9 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	
 	FGameplayEffectSpec Spec = ExecutionParams.GetOwningSpec();
 	
-	auto Test = Spec.GetEffectContext();
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
+	FGameplayEffectContext* Context = EffectContextHandle.Get();
+	FSntpGameplayEffectContext* SntpContext = static_cast<FSntpGameplayEffectContext*>(Context);
 	
 	FAggregatorEvaluateParameters EvaluationParameters;
 	EvaluationParameters.SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
@@ -50,6 +52,11 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	if (const int32 Temp = FMath::RandRange(0, 100); Temp < CriticalChance)
 	{
 		Damage = Damage * 2.f;
+		SntpContext->SetIsCritical(true);
+	}
+	else
+	{
+		SntpContext->SetIsCritical(false);
 	}
 	
 	FGameplayModifierEvaluatedData EvaluatedData(USntpAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, Damage);

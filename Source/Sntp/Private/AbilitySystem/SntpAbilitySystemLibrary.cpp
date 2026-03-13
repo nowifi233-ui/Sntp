@@ -4,6 +4,7 @@
 #include "AbilitySystem/SntpAbilitySystemLibrary.h"
 
 #include "AbilitySystemComponent.h"
+#include "SntpAbilityTypes.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Game/SntpGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -40,4 +41,13 @@ void USntpAbilitySystemLibrary::GiveStartupAbilites(const UObject* WorldContextO
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
 		ASC->GiveAbility(AbilitySpec);
 	}
+}
+
+bool USntpAbilitySystemLibrary::IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FSntpGameplayEffectContext* SntpContext = static_cast<const FSntpGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return SntpContext->IsCritical();
+	}
+	return false;
 }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "SntpAbilitySystemLibrary.generated.h"
 
@@ -22,4 +23,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="SntpAttributeSystemLibrary")
 	static void GiveStartupAbilites(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
+	
+	UFUNCTION(BlueprintPure, Category="SntpAttributeSystemLibrary")
+	static bool IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle);
 };
