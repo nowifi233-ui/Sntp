@@ -14,7 +14,6 @@ AEffectActor::AEffectActor()
 	PrimaryActorTick.bCanEverTick = false;
 	
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>("SceneRoot"));
-
 }
 
 void AEffectActor::ApplyEffectToTarget(AActor* Target, TSubclassOf<UGameplayEffect> GameplayEffectClass)

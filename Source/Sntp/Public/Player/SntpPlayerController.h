@@ -29,7 +29,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	
-
 	// Bind input actions and functions 
 	virtual void SetupInputComponent() override;
 	
