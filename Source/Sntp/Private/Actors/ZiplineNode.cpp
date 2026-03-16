@@ -6,11 +6,17 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "SntpGameplayTags.h"
+#include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 AZiplineNode::AZiplineNode()
 {
 	ConnectRadius = 8000.f;
+	
+	InteractionWidget = CreateDefaultSubobject<UWidgetComponent>("InteractionWidget");
+	InteractionWidget->SetVisibility(false);
+	InteractionWidget->SetupAttachment(RootComponent);
+	InteractionWidget->SetWidgetSpace(EWidgetSpace::Screen);
 }
 
 void AZiplineNode::FindConnectedNodes()
@@ -35,7 +41,7 @@ void AZiplineNode::FindConnectedNodes()
 	}
 }
 
-TArray<FInteractionOption> AZiplineNode::GetInteractionOptions(AActor* Interactor)
+TArray<FInteractionOption> AZiplineNode::GetInteractionOptions()
 {
 	TArray<FInteractionOption> Options;
 	Options.Add({FName("Ride"), FText::FromString("Ride Zipline")});
@@ -60,6 +66,21 @@ void AZiplineNode::Interact(AActor* Interactor, FName OptionName)
 	{
 		Destroy();
 	}
+}
+
+UWidgetComponent* AZiplineNode::GetInteractionWidget()
+{
+	return InteractionWidget;
+}
+
+void AZiplineNode::ShowInteractionWidget()
+{
+	InteractionWidget->SetVisibility(true);
+}
+
+void AZiplineNode::HideInteractionWidget()
+{
+	InteractionWidget->SetVisibility(false);
 }
 
 void AZiplineNode::BeginPlay()

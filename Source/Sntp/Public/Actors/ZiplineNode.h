@@ -7,6 +7,7 @@
 #include "Interaction/Interactable.h"
 #include "ZiplineNode.generated.h"
 
+class UWidgetComponent;
 /**
  * 
  */
@@ -22,11 +23,22 @@ public:
 	
 	void FindConnectedNodes();
 	
-	virtual TArray<FInteractionOption> GetInteractionOptions(AActor* Interactor) override;
+	UFUNCTION(BlueprintCallable)
+	virtual TArray<FInteractionOption> GetInteractionOptions() override;
 	virtual void Interact(AActor* Interactor, FName OptionName) override;
+	virtual UWidgetComponent* GetInteractionWidget();
+	
+	UFUNCTION(BlueprintCallable)
+	void ShowInteractionWidget();
+	
+	UFUNCTION(BlueprintCallable)
+	void HideInteractionWidget();
 protected:
 	virtual void BeginPlay() override;
 	
 	UPROPERTY(EditAnywhere)
 	float ConnectRadius = 8000.f;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UWidgetComponent> InteractionWidget;
 };

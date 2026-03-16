@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/WidgetComponent.h"
 #include "UObject/Interface.h"
 #include "Interactable.generated.h"
 
@@ -19,10 +20,10 @@ struct FInteractionOption
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName OptionName;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText DisplayText;
 };
 
@@ -35,6 +36,7 @@ class SNTP_API IInteractable
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual TArray<FInteractionOption> GetInteractionOptions(AActor* Interactor) = 0;
+	virtual TArray<FInteractionOption> GetInteractionOptions() = 0;
 	virtual void Interact(AActor* Interactor, FName OptionName) = 0;
+	virtual UWidgetComponent* GetInteractionWidget() = 0;
 };

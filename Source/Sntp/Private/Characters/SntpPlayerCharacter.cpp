@@ -9,6 +9,11 @@
 #include "Player/SntpPlayerState.h"
 #include "UI/SntpHUD.h"
 
+ASntpPlayerCharacter::ASntpPlayerCharacter()
+{
+	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>("InteractionComponent");
+}
+
 void ASntpPlayerCharacter::PossessedBy(AController* byController)
 {
 	Super::PossessedBy(byController);

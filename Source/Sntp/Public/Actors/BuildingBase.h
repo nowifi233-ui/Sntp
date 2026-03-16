@@ -17,9 +17,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void Recall(ACharacter* Player);
-	
-	UFUNCTION()
-	TArray<FString> GetInteractionOptions();
 
 protected:
 	UPROPERTY(EditAnywhere)

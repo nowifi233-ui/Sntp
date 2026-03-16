@@ -15,12 +15,6 @@ void ABuildingBase::Recall(ACharacter* Player)
 	Destroy();
 }
 
-TArray<FString> ABuildingBase::GetInteractionOptions()
-{
-	TArray<FString> Options;
-	Options.Add("Inter");
-	Options.Add("Recall");
-	return Options;
-}
+
 
 

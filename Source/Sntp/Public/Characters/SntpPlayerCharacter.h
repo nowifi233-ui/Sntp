@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "InputAction.h"
 #include "Characters/SntpCharacterBase.h"
+#include "Components/InteractionComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "SntpPlayerCharacter.generated.h"
 
@@ -16,9 +17,15 @@ class SNTP_API ASntpPlayerCharacter : public ASntpCharacterBase, public IAbility
 {
 	GENERATED_BODY()
 public:
+	ASntpPlayerCharacter();
 	virtual void PossessedBy(AController* byController) override;
 	virtual void OnRep_PlayerState() override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
+	// Interaction
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="InteractionComponent")
+	TObjectPtr<UInteractionComponent> InteractionComponent;
+	
 	
 protected:
 	virtual void InitAbilityActorInfo() override;

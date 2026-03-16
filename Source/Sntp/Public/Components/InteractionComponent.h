@@ -5,7 +5,11 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "InteractionComponent.generated.h"
+class UWidgetComponent;
+struct FInteractionOption;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FShowWidgetDelegate, const TArray<FInteractionOption>&, Options);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNotShowWidgetDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SNTP_API UInteractionComponent : public UActorComponent
@@ -16,8 +20,16 @@ public:
 	// Sets default values for this component's properties
 	UInteractionComponent();
 	
-	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UWidgetComponent> OptionWidget;
 
+	UPROPERTY(BlueprintAssignable)
+	FShowWidgetDelegate ShowWidgetDelegate;
+	
+	UPROPERTY(BlueprintAssignable)
+	FNotShowWidgetDelegate HideWidgetDelegate;
+protected:
+	virtual void BeginPlay() override;
 	void FindInteractable();
 	
 	UPROPERTY()
@@ -26,6 +38,11 @@ public:
 	UPROPERTY()
 	TObjectPtr<AActor> LastInteractable;
 	
-	UFUNCTION()
-	void ShowInteractUI();
+	FTimerHandle ScanTimer;
+	
+public:
+	void Interact(FName OptionName);
+	
+private:
+	void SetCurrentInteractable(TObjectPtr<AActor> Actor);
 };
