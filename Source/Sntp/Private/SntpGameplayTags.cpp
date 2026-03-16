@@ -41,6 +41,14 @@ void FSntpGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Effects.HitReact"),
 		FString("Tag granted when reacting."));
+	
+	/*
+	 * Interactable
+	 */
+	GameplayTags.Interact = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Interact"),
+		FString("Interact"));
+	
 }
 
 

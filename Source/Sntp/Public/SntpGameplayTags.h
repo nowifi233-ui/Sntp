@@ -24,6 +24,9 @@ public:
 	
 	FGameplayTag Damage;
 	FGameplayTag Effects_HitReact;
+	
+	// Interactable
+	FGameplayTag Interact;
 private:
 	
 protected:

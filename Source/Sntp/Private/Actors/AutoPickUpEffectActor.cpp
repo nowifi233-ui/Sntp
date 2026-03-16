@@ -62,17 +62,16 @@ void AAutoPickUpEffectActor::StartAttract(AActor* InTargetActor)
 
 void AAutoPickUpEffectActor::UpdateItem()
 {
-	float Time = GetWorld()->GetTimeSeconds();
-	FVector CurrentLocation = GetActorLocation();
-	//默认浮动
-	float OffsetZ = FMath::Sin(Time * FloatSpeed) * FloatAmplitude;
+	const float Time = GetWorld()->GetTimeSeconds();
+	const FVector CurrentLocation = GetActorLocation();
+	const float OffsetZ = FMath::Sin(Time * FloatSpeed) * FloatAmplitude;
 
 	FVector FloatLocation = StartLocation;
 	FloatLocation.Z += OffsetZ;
 
 	if (bStartAttract && TargetPlayer)
 	{
-		FVector TargetLocation = TargetPlayer->GetActorLocation();
+		const FVector TargetLocation = TargetPlayer->GetActorLocation();
 
 		FloatLocation = FMath::VInterpTo(
 			CurrentLocation,
@@ -83,7 +82,5 @@ void AAutoPickUpEffectActor::UpdateItem()
 	}
 
 	SetActorLocation(FloatLocation);
-
-	//旋转
 	AddActorLocalRotation(FRotator(0, 2.f, 0));
 }
