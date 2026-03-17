@@ -37,7 +37,15 @@ private:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MoveAction;
 	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ScrollAction;
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* InteractAction;
+	
 	void HandleMove(const FInputActionValue& InputValue);
+	void HandleScroll(const FInputActionValue& InputValue);
+	void HandleInteract(const FInputActionValue& InputValue);
 
 	UPROPERTY(EditAnywhere, Category="Input")
 	TSoftObjectPtr<UInputMappingContext> InputMapping;

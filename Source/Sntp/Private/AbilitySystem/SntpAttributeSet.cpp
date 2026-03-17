@@ -8,7 +8,6 @@
 #include "SntpGameplayTags.h"
 #include "AbilitySystem/SntpAbilitySystemLibrary.h"
 #include "GameFramework/Character.h"
-#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/SntpPlayerController.h"
 
@@ -51,26 +50,24 @@ void USntpAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	{
 		const float LocalIncomingDamage = GetIncomingDamage();
 		SetIncomingDamage(0.f);
-		if (LocalIncomingDamage > 0.f)
+
+		const float NewHealth = GetHealth() - LocalIncomingDamage;
+		SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+		const bool bFatal = NewHealth <= 0.f;
+		if (!bFatal)
 		{
-			const float NewHealth = GetHealth() - LocalIncomingDamage;
-			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
-			const bool bFatal = NewHealth <= 0.f;
-			if (!bFatal)
-			{
-				FGameplayTagContainer TagContainer;
-				FSntpGameplayTags SntpGameplayTags = FSntpGameplayTags::Get();
-				TagContainer.AddTag(SntpGameplayTags.Effects_HitReact);
-				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
-			}
-			else
-			{
-				// Die
-			}
-			
-			const bool bCritical = USntpAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
-			ShowFloatingText(Props, LocalIncomingDamage, bCritical);
+			FGameplayTagContainer TagContainer;
+			FSntpGameplayTags SntpGameplayTags = FSntpGameplayTags::Get();
+			TagContainer.AddTag(SntpGameplayTags.Effects_HitReact);
+			Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 		}
+		else
+		{
+			// Die
+		}
+			
+		const bool bCritical = USntpAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
+		ShowFloatingText(Props, LocalIncomingDamage, bCritical);
 	}
 }
 

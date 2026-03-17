@@ -14,7 +14,6 @@ class UInteractable : public UInterface
 	GENERATED_BODY()
 };
 
-
 USTRUCT(BlueprintType)
 struct FInteractionOption
 {
@@ -38,5 +37,4 @@ class SNTP_API IInteractable
 public:
 	virtual TArray<FInteractionOption> GetInteractionOptions() = 0;
 	virtual void Interact(AActor* Interactor, FName OptionName) = 0;
-	virtual UWidgetComponent* GetInteractionWidget() = 0;
 };

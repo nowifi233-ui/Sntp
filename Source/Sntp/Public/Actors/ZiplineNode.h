@@ -7,6 +7,7 @@
 #include "Interaction/Interactable.h"
 #include "ZiplineNode.generated.h"
 
+class UGameplayEffect;
 class UWidgetComponent;
 /**
  * 
@@ -26,19 +27,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual TArray<FInteractionOption> GetInteractionOptions() override;
 	virtual void Interact(AActor* Interactor, FName OptionName) override;
-	virtual UWidgetComponent* GetInteractionWidget();
 	
-	UFUNCTION(BlueprintCallable)
-	void ShowInteractionWidget();
-	
-	UFUNCTION(BlueprintCallable)
-	void HideInteractionWidget();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FInteractionOption> Options;
+
 protected:
 	virtual void BeginPlay() override;
 	
 	UPROPERTY(EditAnywhere)
 	float ConnectRadius = 8000.f;
 	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UWidgetComponent> InteractionWidget;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
 };

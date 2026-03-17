@@ -14,6 +14,11 @@ UOverlayWidgetController* ASntpHUD::GetOverlayWidgetController(const FWidgetCont
 	return OverlayWidgetController;
 }
 
+UOverlayWidgetController* ASntpHUD::GetOverlayWidgetControllerWithoutParam()
+{
+	return OverlayWidgetController;
+}
+
 void ASntpHUD::InitOverlay(APlayerController* PlayerController, APlayerState* PlayerState, UAbilitySystemComponent* AbilitySystemComponent, UAttributeSet* AttributeSet)
 {
 	checkf(OverlayWidgetClass, TEXT("OverlayWidgetClass uninitialized, please check SntpHUD."))

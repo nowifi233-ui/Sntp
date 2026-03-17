@@ -19,7 +19,7 @@ void UInteractionComponent::BeginPlay()
 		ScanTimer,
 		this, 
 		&UInteractionComponent::FindInteractable,
-		0.2f,
+		0.1f,
 		true);
 }
 
@@ -30,7 +30,7 @@ void UInteractionComponent::FindInteractable()
 	UKismetSystemLibrary::SphereOverlapActors(
 		GetWorld(),
 		GetOwner()->GetActorLocation(),
-		200,
+		150,
 		TArray<TEnumAsByte<EObjectTypeQuery>>(),
 		nullptr,
 		{},

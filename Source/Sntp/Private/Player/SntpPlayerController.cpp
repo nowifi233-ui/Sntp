@@ -5,12 +5,16 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
+#include "Characters/SntpPlayerCharacter.h"
 #include "Input/SntpInputComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
+#include "Components/Overlay.h"
 #include "GameFramework/Character.h"
 #include "Input/SntpInputComponent.h"
 #include "Interaction/EnemyInterface.h"
+#include "UI/SntpHUD.h"
 #include "UI/Widget/DamageTextComponent.h"
+#include "UI/WidgetController/OverlayWidgetController.h"
 
 
 ASntpPlayerController::ASntpPlayerController()
@@ -48,6 +52,8 @@ void ASntpPlayerController::SetupInputComponent()
 
 	USntpInputComponent* SntpInputComponent = Cast<USntpInputComponent>(InputComponent);
 	SntpInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASntpPlayerController::HandleMove);
+	SntpInputComponent->BindAction(ScrollAction, ETriggerEvent::Triggered, this, &ASntpPlayerController::HandleScroll);
+	SntpInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ASntpPlayerController::HandleInteract);
 	SntpInputComponent->BindAbilityActions(
 		InputConfig,
 		this,
@@ -101,6 +107,32 @@ void ASntpPlayerController::HandleMove(const FInputActionValue& InputValue)
 		ControlledPawn->AddMovementInput(RightDirection, MoveInput.Y);
 	}
 	
+}
+
+void ASntpPlayerController::HandleScroll(const FInputActionValue& InputValue)
+{
+	const float ScrollInput = InputValue.Get<float>();
+	if (UOverlayWidgetController* OverlayWidgetController = Cast<ASntpHUD>(GetHUD())->GetOverlayWidgetControllerWithoutParam())
+	{
+		int32 IntScroll = ScrollInput;
+		OverlayWidgetController->OnScrollDelegate.Broadcast(IntScroll);
+	}
+}
+
+void ASntpPlayerController::HandleInteract(const FInputActionValue& InputValue)
+{
+	const float ScrollInput = InputValue.Get<bool>();
+	if (ScrollInput)
+	{
+		if (UOverlayWidgetController* OverlayWidgetController = Cast<ASntpHUD>(GetHUD())->GetOverlayWidgetControllerWithoutParam())
+		{
+			FName OptionName = OverlayWidgetController->CurrentOptionIndex;
+			if (const ASntpPlayerCharacter* PlayerCharacter = GetPawn<ASntpPlayerCharacter>())
+			{
+				PlayerCharacter->InteractionComponent->Interact(OptionName);
+			}
+		}
+	}
 }
 
 void ASntpPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)

@@ -24,7 +24,8 @@ public:
 	TObjectPtr<USntpUserWidget> OverlayWidget;
 	
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& Params);
-
+	UOverlayWidgetController* GetOverlayWidgetControllerWithoutParam();
+	
 	UFUNCTION(BlueprintCallable)
 	void InitOverlay(APlayerController* PlayerController, APlayerState* PlayerState, UAbilitySystemComponent* AbilitySystemComponent, UAttributeSet* AttributeSet);
 

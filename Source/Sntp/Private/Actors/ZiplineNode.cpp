@@ -3,6 +3,7 @@
 
 #include "Actors/ZiplineNode.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "SntpGameplayTags.h"
@@ -12,11 +13,6 @@
 AZiplineNode::AZiplineNode()
 {
 	ConnectRadius = 8000.f;
-	
-	InteractionWidget = CreateDefaultSubobject<UWidgetComponent>("InteractionWidget");
-	InteractionWidget->SetVisibility(false);
-	InteractionWidget->SetupAttachment(RootComponent);
-	InteractionWidget->SetWidgetSpace(EWidgetSpace::Screen);
 }
 
 void AZiplineNode::FindConnectedNodes()
@@ -43,9 +39,6 @@ void AZiplineNode::FindConnectedNodes()
 
 TArray<FInteractionOption> AZiplineNode::GetInteractionOptions()
 {
-	TArray<FInteractionOption> Options;
-	Options.Add({FName("Ride"), FText::FromString("Ride Zipline")});
-	Options.Add({FName("Retrieve"), FText::FromString("Retrieve Zipline")});
 	return Options;
 }
 
@@ -53,34 +46,42 @@ void AZiplineNode::Interact(AActor* Interactor, FName OptionName)
 {
 	if (OptionName == FName("Ride"))
 	{
-		IAbilitySystemInterface* ASCInt = Cast<IAbilitySystemInterface>(Interactor);
-		if (ASCInt)
+		GEngine->AddOnScreenDebugMessage(0, 5, FColor::Red, FString::Printf(TEXT("Ride Interact")), false);
+		if (IAbilitySystemInterface* ASCI = Cast<IAbilitySystemInterface>(Interactor))
 		{
-			FSntpGameplayTags SntpTags = FSntpGameplayTags::Get();
-			FGameplayTagContainer Container;
-			Container.AddTag(SntpTags.Interact);
-			ASCInt->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(Container);
+			if (DamageEffectClass == nullptr)
+			{
+				return;
+			}
+			FSntpGameplayTags GameplayTags = FSntpGameplayTags::Get();
+			UAbilitySystemComponent* InteractorASC = ASCI->GetAbilitySystemComponent();
+			FGameplayEffectContextHandle ContextHandle = InteractorASC->MakeEffectContext();
+			FGameplayEffectSpecHandle EffectSpecHandle = InteractorASC->MakeOutgoingSpec(DamageEffectClass, 1.0f, ContextHandle);
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpecHandle, GameplayTags.Damage, 20.f);
+			InteractorASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+		}
+	}
+	if (OptionName == FName("Heal"))
+	{
+		GEngine->AddOnScreenDebugMessage(0, 5, FColor::Red, FString::Printf(TEXT("Heal Interact")), false);
+		if (IAbilitySystemInterface* ASCI = Cast<IAbilitySystemInterface>(Interactor))
+		{
+			if (DamageEffectClass == nullptr)
+			{
+				return;
+			}
+			FSntpGameplayTags GameplayTags = FSntpGameplayTags::Get();
+			UAbilitySystemComponent* InteractorASC = ASCI->GetAbilitySystemComponent();
+			FGameplayEffectContextHandle ContextHandle = InteractorASC->MakeEffectContext();
+			FGameplayEffectSpecHandle EffectSpecHandle = InteractorASC->MakeOutgoingSpec(DamageEffectClass, 1.0f, ContextHandle);
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpecHandle, GameplayTags.Damage, -20.f);
+			InteractorASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 		}
 	}
 	if (OptionName == FName("Retrieve"))
 	{
 		Destroy();
 	}
-}
-
-UWidgetComponent* AZiplineNode::GetInteractionWidget()
-{
-	return InteractionWidget;
-}
-
-void AZiplineNode::ShowInteractionWidget()
-{
-	InteractionWidget->SetVisibility(true);
-}
-
-void AZiplineNode::HideInteractionWidget()
-{
-	InteractionWidget->SetVisibility(false);
 }
 
 void AZiplineNode::BeginPlay()
