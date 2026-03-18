@@ -56,7 +56,7 @@ void AAutoPickUpEffectActor::StartAttract(AActor* InTargetActor)
 	{
 		return;
 	}
-s	TargetPlayer = InTargetActor;
+	TargetPlayer = InTargetActor;
 	bStartAttract = true;
 }
 
