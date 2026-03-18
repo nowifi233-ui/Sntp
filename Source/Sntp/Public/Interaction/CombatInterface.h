@@ -29,4 +29,5 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UAnimMontage* GetHitReacMontage();
+	
 };

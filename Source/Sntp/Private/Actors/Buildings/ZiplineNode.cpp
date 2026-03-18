@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Actors/ZiplineNode.h"
+#include "Actors/Buildings/ZiplineNode.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
@@ -39,6 +39,10 @@ void AZiplineNode::FindConnectedNodes()
 
 TArray<FInteractionOption> AZiplineNode::GetInteractionOptions()
 {
+	for (auto& Option : Options)
+	{
+		Option.SourceActor = this;
+	}
 	return Options;
 }
 

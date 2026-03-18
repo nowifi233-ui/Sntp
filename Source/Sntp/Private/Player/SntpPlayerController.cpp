@@ -126,10 +126,10 @@ void ASntpPlayerController::HandleInteract(const FInputActionValue& InputValue)
 	{
 		if (UOverlayWidgetController* OverlayWidgetController = Cast<ASntpHUD>(GetHUD())->GetOverlayWidgetControllerWithoutParam())
 		{
-			FName OptionName = OverlayWidgetController->CurrentOptionIndex;
+			int32 OptionIndex = OverlayWidgetController->CurrentOptionIndex;
 			if (const ASntpPlayerCharacter* PlayerCharacter = GetPawn<ASntpPlayerCharacter>())
 			{
-				PlayerCharacter->InteractionComponent->Interact(OptionName);
+				PlayerCharacter->InteractionComponent->Interact(OptionIndex);
 			}
 		}
 	}

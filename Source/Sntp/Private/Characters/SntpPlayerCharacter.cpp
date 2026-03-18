@@ -11,7 +11,18 @@
 
 ASntpPlayerCharacter::ASntpPlayerCharacter()
 {
+	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
+	InteractionSphere->SetupAttachment(RootComponent);
+	InteractionSphere->SetSphereRadius(150.f);
+	// ⭐ 只检测Query，不要物理
+	InteractionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	InteractionSphere->SetCollisionObjectType(ECC_WorldDynamic);
+	InteractionSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+	InteractionSphere->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+	InteractionSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>("InteractionComponent");
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent");
 }
 
 void ASntpPlayerCharacter::PossessedBy(AController* byController)
@@ -32,6 +43,12 @@ void ASntpPlayerCharacter::OnRep_PlayerState()
 UAbilitySystemComponent* ASntpPlayerCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void ASntpPlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	InteractionComponent->InitSphere(InteractionSphere);
 }
 
 void ASntpPlayerCharacter::InitAbilityActorInfo()

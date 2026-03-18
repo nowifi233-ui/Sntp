@@ -3,12 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InventoryComponent.h"
 #include "UI/WidgetController/SntpWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeSignature, float, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FScrollDelegate, int32, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnOptionSelected, int32, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdate);
 /**
  * 
  */
@@ -35,6 +38,21 @@ public:
 	FScrollDelegate OnScrollDelegate;
 	
 	UPROPERTY(BlueprintReadWrite)
-	FName CurrentOptionIndex;
+	int32 CurrentOptionIndex;
 	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UInventoryComponent> InventoryComponent;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnInventoryUpdate OnInventoryUpdate;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnOptionSelected OnOptionSelected;
+	
+private:
+	UFUNCTION()
+	void OnInventoryChanged();
+	
+	UFUNCTION()
+	void OnInteractedOptionSelected(int32 Index);
 };

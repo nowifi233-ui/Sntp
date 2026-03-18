@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Actors/AutoPickUpEffectActor.h"
+#include "Actors/Pickups/AutoPickUpEffectActor.h"
 
 #include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/ProjectileMovementComponent.h"

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Actors/BuildingBase.h"
+#include "Actors/Buildings/BuildingBase.h"
 #include "Interaction/Interactable.h"
 #include "ZiplineNode.generated.h"
 
@@ -27,6 +27,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual TArray<FInteractionOption> GetInteractionOptions() override;
 	virtual void Interact(AActor* Interactor, FName OptionName) override;
+	virtual FName GetInteractionName() override {return BuildingName;}
+	virtual EInteractionType GetType() override {return EInteractionType::Building;}
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FInteractionOption> Options;

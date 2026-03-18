@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interaction/Interactable.h"
 #include "BuildingBase.generated.h"
 
 UCLASS()
@@ -24,4 +25,7 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	bool bCanRecall;
+	
+	UPROPERTY(EditAnywhere)
+	FName BuildingName;
 };

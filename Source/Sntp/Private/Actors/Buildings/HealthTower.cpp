@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Actors/HealthTower.h"
+#include "Actors/Buildings/HealthTower.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
@@ -14,6 +14,10 @@ class IAbilitySystemInterface;
 
 TArray<FInteractionOption> AHealthTower::GetInteractionOptions()
 {
+	for (auto& Option : Options)
+	{
+		Option.SourceActor = this;
+	}
 	return Options;
 }
 

@@ -18,6 +18,12 @@ void UOverlayWidgetController::BindCallbackToDependencies()
 {
 	const USntpAttributeSet* SntpAttributeSet = CastChecked<USntpAttributeSet>(AttributeSet);
 	
+	// Init 
+	if (const APawn* Pawn = PlayerController->GetPawn())
+	{
+		InventoryComponent = Pawn->FindComponentByClass<UInventoryComponent>();
+	}
+	
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetHealthAttribute()).AddLambda(
 		[this](const FOnAttributeChangeData& Data)
 		{
@@ -40,5 +46,20 @@ void UOverlayWidgetController::BindCallbackToDependencies()
 				GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Green, Msg);
 			}
 		});
+	
+	if (InventoryComponent)
+	{
+		InventoryComponent->OnInventoryChanged.AddDynamic(this, &UOverlayWidgetController::OnInventoryChanged);
+	}
+}
+
+void UOverlayWidgetController::OnInventoryChanged()
+{
+	OnInventoryUpdate.Broadcast();
+}
+
+void UOverlayWidgetController::OnInteractedOptionSelected(int32 Index)
+{
+	OnOptionSelected.Broadcast(Index);
 }
 

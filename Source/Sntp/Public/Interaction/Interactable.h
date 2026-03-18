@@ -14,6 +14,18 @@ class UInteractable : public UInterface
 	GENERATED_BODY()
 };
 
+
+/**
+ * FInteractionOptions: Buildings and Pickups
+ * 
+ */
+UENUM(BlueprintType)
+enum class EInteractionType : uint8
+{
+	Building,
+	Pickup
+};
+
 USTRUCT(BlueprintType)
 struct FInteractionOption
 {
@@ -24,6 +36,18 @@ struct FInteractionOption
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText DisplayText;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UTexture2D> Icon = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 Count = 1;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EInteractionType Type;
+	
+	UPROPERTY(BlueprintReadOnly)
+	TWeakObjectPtr<AActor> SourceActor;
 };
 
 /**
@@ -37,4 +61,6 @@ class SNTP_API IInteractable
 public:
 	virtual TArray<FInteractionOption> GetInteractionOptions() = 0;
 	virtual void Interact(AActor* Interactor, FName OptionName) = 0;
+	virtual FName GetInteractionName() = 0;
+	virtual EInteractionType GetType() = 0;
 };
