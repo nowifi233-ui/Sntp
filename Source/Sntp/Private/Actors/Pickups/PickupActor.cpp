@@ -3,7 +3,7 @@
 
 #include "Actors/Pickups/PickupActor.h"
 
-#include "InventoryComponent.h"
+#include "Components/InventoryComponent.h"
 
 // Sets default values
 APickupActor::APickupActor()

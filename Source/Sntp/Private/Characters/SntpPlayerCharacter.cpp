@@ -23,6 +23,7 @@ ASntpPlayerCharacter::ASntpPlayerCharacter()
 	
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>("InteractionComponent");
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent");
+	InventoryComponent->InitInventory();
 }
 
 void ASntpPlayerCharacter::PossessedBy(AController* byController)

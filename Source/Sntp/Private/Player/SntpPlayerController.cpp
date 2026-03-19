@@ -54,6 +54,7 @@ void ASntpPlayerController::SetupInputComponent()
 	SntpInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASntpPlayerController::HandleMove);
 	SntpInputComponent->BindAction(ScrollAction, ETriggerEvent::Triggered, this, &ASntpPlayerController::HandleScroll);
 	SntpInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ASntpPlayerController::HandleInteract);
+	SntpInputComponent->BindAction(ToggleInventoryAction, ETriggerEvent::Started, this, &ASntpPlayerController::ToggleInventory);
 	SntpInputComponent->BindAbilityActions(
 		InputConfig,
 		this,
@@ -132,6 +133,15 @@ void ASntpPlayerController::HandleInteract(const FInputActionValue& InputValue)
 				PlayerCharacter->InteractionComponent->Interact(OptionIndex);
 			}
 		}
+	}
+}
+
+void ASntpPlayerController::ToggleInventory(const FInputActionValue& InputValue)
+{
+	ASntpHUD* HUD = GetHUD<ASntpHUD>();
+	if (HUD)
+	{
+		HUD->ToggleBag(this);
 	}
 }
 

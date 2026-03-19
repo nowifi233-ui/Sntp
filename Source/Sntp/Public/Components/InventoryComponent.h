@@ -18,6 +18,11 @@ struct FItemInstance
 	
 	UPROPERTY(BlueprintReadOnly)
 	int32 Count = 0;
+	
+	bool IsEmpty() const
+	{
+		return ItemDef == nullptr || Count <= 0; 
+	}
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
@@ -31,13 +36,27 @@ public:
 	// Sets default values for this component's properties
 	UInventoryComponent();
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 Capacity = 20;
+	
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FItemInstance> Items;
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnInventoryChanged OnInventoryChanged;
 	
-	bool AddItem(UItemDefinition* ItemDef, int32 Count);
+	void InitInventory();
+	/*
+	 * Operations
+	 */
+	
+	int32 AddItem(UItemDefinition* ItemDef, int32 Count);
 	bool RemoveItem(UItemDefinition* ItemDef, int32 Count);
-		
+	void UseItem(int32 Index);
+	UFUNCTION(BlueprintCallable)
+	void SwapItems(int32 A, int32 B);
+
+private:
+	int32 AddToExistingStacks(UItemDefinition* ItemDef, int32 Count);
+	int32 AddToEmptySlots(UItemDefinition* ItemDef, int32 Count);
 };

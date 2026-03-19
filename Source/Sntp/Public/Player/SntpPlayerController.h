@@ -43,9 +43,13 @@ private:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* InteractAction;
 	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ToggleInventoryAction;
+	
 	void HandleMove(const FInputActionValue& InputValue);
 	void HandleScroll(const FInputActionValue& InputValue);
 	void HandleInteract(const FInputActionValue& InputValue);
+	void ToggleInventory(const FInputActionValue& InputValue);
 
 	UPROPERTY(EditAnywhere, Category="Input")
 	TSoftObjectPtr<UInputMappingContext> InputMapping;

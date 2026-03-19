@@ -2,6 +2,8 @@
 
 
 #include "UI/SntpHUD.h"
+
+#include "Characters/SntpPlayerCharacter.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 
 UOverlayWidgetController* ASntpHUD::GetOverlayWidgetController(const FWidgetControllerParams& Params)
@@ -34,5 +36,34 @@ void ASntpHUD::InitOverlay(APlayerController* PlayerController, APlayerState* Pl
 	
 	OverlayWidgetController->BroadcastInitialValue();
 	Widget->AddToViewport();
+}
+
+void ASntpHUD::ToggleBag(APlayerController* PlayerController)
+{
+	if (!PlayerController) return;
+	if (!BagWidget)
+	{
+		UUserWidget* Widget  = CreateWidget<UUserWidget>(GetWorld(), BagWidgetClass);
+		BagWidget = Cast<USntpUserWidget>(Widget);
+		
+		if (!InventoryWidgetController)
+		{
+			InventoryWidgetController = NewObject<UInventoryWidgetController>(this, InventoryWidgetControllerClass);
+			InventoryWidgetController->Init(PlayerController->GetPawn<ASntpPlayerCharacter>()->InventoryComponent);
+		}
+		
+		BagWidget->SetWidgetController(InventoryWidgetController);
+	}
+	if (bBagOpen)
+	{
+		BagWidget->RemoveFromParent();
+		// PlayerController->SetInputMode(FInputModeGameOnly());
+		bBagOpen = false;
+	}
+	else
+	{
+		BagWidget->AddToViewport();
+		bBagOpen = true;
+	}
 }
 

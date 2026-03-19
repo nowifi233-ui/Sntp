@@ -3,11 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InputAction.h"
-#include "InventoryComponent.h"
+#include "Components/InventoryComponent.h"
 #include "Characters/SntpCharacterBase.h"
 #include "Components/InteractionComponent.h"
-#include "Interaction/CombatInterface.h"
 #include "SntpPlayerCharacter.generated.h"
 
 /**

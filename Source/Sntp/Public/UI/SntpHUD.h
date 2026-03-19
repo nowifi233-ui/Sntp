@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UI/Widgets/SntpUserWidget.h"
 #include "GameFramework/HUD.h"
+#include "WidgetController/InventoryWidgetController.h"
 #include "SntpHUD.generated.h"
 
 class UAttributeSet;
@@ -29,7 +30,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void InitOverlay(APlayerController* PlayerController, APlayerState* PlayerState, UAbilitySystemComponent* AbilitySystemComponent, UAttributeSet* AttributeSet);
 
+	UFUNCTION(BlueprintCallable)
+	void ToggleBag(APlayerController* PlayerController);
+	
 private:
+	/*
+	 * Overlay Widget Controller
+	 */
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<USntpUserWidget> OverlayWidgetClass;
 	
@@ -39,4 +46,21 @@ private:
 	UPROPERTY()
 	TObjectPtr<UOverlayWidgetController> OverlayWidgetController;
 
+	/*
+	 * Inventory Widget Controller
+	 */
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USntpUserWidget> BagWidgetClass;
+	
+	UPROPERTY()
+	TObjectPtr<USntpUserWidget> BagWidget;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UInventoryWidgetController> InventoryWidgetControllerClass; 
+	
+	UPROPERTY()
+	TObjectPtr<UInventoryWidgetController> InventoryWidgetController;
+	
+private:
+	bool bBagOpen = false;
 };
