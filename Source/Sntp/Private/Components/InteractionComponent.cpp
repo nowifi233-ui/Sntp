@@ -78,6 +78,8 @@ void UInteractionComponent::SetCurrentInteractable(TObjectPtr<AActor> Actor)
 	}
 	IInteractable* Interactable = Cast<IInteractable>(CurrentInteractable);
 	ShowWidgetDelegate.Broadcast(Interactable->GetInteractionOptions(), Interactable->GetInteractionName());
+	Interactable->StateChangeDelegate.Clear();
+	Interactable->StateChangeDelegate.AddDynamic(this, &ThisClass::CurrentActorStateChanged);
 }
 
 void UInteractionComponent::UpdateCurrentInteractable()
@@ -175,6 +177,19 @@ void UInteractionComponent::OnEndOverlap(UPrimitiveComponent* OverlappedComponen
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	UpdateCurrentInteractable();
+}
+
+void UInteractionComponent::CurrentActorStateChanged()
+{
+	if (!CurrentInteractable)
+	{
+		HideWidgetDelegate.Broadcast();
+		return;
+	}
+	
+	IInteractable* Interactable = Cast<IInteractable>(CurrentInteractable);
+	CurrentOptions = Interactable->GetInteractionOptions();
+	ShowWidgetDelegate.Broadcast(Interactable->GetInteractionOptions(), Interactable->GetInteractionName());
 }
 
 bool UInteractionComponent::AreOptionsEqual(const TArray<FInteractionOption>& A, const TArray<FInteractionOption>& B)

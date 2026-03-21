@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffect.h"
 #include "Engine/DataAsset.h"
 #include "ItemDefinition.generated.h"
 
@@ -28,4 +29,13 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 MaxStack = 99;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> UseEffect;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayAbility> UseAbility;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText Description;
 };

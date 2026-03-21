@@ -36,6 +36,13 @@ void ASntpHUD::InitOverlay(APlayerController* PlayerController, APlayerState* Pl
 	
 	OverlayWidgetController->BroadcastInitialValue();
 	Widget->AddToViewport();
+	
+	// Init Bag
+	if (!InventoryWidgetController)
+	{
+		InventoryWidgetController = NewObject<UInventoryWidgetController>(this, InventoryWidgetControllerClass);
+		InventoryWidgetController->Init(PlayerController->GetPawn<ASntpPlayerCharacter>()->InventoryComponent, GetOwningPlayerController());
+	}
 }
 
 void ASntpHUD::ToggleBag(APlayerController* PlayerController)
@@ -49,7 +56,7 @@ void ASntpHUD::ToggleBag(APlayerController* PlayerController)
 		if (!InventoryWidgetController)
 		{
 			InventoryWidgetController = NewObject<UInventoryWidgetController>(this, InventoryWidgetControllerClass);
-			InventoryWidgetController->Init(PlayerController->GetPawn<ASntpPlayerCharacter>()->InventoryComponent);
+			InventoryWidgetController->Init(PlayerController->GetPawn<ASntpPlayerCharacter>()->InventoryComponent, GetOwningPlayerController());
 		}
 		
 		BagWidget->SetWidgetController(InventoryWidgetController);

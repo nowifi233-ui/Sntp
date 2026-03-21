@@ -5,6 +5,9 @@
 
 #include "AbilitySystem/SntpAbilitySystemComponent.h"
 #include "AbilitySystem/SntpAttributeSet.h"
+#include "UI/SntpHUD.h"
+
+class ASntpHUD;
 
 void UOverlayWidgetController::BroadcastInitialValue()
 {
@@ -51,6 +54,11 @@ void UOverlayWidgetController::BindCallbackToDependencies()
 	{
 		InventoryComponent->OnInventoryChanged.AddDynamic(this, &UOverlayWidgetController::OnInventoryChanged);
 	}
+}
+
+void UOverlayWidgetController::RequestToggleHUD()
+{
+	PlayerController->GetHUD<ASntpHUD>()->ToggleBag(PlayerController);
 }
 
 void UOverlayWidgetController::OnInventoryChanged()

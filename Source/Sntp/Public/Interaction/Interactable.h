@@ -14,6 +14,8 @@ class UInteractable : public UInterface
 	GENERATED_BODY()
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStateChangeDelegate);
+
 
 /**
  * FInteractionOptions: Buildings and Pickups
@@ -63,4 +65,6 @@ public:
 	virtual void Interact(AActor* Interactor, FName OptionName) = 0;
 	virtual FName GetInteractionName() = 0;
 	virtual EInteractionType GetType() = 0;
+	FStateChangeDelegate StateChangeDelegate;
+	
 };

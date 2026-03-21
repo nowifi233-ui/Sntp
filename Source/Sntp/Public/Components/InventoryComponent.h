@@ -26,6 +26,7 @@ struct FItemInstance
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemUsed, int32, Index);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SNTP_API UInventoryComponent : public UActorComponent
@@ -37,7 +38,7 @@ public:
 	UInventoryComponent();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 Capacity = 20;
+	int32 Capacity = 35;
 	
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FItemInstance> Items;

@@ -49,6 +49,12 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnOptionSelected OnOptionSelected;
 	
+	/**
+	 * Bag
+	 */
+	UFUNCTION(BlueprintCallable)
+	void RequestToggleHUD();
+	
 private:
 	UFUNCTION()
 	void OnInventoryChanged();

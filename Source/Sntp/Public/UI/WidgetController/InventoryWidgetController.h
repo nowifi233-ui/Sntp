@@ -8,6 +8,7 @@
 #include "InventoryWidgetController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInventoryChangedDelegate);
+
 /**
  * 
  */
@@ -17,7 +18,7 @@ class SNTP_API UInventoryWidgetController : public USntpWidgetController
 	GENERATED_BODY()
 	
 public:
-	void Init(UInventoryComponent* InInventoryComponent);
+	void Init(UInventoryComponent* InInventoryComponent, APlayerController* InPlayerController);
 	
 	UFUNCTION(BlueprintCallable)
 	const TArray<FItemInstance>& GetItems() const;
@@ -27,6 +28,12 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly)
 	TWeakObjectPtr<UInventoryComponent> InventoryComponent;
+	
+	UFUNCTION(BlueprintCallable)
+	void RequestUseItem(int32 Index);
+	
+	UFUNCTION(BlueprintCallable)
+	void RequestToggleBag();
 private:
 	
 	

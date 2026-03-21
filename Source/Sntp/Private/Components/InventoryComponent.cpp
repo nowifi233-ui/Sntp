@@ -4,6 +4,9 @@
 #include "Components/InventoryComponent.h"
 
 #include "ItemDefinition.h"
+#include "Abilities/GameplayAbility.h"
+#include "AbilitySystem/SntpAbilitySystemComponent.h"
+#include "Characters/SntpPlayerCharacter.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -40,6 +43,20 @@ void UInventoryComponent::UseItem(int32 Index)
 	FItemInstance& Item = Items[Index];
 	if (Item.Count <= 0) return;
 	// 调用物品逻辑
+	if (Item.ItemDef->UseAbility)
+	{
+		UAbilitySystemComponent* ASC = Cast<ASntpPlayerCharacter>(GetOwner())->GetAbilitySystemComponent();
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Item.ItemDef->UseAbility);
+		ASC->GiveAbilityAndActivateOnce(AbilitySpec);
+	}
+	if (Item.ItemDef->UseEffect)
+	{
+		UAbilitySystemComponent* ASC = Cast<ASntpPlayerCharacter>(GetOwner())->GetAbilitySystemComponent();
+		FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
+		FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(Item.ItemDef->UseEffect, 1, EffectContext);
+		ASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data);
+	}
+	
 	Item.Count -= 1;
 	if (Item.Count <= 0)
 	{
@@ -51,14 +68,19 @@ void UInventoryComponent::UseItem(int32 Index)
 void UInventoryComponent::SwapItems(int32 A, int32 B)
 {
 	if (!Items.IsValidIndex(A) || !Items.IsValidIndex(B)) return;
+	if (Items[A].ItemDef == nullptr)
+	{
+		return;
+	}
 	if (Items[A].ItemDef && Items[B].ItemDef)
 	{
 		if (Items[A].ItemDef->ItemID == Items[B].ItemDef->ItemID)
 		{
 			if (Items[B].Count < Items[B].ItemDef->MaxStack)
 			{
+				int32 TempB = Items[B].Count;
 				Items[B].Count = FMath::Min(Items[A].Count + Items[B].Count, Items[A].ItemDef->MaxStack);
-				Items[A].Count = FMath::Max(0, Items[B].Count + Items[A].Count - Items[B].ItemDef->MaxStack);
+				Items[A].Count = FMath::Max(0, TempB + Items[A].Count - Items[B].ItemDef->MaxStack);
 				if (Items[A].Count == 0)
 				{
 					Items[A] = FItemInstance();
