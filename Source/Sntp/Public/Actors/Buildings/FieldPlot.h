@@ -48,6 +48,10 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<USntpUserWidget> TimerWidgetClass;
 private:
+	EFieldPlotStatus FieldPlotStatus;
+	/*
+	 * Options of Selecting
+	 */
 	UPROPERTY(EditAnywhere)
 	TArray<FInteractionOption> EmptyOptions;
 	
@@ -57,7 +61,32 @@ private:
 	UPROPERTY(EditAnywhere)
 	TArray<FInteractionOption> MatureOptions;
 	
-	EFieldPlotStatus FieldPlotStatus;
+	/**
+	 *  Mesh
+	 */
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* StaticMeshComponent;
+	
+	UPROPERTY(EditDefaultsOnly)
+	UStaticMesh* SeedMesh;
+	
+	UPROPERTY(EditDefaultsOnly)
+	UStaticMesh* GrowthMesh;
+	
+	UPROPERTY(EditDefaultsOnly)
+	UStaticMesh* MatureMesh;
+	
+	void UpdateCropMesh();
+	
+	/*
+	 * AActor Result
+	 */
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AActor> HarvestActor;
+
+	/**
+	 *  Timer
+	 */
 	
 	FTimerHandle GrowthTimer;
 	int32 RemainingTime;

@@ -26,4 +26,7 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category="SntpAttributeSystemLibrary")
 	static bool IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle);
+	
+	UFUNCTION(BlueprintPure, Category="SntpAttributeSystemLibrary")
+	static FText FormatTime(int32 TotalSeconds);
 };

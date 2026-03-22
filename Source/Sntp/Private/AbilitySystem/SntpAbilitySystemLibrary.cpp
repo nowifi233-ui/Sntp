@@ -50,3 +50,21 @@ bool USntpAbilitySystemLibrary::IsCriticalHit(const FGameplayEffectContextHandle
 	}
 	return false;
 }
+
+FText USntpAbilitySystemLibrary::FormatTime(int32 TotalSeconds)
+{
+	int32 Hours = TotalSeconds / 3600;
+	int32 Minutes = (TotalSeconds % 3600) / 60;
+	int32 Seconds = TotalSeconds % 60;
+
+	FNumberFormattingOptions Options;
+	Options.MinimumIntegralDigits = 2;
+	Options.MaximumIntegralDigits = 2;
+
+	return FText::Format(
+		NSLOCTEXT("Time", "HHMMSS", "{0}:{1}:{2}"),
+		FText::AsNumber(Hours, &Options),
+		FText::AsNumber(Minutes, &Options),
+		FText::AsNumber(Seconds, &Options)
+	);
+}

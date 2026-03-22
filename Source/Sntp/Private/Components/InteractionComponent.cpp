@@ -2,8 +2,6 @@
 
 
 #include "Components/InteractionComponent.h"
-
-#include "ViewportInteractionTypes.h"
 #include "Interaction/Interactable.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -89,7 +87,7 @@ void UInteractionComponent::UpdateCurrentInteractable()
 	UKismetSystemLibrary::SphereOverlapActors(
 		GetWorld(),
 		GetOwner()->GetActorLocation(),
-		150,
+		100,
 		TArray<TEnumAsByte<EObjectTypeQuery>>(),
 		nullptr,
 		{},

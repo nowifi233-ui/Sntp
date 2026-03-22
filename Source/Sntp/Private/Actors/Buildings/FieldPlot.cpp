@@ -11,6 +11,8 @@ AFieldPlot::AFieldPlot()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
+	
 }
 
 TArray<FInteractionOption> AFieldPlot::GetInteractionOptions()
@@ -44,26 +46,60 @@ void AFieldPlot::Interact(AActor* Interactor, FName OptionName)
 	if (OptionName == "Plant")
 	{
 		FieldPlotStatus = EFieldPlotStatus::Planting;
+		UpdateCropMesh();
 		RemainingTime = Duration;
 		StateChangeDelegate.Broadcast();
 	}
 	if (OptionName == "Water")
 	{
-		// TODO: 开始计时
-		GetWorldTimerManager().SetTimer(
-			GrowthTimer,
-			this,
-			&ThisClass::GrowthTimerHandler,
-			1,
-			true
+		// Timer
+		if (!GetWorldTimerManager().IsTimerActive(GrowthTimer))
+		{
+			GetWorldTimerManager().SetTimer(
+				GrowthTimer,
+				this,
+				&ThisClass::GrowthTimerHandler,
+				1,
+				true
 			);
+		}
 		CreateTimerWidget();
 	}
 	if (OptionName == "Harvest")
 	{
 		FieldPlotStatus = EFieldPlotStatus::Empty;
+		UpdateCropMesh();
 		StateChangeDelegate.Broadcast();
+		
 		// TODO: 给玩家物品
+		FActorSpawnParameters Params;
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		Params.Owner = this;
+		Params.bNoFail = true; // 强制生成！永不失败！
+		
+		GetWorld()->SpawnActor<AActor>(
+			HarvestActor,
+			GetActorLocation()+ FVector(0, 0, 40.0f),
+			GetActorRotation(),
+			Params
+		);
+	}
+}
+
+void AFieldPlot::UpdateCropMesh()
+{
+	if (!StaticMeshComponent) return;
+	switch (FieldPlotStatus)
+	{
+		case EFieldPlotStatus::Empty:
+			StaticMeshComponent->SetStaticMesh(SeedMesh);
+			break;
+		case EFieldPlotStatus::Planting:
+			StaticMeshComponent->SetStaticMesh(GrowthMesh);
+			break;
+		case EFieldPlotStatus::Mature:
+			StaticMeshComponent->SetStaticMesh(MatureMesh);
+			break;
 	}
 }
 
@@ -85,14 +121,17 @@ void AFieldPlot::GrowthTimerHandler()
 			TimerWidgetComponent->DestroyComponent();
 			TimerWidgetComponent = nullptr;
 		}
+		
+		UpdateCropMesh();
 	}
+	
 }
 
 void AFieldPlot::CreateTimerWidget()
 {
 	if (TimerWidgetComponent != nullptr) return;
 	TimerWidgetComponent = NewObject<UWidgetComponent>(this);
-	TimerWidgetComponent->RegisterComponent(); // 🔥必须
+	TimerWidgetComponent->RegisterComponent(); 
 	TimerWidgetComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 
 	TimerWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
