@@ -4,6 +4,7 @@
 #include "GridSystem/GridManager.h"
 
 #include "IPropertyTable.h"
+#include "Components/InstancedStaticMeshComponent.h"
 
 // Sets default values
 AGridManager::AGridManager()
@@ -17,6 +18,34 @@ void AGridManager::BeginPlay()
 {
 	Super::BeginPlay();
 	Grid.SetNum(Width * Height);
+	
+	GridMesh = NewObject<UInstancedStaticMeshComponent>(this);
+	GridMesh->RegisterComponent();
+	GridMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+	
+	GridMesh->SetStaticMesh(GridPlaneMesh);
+	GridMesh->SetMaterial(0, GridMaterial);
+	for (int32 x = 0; x < Width; x++)
+	{
+		for (int32 y = 0; y < Height; y++)
+		{
+			FVector Location = GridToWorld(FIntPoint(x, y));
+
+			FTransform Transform;
+			Transform.SetLocation(Location);
+			Transform.SetScale3D(FVector(CellSize / 100.f)); // 根据Mesh调整
+
+			GridMesh->AddInstance(Transform);
+		}
+	}
+}
+
+void AGridManager::SetGridMeshVisible(bool bVisible)
+{
+	if (GridMesh)
+	{
+		GridMesh->SetVisibility(bVisible);
+	}
 }
 
 bool AGridManager::IsValidCoord(FIntPoint Coord) const
@@ -59,7 +88,13 @@ AActor* AGridManager::Place(FIntPoint Coord, TSubclassOf<AActor> ActorClass)
 	if (!CanPlace(Coord)) return nullptr;
 	FGridCell& Cell = Grid[GetIndex(Coord)];
 	FVector WorldPos = GridToWorld(Coord);
-	AActor* Actor = GetWorld()->SpawnActor<AActor>(ActorClass, WorldPos, FRotator::ZeroRotator);
+	
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	Params.Owner = this;
+	Params.bNoFail = true; // 强制生成！永不失败！
+	
+	AActor* Actor = GetWorld()->SpawnActor<AActor>(ActorClass, WorldPos, FRotator::ZeroRotator, Params);
 	if (Actor)
 	{
 		Cell.bOccupied = true;

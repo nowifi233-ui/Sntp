@@ -17,9 +17,11 @@ public:
 
 	void SetValid(bool bValid);
 	
-protected:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* Mesh;
+	
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* Root;
 	
 	UPROPERTY()
 	UMaterialInstanceDynamic* DynamicMaterial;

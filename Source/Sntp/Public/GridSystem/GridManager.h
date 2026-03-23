@@ -37,18 +37,29 @@ protected:
 	
 public:
 	UPROPERTY(EditAnywhere, Category="Grid")
-	int32 Width = 10;
+	int32 Width = 20;
 	
 	UPROPERTY(EditAnywhere, Category="Grid")
-	int32 Height = 10;
+	int32 Height = 20;
 	
 	UPROPERTY(EditAnywhere, Category="Grid")
-	float CellSize = 100.f;
+	float CellSize = 50.f;
 	
 	static AGridManager* Get(UWorld* World)
 	{
 		return Cast<AGridManager>(UGameplayStatics::GetActorOfClass(World, AGridManager::StaticClass()));
 	}
+	
+	UPROPERTY(EditAnywhere, Category="Grid")
+	UInstancedStaticMeshComponent* GridMesh;
+	
+	UPROPERTY(EditAnywhere, Category="Grid")
+	UStaticMesh* GridPlaneMesh;
+	
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* GridMaterial;
+	
+	void SetGridMeshVisible(bool bVisible);
 	
 private:
 	UPROPERTY()
@@ -66,7 +77,6 @@ public:
 	
 	// Build
 	bool CanPlace(FIntPoint Coord) const;
-	
 	AActor* Place(FIntPoint Coord, TSubclassOf<AActor> ActorClass) ;
 	void Remove(FIntPoint Coord);
 };

@@ -19,6 +19,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Recall(ACharacter* Player);
 
+	UPROPERTY()
+	UStaticMesh* Mesh;
 protected:
 	UPROPERTY(EditAnywhere)
 	float Health;

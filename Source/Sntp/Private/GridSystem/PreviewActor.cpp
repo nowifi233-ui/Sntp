@@ -9,8 +9,10 @@ APreviewActor::APreviewActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	
+	Root = CreateDefaultSubobject<USceneComponent>("Root");
+	RootComponent = Root;
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	RootComponent = Mesh;
+	Mesh->SetupAttachment(RootComponent);
 }
 
 void APreviewActor::SetValid(bool bValid)

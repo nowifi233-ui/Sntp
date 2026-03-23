@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "InputMappingContext.h"
 #include "AbilitySystem/SntpAbilitySystemComponent.h"
+#include "Actors/Buildings/BuildingBase.h"
 #include "GridSystem/GridManager.h"
 #include "SntpPlayerController.generated.h"
 
@@ -13,6 +14,15 @@ class APreviewActor;
 class UDamageTextComponent;
 class USntpInputConfig;
 class IEnemyInterface;
+
+
+UENUM()
+enum class EBuildModeState : uint8
+{
+	None,
+	Placing
+};
+
 /**
  * 
  */
@@ -37,8 +47,16 @@ protected:
 private:
 	// Enhanced Input Subsystem
 	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* MoveAction;
+	TSoftObjectPtr<UInputMappingContext> InputMapping;
 	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* MoveAction;
+
+	void HandleMove(const FInputActionValue& InputValue);
+	/**
+	 * Interaction System: 
+	 * Scroll / Interaction / Toggle Inventory
+	 */
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* ScrollAction;
 	
@@ -48,16 +66,15 @@ private:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* ToggleInventoryAction;
 	
-	void HandleMove(const FInputActionValue& InputValue);
 	void HandleScroll(const FInputActionValue& InputValue);
 	void HandleInteract(const FInputActionValue& InputValue);
 	void ToggleInventory(const FInputActionValue& InputValue);
-
-	UPROPERTY(EditAnywhere, Category="Input")
-	TSoftObjectPtr<UInputMappingContext> InputMapping;
 	
 	float Speed = 500.f;
-	
+
+	/**
+	 * Ability System Bind
+	 */
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<USntpInputConfig> InputConfig;
 	
@@ -85,6 +102,9 @@ private:
 	 */
 public:
 	UPROPERTY()
+	AGridManager* GridManager;
+	
+	UPROPERTY()
 	APreviewActor* PreviewActor;
 	
 	UPROPERTY(EditAnywhere)
@@ -92,6 +112,26 @@ public:
 	
 	void UpdatePreview();
 	
-	UPROPERTY()
-	AGridManager* GridManager;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ABuildingBase> CurrentBuildClass;
+	
+	EBuildModeState BuildState = EBuildModeState::None;
+	
+private:
+	
+	void EnterBuildMode(TSubclassOf<AActor> BuildClass);
+	void ExitBuildMode();
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* SwitchBuildModeAction;
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* PlaceAction;
+	
+	UFUNCTION()
+	void ToggleBuildMode();
+	
+	UFUNCTION()
+	void HandlePlace();
+	
 };

@@ -7,11 +7,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "Characters/SntpPlayerCharacter.h"
 #include "Input/SntpInputComponent.h"
-#include "Components/InstancedStaticMeshComponent.h"
-#include "Components/Overlay.h"
 #include "GameFramework/Character.h"
 #include "GridSystem/PreviewActor.h"
-#include "Input/SntpInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/SntpHUD.h"
 #include "UI/Widget/DamageTextComponent.h"
@@ -28,7 +25,13 @@ void ASntpPlayerController::PlayerTick(const float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 	CursorTrace();
 	
-	UpdatePreview();
+	/**
+	 * Grid Building System Preview
+	 */
+	if (BuildState == EBuildModeState::Placing)
+	{
+		UpdatePreview();
+	}
 }
 
 void ASntpPlayerController::ShowDamageNumber_Implementation(const float DamageAmount, ACharacter* TargetCharacter, bool bCritical)
@@ -55,9 +58,16 @@ void ASntpPlayerController::SetupInputComponent()
 
 	USntpInputComponent* SntpInputComponent = Cast<USntpInputComponent>(InputComponent);
 	SntpInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASntpPlayerController::HandleMove);
+	
+	/**
+	 * Interaction System
+	 */
 	SntpInputComponent->BindAction(ScrollAction, ETriggerEvent::Triggered, this, &ASntpPlayerController::HandleScroll);
 	SntpInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ASntpPlayerController::HandleInteract);
 	SntpInputComponent->BindAction(ToggleInventoryAction, ETriggerEvent::Started, this, &ASntpPlayerController::ToggleInventory);
+	/**
+	 * Ability System
+	 */
 	SntpInputComponent->BindAbilityActions(
 		InputConfig,
 		this,
@@ -65,14 +75,20 @@ void ASntpPlayerController::SetupInputComponent()
 		&ThisClass::AbilityInputTagReleased,
 		&ThisClass::AbilityInputTagHeld);
 	
+	/**
+	 * Grid Build System: Place and Switch Build mode
+	 */
+	SntpInputComponent->BindAction(SwitchBuildModeAction, ETriggerEvent::Started, this, &ASntpPlayerController::ToggleBuildMode);
+	SntpInputComponent->BindAction(PlaceAction, ETriggerEvent::Started, this, &ASntpPlayerController::HandlePlace);
 }
 
 void ASntpPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// Preview
+	// Spawn Preview Actor
 	PreviewActor = GetWorld()->SpawnActor<APreviewActor>(PreviewClass);
+	GridManager = AGridManager::Get(GetWorld());
 	
 	// Set Mouse actions
 	bShowMouseCursor = true;
@@ -94,9 +110,6 @@ void ASntpPlayerController::BeginPlay()
 			}
 		}
 	}
-	//
-	
-	GridManager = AGridManager::Get(GetWorld());
 }
 
 
@@ -116,7 +129,6 @@ void ASntpPlayerController::HandleMove(const FInputActionValue& InputValue)
 		ControlledPawn->AddMovementInput(ForwardDirection, MoveInput.X);
 		ControlledPawn->AddMovementInput(RightDirection, MoveInput.Y);
 	}
-	
 }
 
 void ASntpPlayerController::HandleScroll(const FInputActionValue& InputValue)
@@ -208,6 +220,12 @@ void ASntpPlayerController::UpdatePreview()
 	{
 		return;
 	}
+	
+	ABuildingBase* BuildCDO = CurrentBuildClass->GetDefaultObject<ABuildingBase>();
+	if (BuildCDO && BuildCDO->Mesh)
+	{
+		PreviewActor->Mesh->SetStaticMesh(BuildCDO->Mesh);
+	}
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
@@ -227,4 +245,62 @@ void ASntpPlayerController::UpdatePreview()
 
 	// ⑤ 更新颜色
 	PreviewActor->SetValid(bCanPlace);
+}
+
+void ASntpPlayerController::EnterBuildMode(TSubclassOf<AActor> BuildClass)
+{
+	BuildState = EBuildModeState::Placing;
+	// CurrentBuildClass = BuildClass;
+	
+	if (!PreviewActor)
+	{
+		PreviewActor = GetWorld()->SpawnActor<APreviewActor>(PreviewClass);
+	}
+	PreviewActor->SetActorHiddenInGame(false);
+	GridManager->SetGridMeshVisible(true);
+}
+
+void ASntpPlayerController::ExitBuildMode()
+{
+	BuildState = EBuildModeState::None;
+	// CurrentBuildClass = nullptr;
+	if (PreviewActor)
+	{
+		PreviewActor->SetActorHiddenInGame(true);
+	}
+	GridManager->SetGridMeshVisible(false);
+}
+
+void ASntpPlayerController::ToggleBuildMode()
+{
+	if (BuildState == EBuildModeState::None)
+	{
+		EnterBuildMode(PreviewClass);
+	}
+	else
+	{
+		ExitBuildMode();
+	}
+}
+
+void ASntpPlayerController::HandlePlace()
+{
+	if (BuildState != EBuildModeState::Placing) return;
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+	
+	if (!Hit.bBlockingHit) return;
+	
+	FIntPoint Coord = GridManager->WorldToGrid(Hit.Location);
+	
+	
+	if (GridManager->CanPlace(Coord))
+	{
+		FActorSpawnParameters Params;
+		GridManager->Place(Coord, CurrentBuildClass);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(2, 3, FColor::Red, *Hit.Location.ToString());
+	}
 }
