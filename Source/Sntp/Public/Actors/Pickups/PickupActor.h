@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ItemDefinition.h"
+#include "Data/ItemDefinition.h"
 #include "GameFramework/Actor.h"
 #include "Interaction/Interactable.h"
 #include "PickupActor.generated.h"

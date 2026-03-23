@@ -5,7 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "SntpAbilityTypes.h"
-#include "AbilitySystem/Data/CharacterClassInfo.h"
+#include "Data/CharacterClassInfo.h"
 #include "Game/SntpGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 

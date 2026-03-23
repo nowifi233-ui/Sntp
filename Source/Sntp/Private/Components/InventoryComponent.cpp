@@ -3,9 +3,8 @@
 
 #include "Components/InventoryComponent.h"
 
-#include "ItemDefinition.h"
+#include "Data/ItemDefinition.h"
 #include "Abilities/GameplayAbility.h"
-#include "AbilitySystem/SntpAbilitySystemComponent.h"
 #include "Characters/SntpPlayerCharacter.h"
 
 // Sets default values for this component's properties

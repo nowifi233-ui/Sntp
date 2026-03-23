@@ -10,6 +10,7 @@
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Components/Overlay.h"
 #include "GameFramework/Character.h"
+#include "GridSystem/PreviewActor.h"
 #include "Input/SntpInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/SntpHUD.h"
@@ -26,6 +27,8 @@ void ASntpPlayerController::PlayerTick(const float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 	CursorTrace();
+	
+	UpdatePreview();
 }
 
 void ASntpPlayerController::ShowDamageNumber_Implementation(const float DamageAmount, ACharacter* TargetCharacter, bool bCritical)
@@ -68,6 +71,9 @@ void ASntpPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// Preview
+	PreviewActor = GetWorld()->SpawnActor<APreviewActor>(PreviewClass);
+	
 	// Set Mouse actions
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
@@ -88,6 +94,9 @@ void ASntpPlayerController::BeginPlay()
 			}
 		}
 	}
+	//
+	
+	GridManager = AGridManager::Get(GetWorld());
 }
 
 
@@ -191,4 +200,31 @@ void ASntpPlayerController::CursorTrace()
 		if (LastActor != nullptr) LastActor->UnHighlightActor();
 		if (CurrentActor != nullptr) CurrentActor->HighlightActor();
 	}
+}
+
+void ASntpPlayerController::UpdatePreview()
+{
+	if (!PreviewActor || !GridManager)
+	{
+		return;
+	}
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+
+	if (!Hit.bBlockingHit) return;
+
+	// ① 世界 → Grid
+	FIntPoint Coord = GridManager->WorldToGrid(Hit.Location);
+
+	// ② Grid → 世界（对齐格子）
+	FVector SnapLocation = GridManager->GridToWorld(Coord);
+
+	// ③ 移动预览Actor
+	PreviewActor->SetActorLocation(SnapLocation);
+
+	// ④ 判断能不能放
+	bool bCanPlace = GridManager->CanPlace(Coord);
+
+	// ⑤ 更新颜色
+	PreviewActor->SetValid(bCanPlace);
 }

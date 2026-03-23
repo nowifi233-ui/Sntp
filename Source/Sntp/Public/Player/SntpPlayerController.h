@@ -6,8 +6,10 @@
 #include "GameFramework/PlayerController.h"
 #include "InputMappingContext.h"
 #include "AbilitySystem/SntpAbilitySystemComponent.h"
+#include "GridSystem/GridManager.h"
 #include "SntpPlayerController.generated.h"
 
+class APreviewActor;
 class UDamageTextComponent;
 class USntpInputConfig;
 class IEnemyInterface;
@@ -76,4 +78,20 @@ private:
 	// Damage Text
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
+
+	/**
+	 *  Grid System
+	 *
+	 */
+public:
+	UPROPERTY()
+	APreviewActor* PreviewActor;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<APreviewActor> PreviewClass;
+	
+	void UpdatePreview();
+	
+	UPROPERTY()
+	AGridManager* GridManager;
 };
