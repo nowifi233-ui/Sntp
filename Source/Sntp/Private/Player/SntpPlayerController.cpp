@@ -5,9 +5,11 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
+#include "Camera/CameraComponent.h"
 #include "Characters/SntpPlayerCharacter.h"
 #include "Input/SntpInputComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GridSystem/PreviewActor.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/SntpHUD.h"
@@ -58,6 +60,7 @@ void ASntpPlayerController::SetupInputComponent()
 
 	USntpInputComponent* SntpInputComponent = Cast<USntpInputComponent>(InputComponent);
 	SntpInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASntpPlayerController::HandleMove);
+	SntpInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASntpPlayerController::HandleLook);
 	
 	/**
 	 * Interaction System
@@ -80,6 +83,11 @@ void ASntpPlayerController::SetupInputComponent()
 	 */
 	SntpInputComponent->BindAction(SwitchBuildModeAction, ETriggerEvent::Started, this, &ASntpPlayerController::ToggleBuildMode);
 	SntpInputComponent->BindAction(PlaceAction, ETriggerEvent::Started, this, &ASntpPlayerController::HandlePlace);
+	
+	/**
+	 * Setting Menu
+	 */
+	SntpInputComponent->BindAction(SettingMenuAction, ETriggerEvent::Started, this, &ASntpPlayerController::HandleSettingMenu);
 }
 
 void ASntpPlayerController::BeginPlay()
@@ -91,13 +99,12 @@ void ASntpPlayerController::BeginPlay()
 	GridManager = AGridManager::Get(GetWorld());
 	
 	// Set Mouse actions
-	bShowMouseCursor = true;
-	DefaultMouseCursor = EMouseCursor::Default;
-	
-	FInputModeGameAndUI InputMode;
-	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-	InputMode.SetHideCursorDuringCapture(false);
+	bShowMouseCursor = false;
+	FInputModeGameOnly InputMode;
+	InputMode.SetConsumeCaptureMouseDown(true);
 	SetInputMode(InputMode);
+	SetIgnoreLookInput(false);
+	SetIgnoreMoveInput(false);
 	
 	// Set up Input Mapping context
 	if (const ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player))
@@ -116,19 +123,30 @@ void ASntpPlayerController::BeginPlay()
 
 void ASntpPlayerController::HandleMove(const FInputActionValue& InputValue)
 {
-	// Moving action for bind.
 	const FVector2D MoveInput = InputValue.Get<FVector2D>();
-    const FRotator Rotation = GetControlRotation();
-	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
-	
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-	const FVector RightDirection = FRotationMatrix(Rotation).GetUnitAxis(EAxis::X);
-	
-	if (APawn* ControlledPawn = GetPawn<APawn>())
+
+	APawn* PawnCharacter = GetPawn();
+	if (!PawnCharacter) return;
+
+	const FRotator ControlRot = GetControlRotation();
+	const FRotator YawRot(0.f, ControlRot.Yaw, 0.f);
+
+	const FVector Forward = FRotationMatrix(YawRot).GetUnitAxis(EAxis::X);
+	const FVector Right   = FRotationMatrix(YawRot).GetUnitAxis(EAxis::Y);
+
+	PawnCharacter->AddMovementInput(Forward, MoveInput.Y);
+	PawnCharacter->AddMovementInput(Right, MoveInput.X);
+}
+
+void ASntpPlayerController::HandleLook(const FInputActionValue& InputValue)
+{
+	if (BuildState == EBuildModeState::Placing)
 	{
-		ControlledPawn->AddMovementInput(ForwardDirection, MoveInput.X);
-		ControlledPawn->AddMovementInput(RightDirection, MoveInput.Y);
+		return;
 	}
+	const FVector2D LookInput = InputValue.Get<FVector2D>();
+	AddYawInput(LookInput.X);
+	AddPitchInput(LookInput.Y);
 }
 
 void ASntpPlayerController::HandleScroll(const FInputActionValue& InputValue)
@@ -163,6 +181,15 @@ void ASntpPlayerController::ToggleInventory(const FInputActionValue& InputValue)
 	if (HUD)
 	{
 		HUD->ToggleBag(this);
+	}
+}
+
+void ASntpPlayerController::HandleSettingMenu(const FInputActionValue& InputValue)
+{
+	ASntpHUD* HUD = GetHUD<ASntpHUD>();
+	if (HUD)
+	{
+		HUD->ToggleSettingMenu(this);
 	}
 }
 
@@ -252,12 +279,28 @@ void ASntpPlayerController::EnterBuildMode(TSubclassOf<AActor> BuildClass)
 	BuildState = EBuildModeState::Placing;
 	// CurrentBuildClass = BuildClass;
 	
+	// Preview Actor
 	if (!PreviewActor)
 	{
 		PreviewActor = GetWorld()->SpawnActor<APreviewActor>(PreviewClass);
 	}
 	PreviewActor->SetActorHiddenInGame(false);
 	GridManager->SetGridMeshVisible(true);
+	
+	
+	// Switch Camrea
+	ASntpPlayerCharacter* PlayerCharacter = GetPawn<ASntpPlayerCharacter>();
+	PlayerCharacter->FollowCamera->Deactivate();
+	PlayerCharacter->BuildCamera->Activate();
+	// PlayerCharacter->GetCharacterMovement()->DisableMovement();
+	
+	// Set Mouse actions
+	bShowMouseCursor = true;
+	FInputModeGameAndUI InputMode;
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	InputMode.SetHideCursorDuringCapture(false);
+	SetInputMode(InputMode);
+	
 }
 
 void ASntpPlayerController::ExitBuildMode()
@@ -269,10 +312,24 @@ void ASntpPlayerController::ExitBuildMode()
 		PreviewActor->SetActorHiddenInGame(true);
 	}
 	GridManager->SetGridMeshVisible(false);
+	
+	ASntpPlayerCharacter* PlayerCharacter = GetPawn<ASntpPlayerCharacter>();
+	PlayerCharacter->BuildCamera->Deactivate();
+	PlayerCharacter->FollowCamera->Activate();
+	// PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	
+	// Set Mouse actions
+	bShowMouseCursor = false;
+	FInputModeGameOnly InputMode;
+	InputMode.SetConsumeCaptureMouseDown(true);
+	SetInputMode(InputMode);
+	SetIgnoreLookInput(false);
+	SetIgnoreMoveInput(false);
 }
 
 void ASntpPlayerController::ToggleBuildMode()
 {
+	
 	if (BuildState == EBuildModeState::None)
 	{
 		EnterBuildMode(PreviewClass);

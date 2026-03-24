@@ -114,6 +114,7 @@ int32 UInventoryComponent::AddToExistingStacks(UItemDefinition* ItemDef, int32 C
 
 int32 UInventoryComponent::AddToEmptySlots(UItemDefinition* ItemDef, int32 Count)
 {
+	if (Count <= 0) return 0;
 	for (FItemInstance& Item : Items)
 	{
 		if (Item.IsEmpty())

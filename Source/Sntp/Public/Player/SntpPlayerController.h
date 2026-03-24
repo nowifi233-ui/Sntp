@@ -53,6 +53,11 @@ private:
 	UInputAction* MoveAction;
 
 	void HandleMove(const FInputActionValue& InputValue);
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* LookAction;
+	
+	void HandleLook(const FInputActionValue& InputValue);
 	/**
 	 * Interaction System: 
 	 * Scroll / Interaction / Toggle Inventory
@@ -69,6 +74,16 @@ private:
 	void HandleScroll(const FInputActionValue& InputValue);
 	void HandleInteract(const FInputActionValue& InputValue);
 	void ToggleInventory(const FInputActionValue& InputValue);
+
+
+	/**
+	 *  Setting Menu
+	 */
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* SettingMenuAction;
+	
+	void HandleSettingMenu(const FInputActionValue& InputValue);
+	
 	
 	float Speed = 500.f;
 

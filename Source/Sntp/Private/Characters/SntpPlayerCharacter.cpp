@@ -5,12 +5,40 @@
 
 #include "AbilitySystem/SntpAbilitySystemComponent.h"
 #include "AbilitySystem/SntpAttributeSet.h"
+#include "Camera/CameraComponent.h"
 #include "Player/SntpPlayerController.h"
 #include "Player/SntpPlayerState.h"
 #include "UI/SntpHUD.h"
 
 ASntpPlayerCharacter::ASntpPlayerCharacter()
 {
+	// Set up Cameras
+	
+	// Follow Camera
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
+	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->TargetArmLength = 300.0f;
+	SpringArm->bUsePawnControlRotation = true;
+	
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
+	FollowCamera->SetupAttachment(SpringArm);
+	FollowCamera->bUsePawnControlRotation = false;
+	
+	// Build Camera
+	BuildCameraRoot = CreateDefaultSubobject<UCameraComponent>("BuildCameraRoot");
+	BuildCameraRoot->SetupAttachment(RootComponent);
+	
+	BuildCameraRoot->SetRelativeLocation(FVector(0, 0, 0));
+	BuildCameraRoot->SetRelativeRotation(FRotator(-60.f, 0, 0));
+	
+	BuildCamera = CreateDefaultSubobject<UCameraComponent>("BuildCamera");
+	BuildCamera->SetupAttachment(BuildCameraRoot);
+	BuildCamera->SetRelativeLocation(FVector(0, 0, 1500));
+	
+	/**
+	 * Interaction Components
+	 */
+	
 	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
 	InteractionSphere->SetupAttachment(RootComponent);
 	InteractionSphere->SetSphereRadius(150.f);

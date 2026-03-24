@@ -60,17 +60,65 @@ void ASntpHUD::ToggleBag(APlayerController* PlayerController)
 		}
 		
 		BagWidget->SetWidgetController(InventoryWidgetController);
+		
 	}
 	if (bBagOpen)
 	{
 		BagWidget->RemoveFromParent();
 		// PlayerController->SetInputMode(FInputModeGameOnly());
 		bBagOpen = false;
+		
+		// Set Mouse actions
+		PlayerController->bShowMouseCursor = false;
+		FInputModeGameOnly InputMode;
+		InputMode.SetConsumeCaptureMouseDown(true);
+		PlayerController->SetInputMode(InputMode);
+		PlayerController->SetIgnoreLookInput(false);
+		PlayerController->SetIgnoreMoveInput(false);
 	}
 	else
 	{
 		BagWidget->AddToViewport();
 		bBagOpen = true;
+		
+		// Set Mouse actions
+		PlayerController->bShowMouseCursor = true;
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetHideCursorDuringCapture(false);
+		PlayerController->SetInputMode(InputMode);
+	}
+}
+
+void ASntpHUD::ToggleSettingMenu(APlayerController* PlayerController)
+{
+	if (!SettingWidget)
+	{
+		SettingWidget = CreateWidget<UUserWidget>(GetWorld(), SettingWidgetClass);
+	}
+	if (!bSettingOpen)
+	{
+		
+		SettingWidget->AddToViewport();
+		bSettingOpen = true;
+		
+		PlayerController->bShowMouseCursor = true;
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetHideCursorDuringCapture(false);
+		PlayerController->SetInputMode(InputMode);
+	}
+	else
+	{
+		bSettingOpen = false;
+		SettingWidget->RemoveFromParent();
+		// Set Mouse actions
+		PlayerController->bShowMouseCursor = false;
+		FInputModeGameOnly InputMode;
+		InputMode.SetConsumeCaptureMouseDown(true);
+		PlayerController->SetInputMode(InputMode);
+		PlayerController->SetIgnoreLookInput(false);
+		PlayerController->SetIgnoreMoveInput(false);
 	}
 }
 

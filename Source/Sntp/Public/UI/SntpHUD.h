@@ -33,6 +33,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ToggleBag(APlayerController* PlayerController);
 	
+	UFUNCTION(BlueprintCallable)
+	void ToggleSettingMenu(APlayerController* PlayerController);
 private:
 	/*
 	 * Overlay Widget Controller
@@ -61,6 +63,13 @@ private:
 	UPROPERTY()
 	TObjectPtr<UInventoryWidgetController> InventoryWidgetController;
 	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> SettingWidgetClass;
+	
+	UPROPERTY()
+	TObjectPtr<UUserWidget> SettingWidget;
+	
 private:
 	bool bBagOpen = false;
+	bool bSettingOpen = false;
 };

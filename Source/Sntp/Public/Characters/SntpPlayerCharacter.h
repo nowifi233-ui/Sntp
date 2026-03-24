@@ -6,8 +6,10 @@
 #include "Components/InventoryComponent.h"
 #include "Characters/SntpCharacterBase.h"
 #include "Components/InteractionComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "SntpPlayerCharacter.generated.h"
 
+class UCameraComponent;
 /**
  * 
  */
@@ -17,6 +19,22 @@ class SNTP_API ASntpPlayerCharacter : public ASntpCharacterBase, public IAbility
 	GENERATED_BODY()
 public:
 	ASntpPlayerCharacter();
+	
+	// Camera
+	UPROPERTY(VisibleAnywhere)
+	USpringArmComponent* SpringArm;
+	
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* FollowCamera;
+	
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* BuildCameraRoot;
+	
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* BuildCamera;
+	
+	//
+	
 	virtual void PossessedBy(AController* byController) override;
 	virtual void OnRep_PlayerState() override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
