@@ -2,9 +2,12 @@
 
 
 #include "Components/InteractionComponent.h"
+
+#include "Components/CapsuleComponent.h"
 #include "Interaction/Interactable.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+class UCapsuleComponent;
 // Sets default values for this component's properties
 UInteractionComponent::UInteractionComponent()
 {
@@ -18,31 +21,15 @@ void UInteractionComponent::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(
 		ScanTimer,
 		this, 
-		&UInteractionComponent::FindInteractable,
+		&UInteractionComponent::UpdateCurrentInteractable,
 		0.2f,
 		true);
 }
 
-void UInteractionComponent::FindInteractable()
+void UInteractionComponent::Interact(FInteractionOption Option)
 {
-	TArray<AActor*> Actors;
-	
-	UpdateCurrentInteractable();
-}
+	OnOptionSelected.Broadcast(Option);
 
-void Update()
-{
-
-}
-
-void UInteractionComponent::Interact(int32 Index)
-{
-	OnOptionSelected.Broadcast(Index);
-	if (!CurrentOptions.IsValidIndex(Index))
-	{
-		return;
-	}
-	const FInteractionOption& Option = CurrentOptions[Index];
 	if (!Option.SourceActor.Get()) return;
 	IInteractable* Interactable = Cast<IInteractable>(Option.SourceActor);
 	if (Interactable)
@@ -51,7 +38,7 @@ void UInteractionComponent::Interact(int32 Index)
 	}
 }
 
-void UInteractionComponent::InitSphere(USphereComponent* InSphereComponent)
+void UInteractionComponent::InitSphere(UCapsuleComponent* InSphereComponent)
 {
 	DetectionSphere = InSphereComponent;
 	if (!DetectionSphere)
@@ -84,14 +71,17 @@ void UInteractionComponent::UpdateCurrentInteractable()
 {
 	TArray<AActor*> Actors;
 	
-	UKismetSystemLibrary::SphereOverlapActors(
+	UKismetSystemLibrary::CapsuleOverlapActors(
 		GetWorld(),
 		GetOwner()->GetActorLocation(),
-		100,
+		150,
+		180,
 		TArray<TEnumAsByte<EObjectTypeQuery>>(),
 		nullptr,
 		{},
 		Actors);
+	
+	// UKismetSystemLibrary::DrawDebugCapsule(GetWorld(), GetOwner()->GetActorLocation(), 180, 150, FRotator(), FColor::Blue);
 	
 	AActor* Closest = nullptr;
 	float BestDist = MAX_FLT;
@@ -107,7 +97,6 @@ void UInteractionComponent::UpdateCurrentInteractable()
 			BestDist = Dist;
 		}
 	}
-	
 	
 	if (!Closest)
 	{
@@ -138,9 +127,7 @@ void UInteractionComponent::UpdateCurrentInteractable()
 			}
 		}
 	}
-	/*
-	 * Do Nothing
-	 */
+
 	AActor* LastClosestActor = CurrentInteractable;
 	bool bSameActor = (Closest == LastClosestActor);
 	bool bSameOptions = AreOptionsEqual(CurrentOptions, Options);
@@ -148,16 +135,25 @@ void UInteractionComponent::UpdateCurrentInteractable()
 	{
 		return;
 	}
+	
 	CurrentInteractable = Closest;
 	CurrentOptions = Options;
+	
+	if (CurrentInteractable && LastClosestActor)
+	{
+		if (CurrentInteractable->Implements<UInteractable>() && LastClosestActor->Implements<UInteractable>())
+		{
+			if (Cast<IInteractable>(LastClosestActor)->GetType() == EInteractionType::Building && Cast<IInteractable>(CurrentInteractable)->GetType() == EInteractionType::Pickup)
+			{
+				ShowWidgetDelegate.Broadcast(CurrentOptions, Cast<IInteractable>(CurrentInteractable)->GetInteractionName());
+			}
+		}
+	}
+	
 	
 	if (CurrentOptions.Num() == 0)
 	{
 		HideWidgetDelegate.Broadcast();
-	}
-	else
-	{
-		ShowWidgetDelegate.Broadcast(CurrentOptions, ClosestInteractable->GetInteractionName());
 	}
 }
 
@@ -168,13 +164,35 @@ void UInteractionComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedCompon
 	{
 		return;
 	}
-	UpdateCurrentInteractable();
+	IInteractable* ClosestInteractable = Cast<IInteractable>(OtherActor);
+	if (ClosestInteractable->GetType() == EInteractionType::Pickup)
+	{
+		FInteractionOption Option = ClosestInteractable->GetInteractionOptions()[0];
+		AddOptionDelegate.Broadcast(Option);
+	}
+	else
+	{
+		UpdateCurrentInteractable();
+	}
 }
 
 void UInteractionComponent::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	UpdateCurrentInteractable();
+	if (!OtherActor->Implements<UInteractable>())
+	{
+		return;
+	}
+	IInteractable* ClosestInteractable = Cast<IInteractable>(OtherActor);
+	if (ClosestInteractable->GetType() == EInteractionType::Pickup)
+	{
+		FInteractionOption Option = ClosestInteractable->GetInteractionOptions()[0];
+		RemoveOptionDelegate.Broadcast(Option);
+	}
+	else
+	{
+		UpdateCurrentInteractable();
+	}
 }
 
 void UInteractionComponent::CurrentActorStateChanged()

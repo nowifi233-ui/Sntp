@@ -7,6 +7,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "SntpAbilitySystemLibrary.generated.h"
 
+struct FInteractionOption;
 class UAbilitySystemComponent;
 enum class ECharacterClass : uint8;
 /**
@@ -29,4 +30,14 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category="SntpAttributeSystemLibrary")
 	static FText FormatTime(int32 TotalSeconds);
+	
+	
+	UFUNCTION(BlueprintPure, Category="SntpAttributeSystemLibrary")
+	static AActor* GetNearestEnemy(AActor* Source, float Radius);
+	
+	UFUNCTION(BlueprintPure, Category="SntpAttributeSystemLibrary")
+	static bool IsEnemy(AActor* Source, AActor* Target);
+	
+	UFUNCTION(BlueprintPure, Category="SntpAttributeSystemLibrary")
+	static bool IsSameInteractionOption(const FInteractionOption& A, const FInteractionOption& B);
 };

@@ -7,6 +7,7 @@
 #include "SntpAbilityTypes.h"
 #include "Data/CharacterClassInfo.h"
 #include "Game/SntpGameModeBase.h"
+#include "Interaction/Interactable.h"
 #include "Kismet/GameplayStatics.h"
 
 void USntpAbilitySystemLibrary::InitializeDefaultAttributes(const UObject* WorldContextObject,
@@ -67,4 +68,55 @@ FText USntpAbilitySystemLibrary::FormatTime(int32 TotalSeconds)
 		FText::AsNumber(Minutes, &Options),
 		FText::AsNumber(Seconds, &Options)
 	);
+}
+
+AActor* USntpAbilitySystemLibrary::GetNearestEnemy(AActor* Source, float Radius)
+{
+	if (Source == nullptr) return nullptr;
+	UWorld* World = Source->GetWorld();
+	if (World == nullptr) return nullptr;
+	
+	TArray<AActor*> OverlappingActors;
+	
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+	
+	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(Source);
+	// Detect
+	UKismetSystemLibrary::SphereOverlapActors(
+		World,
+		Source->GetActorLocation(),
+		Radius,
+		ObjectTypes,
+		AActor::StaticClass(),
+		IgnoreActors,
+		OverlappingActors
+		);
+	AActor* NearestActor = nullptr;
+	float MinDestSq = TNumericLimits<float>::Max();
+	
+	for (AActor* Actor : OverlappingActors)
+	{
+		if (!Actor) continue;
+		if (!IsEnemy(Source, Actor)) continue;
+		float DistSq = FVector::DistSquared(Source->GetActorLocation(), Actor->GetActorLocation());
+		if (DistSq < MinDestSq)
+		{
+			MinDestSq = DistSq;
+			NearestActor = Actor;
+		}
+	}
+	return NearestActor;
+}
+
+bool USntpAbilitySystemLibrary::IsEnemy(AActor* Source, AActor* Target)
+{
+	if (!Source || !Target) return false;
+	return Target->ActorHasTag(FName("Enemy"));
+}
+
+bool USntpAbilitySystemLibrary::IsSameInteractionOption(const FInteractionOption& A, const FInteractionOption& B)
+{
+	return (A.SourceActor == B.SourceActor && A.OptionName == B.OptionName);
 }

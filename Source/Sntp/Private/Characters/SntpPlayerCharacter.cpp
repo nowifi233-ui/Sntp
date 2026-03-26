@@ -6,6 +6,7 @@
 #include "AbilitySystem/SntpAbilitySystemComponent.h"
 #include "AbilitySystem/SntpAttributeSet.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Player/SntpPlayerController.h"
 #include "Player/SntpPlayerState.h"
 #include "UI/SntpHUD.h"
@@ -35,19 +36,22 @@ ASntpPlayerCharacter::ASntpPlayerCharacter()
 	BuildCamera->SetupAttachment(BuildCameraRoot);
 	BuildCamera->SetRelativeLocation(FVector(0, 0, 1500));
 	
-	/**
-	 * Interaction Components
-	 */
-	
-	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
+	//
+	InteractionSphere = CreateDefaultSubobject<UCapsuleComponent>(TEXT("InteractionSphere"));
 	InteractionSphere->SetupAttachment(RootComponent);
-	InteractionSphere->SetSphereRadius(150.f);
-	// ⭐ 只检测Query，不要物理
+	InteractionSphere->SetCapsuleRadius(150.f);
+	InteractionSphere->SetCapsuleHalfHeight(100.f);
+	
+	InteractionSphere->SetGenerateOverlapEvents(true);
 	InteractionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	
 	InteractionSphere->SetCollisionObjectType(ECC_WorldDynamic);
 	InteractionSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
-	InteractionSphere->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
-	InteractionSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+
+	// ✅ 打开你需要的重叠通道（最关键）
+	InteractionSphere->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap); 
+	InteractionSphere->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap); 
+	InteractionSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);         
 	
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>("InteractionComponent");
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent");

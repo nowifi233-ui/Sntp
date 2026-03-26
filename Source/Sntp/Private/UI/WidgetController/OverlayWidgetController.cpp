@@ -66,8 +66,8 @@ void UOverlayWidgetController::OnInventoryChanged()
 	OnInventoryUpdate.Broadcast();
 }
 
-void UOverlayWidgetController::OnInteractedOptionSelected(int32 Index)
+void UOverlayWidgetController::OnInteractedOptionSelected(FInteractionOption Option)
 {
-	OnOptionSelected.Broadcast(Index);
+	OnOptionSelected.Broadcast(Option);
 }
 

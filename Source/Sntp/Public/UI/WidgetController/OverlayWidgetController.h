@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Components/InventoryComponent.h"
+#include "Interaction/Interactable.h"
 #include "UI/WidgetController/SntpWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeSignature, float, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FScrollDelegate, int32, NewValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnOptionSelected, int32, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnOptionSelected, FInteractionOption, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdate);
 /**
  * 
@@ -25,6 +26,7 @@ public:
 	virtual void BroadcastInitialValue() override;
 	virtual void BindCallbackToDependencies() override;
 
+	//~ Delegates
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
 	FOnAttributeSignature OnHealthChanged;
 	
@@ -37,17 +39,25 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
 	FScrollDelegate OnScrollDelegate;
 	
-	UPROPERTY(BlueprintReadWrite)
-	int32 CurrentOptionIndex;
-	
-	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<UInventoryComponent> InventoryComponent;
-	
 	UPROPERTY(BlueprintAssignable)
 	FOnInventoryUpdate OnInventoryUpdate;
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnOptionSelected OnOptionSelected;
+	
+	UPROPERTY(BlueprintReadWrite)
+	int32 CurrentOptionIndex;
+	//~ Delegates End
+	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UInventoryComponent> InventoryComponent;
+	
+	/**
+	 * Interaction
+	 */
+	
+	UPROPERTY(BlueprintReadWrite)
+	FInteractionOption CurrentOption;
 	
 	/**
 	 * Bag
@@ -60,5 +70,5 @@ private:
 	void OnInventoryChanged();
 	
 	UFUNCTION()
-	void OnInteractedOptionSelected(int32 Index);
+	void OnInteractedOptionSelected(FInteractionOption Option);
 };

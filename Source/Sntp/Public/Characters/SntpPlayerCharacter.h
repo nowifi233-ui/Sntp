@@ -50,7 +50,7 @@ public:
 protected:
 	virtual void InitAbilityActorInfo() override;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<USphereComponent> InteractionSphere;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UCapsuleComponent> InteractionSphere;
 	
 };
