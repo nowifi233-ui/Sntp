@@ -25,7 +25,7 @@ struct FItemInstance
 	}
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryItemChanged);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemUsed, int32, Index);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -44,7 +44,7 @@ public:
 	TArray<FItemInstance> Items;
 	
 	UPROPERTY(BlueprintAssignable)
-	FOnInventoryChanged OnInventoryChanged;
+	FOnInventoryItemChanged OnInventoryChanged;
 	
 	void InitInventory();
 	/*
@@ -56,6 +56,17 @@ public:
 	void UseItem(int32 Index);
 	UFUNCTION(BlueprintCallable)
 	void SwapItems(int32 A, int32 B);
+	bool HasItem(UItemDefinition* ItemDef, int32 Count);
+	int32 FindItemSlot(UItemDefinition* ItemDef);
+	bool RemoveItemByIndex(int32 Index, int32 Count);
+	
+	
+	/**
+	 * Other Inventory component
+	 */
+	static void TransferItem(UInventoryComponent* From, UInventoryComponent* To, int32 Index, int32 Count);
+	UFUNCTION(BlueprintCallable)
+	static bool SwapItemsByIndex(UInventoryComponent* From, UInventoryComponent* To, int32 FromIndex, int32 ToIndex);
 
 private:
 	int32 AddToExistingStacks(UItemDefinition* ItemDef, int32 Count);

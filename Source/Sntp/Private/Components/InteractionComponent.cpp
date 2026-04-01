@@ -149,8 +149,6 @@ void UInteractionComponent::UpdateCurrentInteractable()
 			}
 		}
 	}
-	
-	
 	if (CurrentOptions.Num() == 0)
 	{
 		HideWidgetDelegate.Broadcast();

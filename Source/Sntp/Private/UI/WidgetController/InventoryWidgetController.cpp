@@ -9,7 +9,7 @@ class ASntpHUD;
 
 void UInventoryWidgetController::Init(UInventoryComponent* InInventoryComponent, APlayerController* InPlayerController)
 {
-	InventoryComponent = InInventoryComponent;
+	PlayerInventoryComponent = InInventoryComponent;
 	if (InInventoryComponent)
 	{
 		InInventoryComponent->OnInventoryChanged.AddDynamic(this, &ThisClass::HandleInventoryChanged);
@@ -17,22 +17,44 @@ void UInventoryWidgetController::Init(UInventoryComponent* InInventoryComponent,
 	}
 }
 
+void UInventoryWidgetController::SetTargetInventoryComponent(UInventoryComponent* InInventoryComponent)
+{
+	TargetInventoryComponent = InInventoryComponent;
+	if (InInventoryComponent)
+	{
+		InInventoryComponent->OnInventoryChanged.Clear();
+		InInventoryComponent->OnInventoryChanged.AddDynamic(this, &ThisClass::HandleInventoryChanged);
+	}
+	EventTargetControllerSet.Broadcast();
+}
+
 const TArray<FItemInstance>& UInventoryWidgetController::GetItems() const
 {
-	return InventoryComponent->Items;
+	return PlayerInventoryComponent->Items;
 }
 
 void UInventoryWidgetController::RequestUseItem(int32 Index)
 {
-	if (InventoryComponent.Get())
+	if (PlayerInventoryComponent.Get())
 	{
-		InventoryComponent->UseItem(Index);
+		PlayerInventoryComponent->UseItem(Index);
 	}
 }
 
 void UInventoryWidgetController::RequestToggleBag()
 {
 	PlayerController->GetHUD<ASntpHUD>()->ToggleBag(PlayerController);
+}
+
+void UInventoryWidgetController::RequestToggleInv()
+{
+	PlayerController->GetHUD<ASntpHUD>()->ToggleInventoryUI(PlayerController, nullptr);
+}
+
+void UInventoryWidgetController::TransferItem(UInventoryComponent* From, UInventoryComponent* To, int32 Index,
+                                              int32 Count)
+{
+	UInventoryComponent::TransferItem(From, To, Index, Count);
 }
 
 void UInventoryWidgetController::HandleInventoryChanged()

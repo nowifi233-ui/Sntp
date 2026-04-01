@@ -19,6 +19,7 @@ class SNTP_API UInventoryWidgetController : public USntpWidgetController
 	
 public:
 	void Init(UInventoryComponent* InInventoryComponent, APlayerController* InPlayerController);
+	void SetTargetInventoryComponent(UInventoryComponent* InInventoryComponent);
 	
 	UFUNCTION(BlueprintCallable)
 	const TArray<FItemInstance>& GetItems() const;
@@ -27,15 +28,26 @@ public:
 	FInventoryChangedDelegate OnInventoryChanged;
 	
 	UPROPERTY(BlueprintReadOnly)
-	TWeakObjectPtr<UInventoryComponent> InventoryComponent;
+	TWeakObjectPtr<UInventoryComponent> PlayerInventoryComponent;
+	
+	UPROPERTY(BlueprintReadOnly)
+	TWeakObjectPtr<UInventoryComponent> TargetInventoryComponent;
 	
 	UFUNCTION(BlueprintCallable)
 	void RequestUseItem(int32 Index);
 	
 	UFUNCTION(BlueprintCallable)
 	void RequestToggleBag();
-private:
 	
+	UFUNCTION(BlueprintCallable)
+	void RequestToggleInv();
+	
+	UFUNCTION(BlueprintCallable)
+	void TransferItem(UInventoryComponent* From, UInventoryComponent* To, int32 Index, int32 Count);
+	
+	UPROPERTY(BlueprintAssignable)
+	FInventoryChangedDelegate EventTargetControllerSet;
+private:
 	
 	UFUNCTION()
 	void HandleInventoryChanged();

@@ -3,6 +3,7 @@
 
 #include "Components/InventoryComponent.h"
 
+#include "AbilitySystemGlobals.h"
 #include "Data/ItemDefinition.h"
 #include "Abilities/GameplayAbility.h"
 #include "Characters/SntpPlayerCharacter.h"
@@ -16,7 +17,7 @@ UInventoryComponent::UInventoryComponent()
 
 void UInventoryComponent::InitInventory()
 {
-	Items.SetNum(Capacity);
+	Items.Init(FItemInstance(), Capacity);
 }
 
 int32 UInventoryComponent::AddItem(UItemDefinition* ItemDef, int32 Count)
@@ -31,7 +32,26 @@ int32 UInventoryComponent::AddItem(UItemDefinition* ItemDef, int32 Count)
 
 bool UInventoryComponent::RemoveItem(UItemDefinition* ItemDef, int32 Count)
 {
-	// TODO: Finish it
+	if (!ItemDef || Count <= 0) return false;
+	
+	for (FItemInstance& Item : Items)
+	{
+		if (Item.ItemDef == ItemDef)
+		{
+			const int32 RemoveAmount = FMath::Min(Item.Count, Count);
+			Item.Count -= RemoveAmount;
+			Count -= RemoveAmount;
+			if (Item.Count <= 0)
+			{
+				Item = FItemInstance();
+			}
+			if (Count <= 0)
+			{
+				OnInventoryChanged.Broadcast();
+				return true;
+			}
+		}
+	}
 	OnInventoryChanged.Broadcast();
 	return false;
 }
@@ -44,7 +64,7 @@ void UInventoryComponent::UseItem(int32 Index)
 	// 调用物品逻辑
 	if (Item.ItemDef->UseAbility)
 	{
-		UAbilitySystemComponent* ASC = Cast<ASntpPlayerCharacter>(GetOwner())->GetAbilitySystemComponent();
+		UAbilitySystemComponent* ASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwner());
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Item.ItemDef->UseAbility);
 		ASC->GiveAbilityAndActivateOnce(AbilitySpec);
 	}
@@ -91,6 +111,137 @@ void UInventoryComponent::SwapItems(int32 A, int32 B)
 	}
 	Items.Swap(A, B);
 	OnInventoryChanged.Broadcast();
+}
+
+bool UInventoryComponent::HasItem(UItemDefinition* ItemDef, const int32 Count)
+{
+	if (!ItemDef || Count <= 0) return false;
+	int32 Total = 0;
+	for (const FItemInstance& Item  : Items)
+	{
+		if (Item.ItemDef == ItemDef)
+		{
+			Total += Item.Count;
+			if (Total >= Count)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+int32 UInventoryComponent::FindItemSlot(UItemDefinition* ItemDef)
+{
+	if (!ItemDef) return false;
+	for (int32 i = 0; i < Items.Num(); ++i)
+	{
+		if (Items[i].ItemDef == ItemDef && Items[i].Count >= 1)
+		{
+			return i;
+		}
+	}
+	return INDEX_NONE;
+}
+
+bool UInventoryComponent::RemoveItemByIndex(int32 Index, int32 Count)
+{
+	if (!Items.IsValidIndex(Index)) return false;
+	FItemInstance& Item = Items[Index];
+	if (Item.Count < Count) return false;
+	Item.Count -= Count;
+	if (Item.Count <= 0)
+	{
+		Item = FItemInstance();
+	}
+	OnInventoryChanged.Broadcast();
+	return true;
+}
+
+void UInventoryComponent::TransferItem(UInventoryComponent* From, UInventoryComponent* To, int32 Index, int32 Count)
+{
+	if (!From || !To) return;
+	FItemInstance& Item = From->Items[Index];
+	int32 Remaining = To->AddItem(Item.ItemDef, Count);
+	int32 Removed = Count - Remaining;
+	From->RemoveItemByIndex(Index, Removed);
+}
+
+bool UInventoryComponent::SwapItemsByIndex(UInventoryComponent* From, UInventoryComponent* To, int32 FromIndex,
+	int32 ToIndex)
+{
+	
+	if (!From || !To) return false;
+	if (!From->Items.IsValidIndex(FromIndex) || !To->Items.IsValidIndex(ToIndex)) return false;
+	if (From->Items[FromIndex].ItemDef == nullptr)
+	{
+		return false;
+	}
+	FItemInstance& FromItem = From->Items[FromIndex];
+	FItemInstance& ToItem = To->Items[ToIndex];
+	
+	if (FromItem.IsEmpty()) return false;
+	
+	/**
+	 * Situaction1: if To is empty
+	 */
+	if (ToItem.IsEmpty())
+	{
+		ToItem = FromItem;
+		FromItem = FItemInstance();
+		if (From == To)
+		{
+			From->OnInventoryChanged.Broadcast();
+		}
+		else
+		{
+			From->OnInventoryChanged.Broadcast();
+			To->OnInventoryChanged.Broadcast();
+		}
+		return true;
+	}
+	/**
+	 * Situation2: if Same Item Def
+	 */
+	if (FromItem.ItemDef == ToItem.ItemDef)
+	{
+		int32 MaxStack = FromItem.ItemDef->MaxStack;
+		int32 Space = MaxStack - ToItem.Count;
+		if (Space > 0)
+		{
+			int32 MoveCount = FMath::Min(Space, FromItem.Count);
+			ToItem.Count += MoveCount;
+			FromItem.Count -= MoveCount;
+			if (FromItem.Count <= 0)
+			{
+				FromItem = FItemInstance();
+			}
+			if (From == To)
+			{
+				From->OnInventoryChanged.Broadcast();
+			}
+			else
+			{
+				From->OnInventoryChanged.Broadcast();
+				To->OnInventoryChanged.Broadcast();
+			}
+			return true;
+		}
+	}
+	/**
+	 * Situation3: Different Item def
+	 */
+	Swap(FromItem, ToItem);
+	if (From == To)
+	{
+		From->OnInventoryChanged.Broadcast();
+	}
+	else
+	{
+		From->OnInventoryChanged.Broadcast();
+		To->OnInventoryChanged.Broadcast();
+	}
+	return true;
 }
 
 int32 UInventoryComponent::AddToExistingStacks(UItemDefinition* ItemDef, int32 Count)

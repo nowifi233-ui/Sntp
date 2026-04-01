@@ -60,7 +60,6 @@ void ASntpHUD::ToggleBag(APlayerController* PlayerController)
 		}
 		
 		BagWidget->SetWidgetController(InventoryWidgetController);
-		
 	}
 	if (bBagOpen)
 	{
@@ -88,6 +87,53 @@ void ASntpHUD::ToggleBag(APlayerController* PlayerController)
 		InputMode.SetHideCursorDuringCapture(false);
 		PlayerController->SetInputMode(InputMode);
 	}
+}
+
+void ASntpHUD::ToggleInventoryUI(APlayerController* PlayerController, UInventoryComponent* TargetInventoryComponent)
+{
+	if (!PlayerController) return;
+	if (!InventoryWidget)
+	{
+		UUserWidget* Widget  = CreateWidget<UUserWidget>(GetWorld(), InventoryWidgetClass);
+		InventoryWidget = Cast<USntpUserWidget>(Widget);
+		
+		if (!InventoryWidgetController)
+		{
+			InventoryWidgetController = NewObject<UInventoryWidgetController>(this, InventoryWidgetControllerClass);
+			InventoryWidgetController->Init(PlayerController->GetPawn<ASntpPlayerCharacter>()->InventoryComponent, GetOwningPlayerController());
+		}
+		InventoryWidgetController->SetTargetInventoryComponent(TargetInventoryComponent);
+		InventoryWidget->SetWidgetController(InventoryWidgetController);
+	}
+	
+	if (bInventoryOpen)
+	{
+		InventoryWidget->RemoveFromParent();
+		// PlayerController->SetInputMode(FInputModeGameOnly());
+		bInventoryOpen = false;
+		
+		// Set Mouse actions
+		PlayerController->bShowMouseCursor = false;
+		FInputModeGameOnly InputMode;
+		InputMode.SetConsumeCaptureMouseDown(true);
+		PlayerController->SetInputMode(InputMode);
+		PlayerController->SetIgnoreLookInput(false);
+		PlayerController->SetIgnoreMoveInput(false);
+	}
+	else
+	{
+		InventoryWidgetController->SetTargetInventoryComponent(TargetInventoryComponent);
+		InventoryWidget->AddToViewport();
+		bInventoryOpen = true;
+		
+		// Set Mouse actions
+		PlayerController->bShowMouseCursor = true;
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetHideCursorDuringCapture(false);
+		PlayerController->SetInputMode(InputMode);
+	}
+	
 }
 
 void ASntpHUD::ToggleSettingMenu(APlayerController* PlayerController)

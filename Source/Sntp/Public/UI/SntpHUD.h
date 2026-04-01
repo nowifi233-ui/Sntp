@@ -34,6 +34,9 @@ public:
 	void ToggleBag(APlayerController* PlayerController);
 	
 	UFUNCTION(BlueprintCallable)
+	void ToggleInventoryUI(APlayerController* PlayerController, UInventoryComponent* TargetInventoryComponent);
+	
+	UFUNCTION(BlueprintCallable)
 	void ToggleSettingMenu(APlayerController* PlayerController);
 private:
 	/*
@@ -62,7 +65,17 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<UInventoryWidgetController> InventoryWidgetController;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USntpUserWidget> InventoryWidgetClass;
 	
+	UPROPERTY()
+	TObjectPtr<USntpUserWidget> InventoryWidget;
+	
+	/**
+	 * Setting Menu
+	 * 
+	 */
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> SettingWidgetClass;
 	
@@ -72,4 +85,5 @@ private:
 private:
 	bool bBagOpen = false;
 	bool bSettingOpen = false;
+	bool bInventoryOpen = false;
 };
