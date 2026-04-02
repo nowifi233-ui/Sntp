@@ -244,6 +244,28 @@ bool UInventoryComponent::SwapItemsByIndex(UInventoryComponent* From, UInventory
 	return true;
 }
 
+bool UInventoryComponent::QuickMoveItems(UInventoryComponent* From, UInventoryComponent* To, int32 FromIndex)
+{
+	if (!From || !To) return false;
+	if (!From->Items.IsValidIndex(FromIndex)) return false;
+	if (From->Items[FromIndex].ItemDef == nullptr)
+	{
+		return false;
+	}
+	int32 AddAmount = From->Items[FromIndex].Count;
+	int32 Remain = AddToExistingStacks(From->Items[FromIndex].ItemDef, AddAmount, To);
+	From->RemoveItemByIndex(FromIndex, AddAmount - Remain);
+	AddAmount = Remain;
+	
+	if (Remain <= 0) return true;
+	Remain = AddToEmptySlots(From->Items[FromIndex].ItemDef, AddAmount, To);
+	From->RemoveItemByIndex(FromIndex, AddAmount - Remain);
+	AddAmount = Remain;
+	
+	if (AddAmount <= 0) return true;
+	return false;
+}
+
 int32 UInventoryComponent::AddToExistingStacks(UItemDefinition* ItemDef, int32 Count)
 {
 	for (FItemInstance& Item : Items)
@@ -267,6 +289,43 @@ int32 UInventoryComponent::AddToEmptySlots(UItemDefinition* ItemDef, int32 Count
 {
 	if (Count <= 0) return 0;
 	for (FItemInstance& Item : Items)
+	{
+		if (Item.IsEmpty())
+		{
+			int32 AddAmount = FMath::Min(ItemDef->MaxStack, Count);
+			Item.ItemDef = ItemDef;
+			Item.Count = AddAmount;
+			Count -= AddAmount;
+			if (Count <= 0)
+				return 0;
+		}
+	}
+	return Count;
+}
+
+int32 UInventoryComponent::AddToExistingStacks(UItemDefinition* ItemDef, int32 Count, UInventoryComponent* To)
+{
+	for (FItemInstance& Item : To->Items)
+	{
+		if (Item.ItemDef == ItemDef && Item.Count < ItemDef->MaxStack)
+		{
+			int32 Space = ItemDef->MaxStack - Item.Count;
+			int32 AddAmount = FMath::Min(Space, Count);
+			Item.Count += AddAmount;
+			Count -= AddAmount;
+			if (Count <= 0)
+			{
+				return 0;
+			}
+		}
+	}
+	return Count;
+}
+
+int32 UInventoryComponent::AddToEmptySlots(UItemDefinition* ItemDef, int32 Count, UInventoryComponent* To)
+{
+	if (Count <= 0) return 0;
+	for (FItemInstance& Item : To->Items)
 	{
 		if (Item.IsEmpty())
 		{

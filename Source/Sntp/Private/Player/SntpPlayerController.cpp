@@ -133,9 +133,10 @@ void ASntpPlayerController::HandleMove(const FInputActionValue& InputValue)
 
 	const FVector Forward = FRotationMatrix(YawRot).GetUnitAxis(EAxis::X);
 	const FVector Right   = FRotationMatrix(YawRot).GetUnitAxis(EAxis::Y);
+	
+	FVector MovementDir = (Forward * MoveInput.Y + Right * MoveInput.X).GetSafeNormal();
 
-	PawnCharacter->AddMovementInput(Forward, MoveInput.Y);
-	PawnCharacter->AddMovementInput(Right, MoveInput.X);
+	PawnCharacter->AddMovementInput(MovementDir);
 }
 
 void ASntpPlayerController::HandleLook(const FInputActionValue& InputValue)

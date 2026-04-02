@@ -57,6 +57,19 @@ void UInventoryWidgetController::TransferItem(UInventoryComponent* From, UInvent
 	UInventoryComponent::TransferItem(From, To, Index, Count);
 }
 
+void UInventoryWidgetController::HandleShiftClick(UInventoryComponent* From, UInventoryComponent* To, int32 Index, bool IsTarget)
+{
+	if (!IsTarget)
+	{
+		UInventoryComponent::QuickMoveItems(PlayerInventoryComponent.Get(), TargetInventoryComponent.Get(), Index);
+	}
+	else
+	{
+		UInventoryComponent::QuickMoveItems(TargetInventoryComponent.Get(), PlayerInventoryComponent.Get(), Index);
+	}
+}
+
+
 void UInventoryWidgetController::HandleInventoryChanged()
 {
 	OnInventoryChanged.Broadcast();

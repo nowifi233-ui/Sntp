@@ -85,7 +85,7 @@ private:
 	void HandleSettingMenu(const FInputActionValue& InputValue);
 	
 	
-	float Speed = 500.f;
+	float Speed = 375.f;
 
 	/**
 	 * Ability System Bind

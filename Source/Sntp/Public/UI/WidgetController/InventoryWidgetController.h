@@ -44,9 +44,13 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void TransferItem(UInventoryComponent* From, UInventoryComponent* To, int32 Index, int32 Count);
+
+	UFUNCTION(BlueprintCallable)
+	void HandleShiftClick(UInventoryComponent* From, UInventoryComponent* To, int32 Index, bool IsTarget);
 	
 	UPROPERTY(BlueprintAssignable)
 	FInventoryChangedDelegate EventTargetControllerSet;
+
 private:
 	
 	UFUNCTION()

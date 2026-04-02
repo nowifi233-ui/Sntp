@@ -67,8 +67,12 @@ public:
 	static void TransferItem(UInventoryComponent* From, UInventoryComponent* To, int32 Index, int32 Count);
 	UFUNCTION(BlueprintCallable)
 	static bool SwapItemsByIndex(UInventoryComponent* From, UInventoryComponent* To, int32 FromIndex, int32 ToIndex);
-
+	UFUNCTION(BlueprintCallable)
+	static bool QuickMoveItems(UInventoryComponent* From, UInventoryComponent* To, int32 FromIndex);
+	
 private:
 	int32 AddToExistingStacks(UItemDefinition* ItemDef, int32 Count);
 	int32 AddToEmptySlots(UItemDefinition* ItemDef, int32 Count);
+	static int32 AddToExistingStacks(UItemDefinition* ItemDef, int32 Count, UInventoryComponent* To);
+	static int32 AddToEmptySlots(UItemDefinition* ItemDef, int32 Count, UInventoryComponent* To);
 };
