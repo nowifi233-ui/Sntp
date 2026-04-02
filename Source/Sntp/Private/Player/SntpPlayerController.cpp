@@ -34,6 +34,13 @@ void ASntpPlayerController::PlayerTick(const float DeltaTime)
 	{
 		UpdatePreview();
 	}
+	/**
+	 * Look Control Smooth
+	 */
+	const FRotator CurrentRot = GetControlRotation();
+	const FRotator TargetRot = TargetControlRotation;
+	const FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, 15.0f);
+	SetControlRotation(NewRot);
 }
 
 void ASntpPlayerController::ShowDamageNumber_Implementation(const float DamageAmount, ACharacter* TargetCharacter, bool bCritical)
@@ -145,9 +152,15 @@ void ASntpPlayerController::HandleLook(const FInputActionValue& InputValue)
 	{
 		return;
 	}
-	const FVector2D LookInput = InputValue.Get<FVector2D>();
+	FVector2D RawInput = InputValue.Get<FVector2D>();
+	
+	TargetControlRotation.Yaw += RawInput.X * 2.0f;
+	TargetControlRotation.Pitch -= RawInput.Y * 2.0f;
+	TargetControlRotation.Pitch = FMath::Clamp(TargetControlRotation.Pitch, -60, 80);
+	
+	/*const FVector2D LookInput = InputValue.Get<FVector2D>();
 	AddYawInput(LookInput.X);
-	AddPitchInput(LookInput.Y);
+	AddPitchInput(LookInput.Y);*/
 }
 
 void ASntpPlayerController::HandleScroll(const FInputActionValue& InputValue)
@@ -158,6 +171,8 @@ void ASntpPlayerController::HandleScroll(const FInputActionValue& InputValue)
 		int32 IntScroll = ScrollInput;
 		OverlayWidgetController->OnScrollDelegate.Broadcast(IntScroll);
 	}
+	
+	
 }
 
 void ASntpPlayerController::HandleInteract(const FInputActionValue& InputValue)

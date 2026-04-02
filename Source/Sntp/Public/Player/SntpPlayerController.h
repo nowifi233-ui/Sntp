@@ -58,6 +58,10 @@ private:
 	UInputAction* LookAction;
 	
 	void HandleLook(const FInputActionValue& InputValue);
+	
+	FRotator TargetControlRotation;
+
+	
 	/**
 	 * Interaction System: 
 	 * Scroll / Interaction / Toggle Inventory
@@ -74,8 +78,7 @@ private:
 	void HandleScroll(const FInputActionValue& InputValue);
 	void HandleInteract(const FInputActionValue& InputValue);
 	void ToggleInventory(const FInputActionValue& InputValue);
-
-
+	
 	/**
 	 *  Setting Menu
 	 */
@@ -83,7 +86,6 @@ private:
 	UInputAction* SettingMenuAction;
 	
 	void HandleSettingMenu(const FInputActionValue& InputValue);
-	
 	
 	float Speed = 375.f;
 

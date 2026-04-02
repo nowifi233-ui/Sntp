@@ -14,4 +14,5 @@ class SNTP_API UGameUIManagerSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 	
+	
 };

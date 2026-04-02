@@ -21,7 +21,7 @@ public:
 	ASntpPlayerCharacter();
 	
 	// Camera
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	USpringArmComponent* SpringArm;
 	
 	UPROPERTY(VisibleAnywhere)
