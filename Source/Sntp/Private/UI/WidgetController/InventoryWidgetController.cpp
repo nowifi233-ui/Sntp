@@ -69,6 +69,16 @@ void UInventoryWidgetController::HandleShiftClick(UInventoryComponent* From, UIn
 	}
 }
 
+void UInventoryWidgetController::HandleAutoSortBag()
+{
+	PlayerInventoryComponent->AutoSortItems();
+}
+
+void UInventoryWidgetController::HandleAutoSortTarget()
+{
+	TargetInventoryComponent->AutoSortItems();
+}
+
 
 void UInventoryWidgetController::HandleInventoryChanged()
 {

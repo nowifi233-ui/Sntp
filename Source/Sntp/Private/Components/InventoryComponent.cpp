@@ -158,6 +158,45 @@ bool UInventoryComponent::RemoveItemByIndex(int32 Index, int32 Count)
 	return true;
 }
 
+void UInventoryComponent::AutoSortItems()
+{
+	TArray<FItemInstance> AllItems;
+	for (const FItemInstance& Item : Items)
+	{
+		if (!Item.IsEmpty())
+		{
+			AllItems.Add(Item);
+		}
+	}
+	for (int32 i = 0; i < Items.Num(); ++i)
+	{
+		Items[i] = FItemInstance();
+	}
+	
+	
+	// Rebuild Items
+	TMap<UItemDefinition*, int32> ItemCountMap;
+	for (const FItemInstance& Item : AllItems)
+	{
+		ItemCountMap.FindOrAdd(Item.ItemDef) += Item.Count;
+	}
+	int32 Index = 0;
+	for (auto& Pair : ItemCountMap)
+	{
+		UItemDefinition* Def = Pair.Key;
+		int32 TotalCount = Pair.Value;
+		while (TotalCount > 0 && Index < Items.Num())
+		{
+			int32 StackSize = FMath::Min(Def->MaxStack, TotalCount);
+			Items[Index] = FItemInstance(Def, StackSize);
+			TotalCount -= StackSize;
+			Index++;
+		}
+	}
+	SortItems(Items);
+	OnInventoryChanged.Broadcast();
+}
+
 void UInventoryComponent::TransferItem(UInventoryComponent* From, UInventoryComponent* To, int32 Index, int32 Count)
 {
 	if (!From || !To) return;
@@ -338,6 +377,25 @@ int32 UInventoryComponent::AddToEmptySlots(UItemDefinition* ItemDef, int32 Count
 		}
 	}
 	return Count;
+}
+
+void UInventoryComponent::SortItems(TArray<FItemInstance>& InputItems)
+{
+	InputItems.Sort([](const FItemInstance& A, const FItemInstance& B)
+	{
+		if (A.IsEmpty()) return false;
+		if (B.IsEmpty()) return true;
+		// Type
+		if (A.ItemDef->ItemType != B.ItemDef->ItemType)
+		{
+			return A.ItemDef->ItemType < B.ItemDef->ItemType;
+		}
+		if (A.ItemDef->ItemID != B.ItemDef->ItemID)
+		{
+			return A.ItemDef->ItemID.ToUnstableInt() < B.ItemDef->ItemID.ToUnstableInt();
+		}
+		return A.Count > B.Count;
+	});
 }
 
 

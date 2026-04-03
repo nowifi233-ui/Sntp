@@ -54,12 +54,16 @@ public:
 	int32 AddItem(UItemDefinition* ItemDef, int32 Count);
 	bool RemoveItem(UItemDefinition* ItemDef, int32 Count);
 	void UseItem(int32 Index);
+	
 	UFUNCTION(BlueprintCallable)
 	void SwapItems(int32 A, int32 B);
+	
 	bool HasItem(UItemDefinition* ItemDef, int32 Count);
 	int32 FindItemSlot(UItemDefinition* ItemDef);
 	bool RemoveItemByIndex(int32 Index, int32 Count);
 	
+	UFUNCTION(BlueprintCallable)
+	void AutoSortItems();
 	
 	/**
 	 * Other Inventory component
@@ -70,9 +74,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static bool QuickMoveItems(UInventoryComponent* From, UInventoryComponent* To, int32 FromIndex);
 	
+	
+	
 private:
 	int32 AddToExistingStacks(UItemDefinition* ItemDef, int32 Count);
 	int32 AddToEmptySlots(UItemDefinition* ItemDef, int32 Count);
 	static int32 AddToExistingStacks(UItemDefinition* ItemDef, int32 Count, UInventoryComponent* To);
 	static int32 AddToEmptySlots(UItemDefinition* ItemDef, int32 Count, UInventoryComponent* To);
+	void SortItems(TArray<FItemInstance>& Items);
 };

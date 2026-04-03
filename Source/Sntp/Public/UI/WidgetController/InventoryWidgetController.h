@@ -48,6 +48,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void HandleShiftClick(UInventoryComponent* From, UInventoryComponent* To, int32 Index, bool IsTarget);
 	
+	UFUNCTION(BlueprintCallable)
+	void HandleAutoSortBag();
+	
+	UFUNCTION(BlueprintCallable)
+	void HandleAutoSortTarget();
+	
 	UPROPERTY(BlueprintAssignable)
 	FInventoryChangedDelegate EventTargetControllerSet;
 

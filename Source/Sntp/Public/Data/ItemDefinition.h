@@ -19,6 +19,9 @@ public:
 	FName ItemID;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag ItemType;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText Name;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

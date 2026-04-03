@@ -145,7 +145,12 @@ void UInteractionComponent::UpdateCurrentInteractable()
 		{
 			if (Cast<IInteractable>(LastClosestActor)->GetType() == EInteractionType::Building && Cast<IInteractable>(CurrentInteractable)->GetType() == EInteractionType::Pickup)
 			{
-				ShowWidgetDelegate.Broadcast(CurrentOptions, Cast<IInteractable>(CurrentInteractable)->GetInteractionName());
+				// ShowWidgetDelegate.Broadcast(CurrentOptions, Cast<IInteractable>(CurrentInteractable)->GetInteractionName());
+				HideWidgetDelegate.Broadcast();
+				for (const FInteractionOption& Option : CurrentOptions)
+				{
+					AddOptionDelegate.Broadcast(Option);
+				}
 			}
 		}
 	}
@@ -166,6 +171,10 @@ void UInteractionComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedCompon
 	if (ClosestInteractable->GetType() == EInteractionType::Pickup)
 	{
 		FInteractionOption Option = ClosestInteractable->GetInteractionOptions()[0];
+		if (CurrentInteractable && CurrentInteractable->Implements<UInteractable>() && Cast<IInteractable>(CurrentInteractable)->GetType() == EInteractionType::Building)
+		{
+			HideWidgetDelegate.Broadcast();
+		}
 		AddOptionDelegate.Broadcast(Option);
 	}
 	else
