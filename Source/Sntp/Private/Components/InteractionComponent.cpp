@@ -106,6 +106,21 @@ void UInteractionComponent::UpdateCurrentInteractable()
 		return;
 	}
 	
+	// Get Closest Interactable
+	if (bDebug)
+	{
+		DrawDebugSphere(
+		GetWorld(),
+		Closest->GetActorLocation(),
+		10.f,
+		12,
+		FColor::Green,
+		false,
+		.3f
+		);
+	}
+	
+	
 	IInteractable* ClosestInteractable = Cast<IInteractable>(Closest);
 	TArray<FInteractionOption> Options;
 	
@@ -176,6 +191,17 @@ void UInteractionComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedCompon
 			HideWidgetDelegate.Broadcast();
 		}
 		AddOptionDelegate.Broadcast(Option);
+		if (bDebug)
+		{
+			DrawDebugSphere(
+				GetWorld(),
+				OtherActor->GetActorLocation(),
+				10.f,
+				12,
+				FColor::Red,
+				false,
+				1.f);
+		}
 	}
 	else
 	{

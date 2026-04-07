@@ -41,6 +41,9 @@ public:
 	FAddOptionDelegate RemoveOptionDelegate;
 	//~
 	
+	UPROPERTY(EditAnywhere, Category="Interaction")
+	bool bDebug;
+	
 protected:
 	//~ AActor
 	virtual void BeginPlay() override;

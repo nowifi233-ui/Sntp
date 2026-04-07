@@ -51,19 +51,21 @@ public:
 	 * Operations
 	 */
 	
-	int32 AddItem(UItemDefinition* ItemDef, int32 Count);
-	bool RemoveItem(UItemDefinition* ItemDef, int32 Count);
-	void UseItem(int32 Index);
+	UFUNCTION(BlueprintCallable)
+	void AutoSortItems();
 	
 	UFUNCTION(BlueprintCallable)
 	void SwapItems(int32 A, int32 B);
 	
+	int32 AddItem(UItemDefinition* ItemDef, int32 Count);
+	bool RemoveItem(UItemDefinition* ItemDef, int32 Count);
+	void UseItem(int32 Index);
 	bool HasItem(UItemDefinition* ItemDef, int32 Count);
+	int32 GetItemCount(UItemDefinition* ItemDef);
 	int32 FindItemSlot(UItemDefinition* ItemDef);
 	bool RemoveItemByIndex(int32 Index, int32 Count);
 	
-	UFUNCTION(BlueprintCallable)
-	void AutoSortItems();
+	
 	
 	/**
 	 * Other Inventory component

@@ -22,6 +22,9 @@ public:
 	void SetTargetInventoryComponent(UInventoryComponent* InInventoryComponent);
 	
 	UFUNCTION(BlueprintCallable)
+	void ToggleCraftingWidget();
+	
+	UFUNCTION(BlueprintCallable)
 	const TArray<FItemInstance>& GetItems() const;
 	
 	UPROPERTY(BlueprintAssignable)

@@ -131,6 +131,19 @@ bool UInventoryComponent::HasItem(UItemDefinition* ItemDef, const int32 Count)
 	return false;
 }
 
+int32 UInventoryComponent::GetItemCount(UItemDefinition* ItemDef)
+{
+	int32 Count = 0;
+	for (const FItemInstance& Item : Items)
+	{
+		if (Item.ItemDef == ItemDef)
+		{
+			Count += Item.Count;
+		}
+	}
+	return Count;
+}
+
 int32 UInventoryComponent::FindItemSlot(UItemDefinition* ItemDef)
 {
 	if (!ItemDef) return false;

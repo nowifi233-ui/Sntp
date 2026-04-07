@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UI/Widgets/SntpUserWidget.h"
 #include "GameFramework/HUD.h"
+#include "WidgetController/CraftingWidgetController.h"
 #include "WidgetController/InventoryWidgetController.h"
 #include "SntpHUD.generated.h"
 
@@ -38,6 +39,10 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void ToggleSettingMenu(APlayerController* PlayerController);
+	
+	UFUNCTION(BlueprintCallable)
+	void ToggleCraftingWidget(APlayerController* PlayerController);
+	
 private:
 	/*
 	 * Overlay Widget Controller
@@ -73,6 +78,21 @@ private:
 	TObjectPtr<USntpUserWidget> InventoryWidget;
 	
 	/**
+	 * Crafting Widget
+	 */
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USntpUserWidget> CraftingWidgetClass;
+	
+	UPROPERTY()
+	TObjectPtr<USntpUserWidget> CraftingWidget;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UCraftingWidgetController> CraftingWidgetControllerClass; 
+	
+	UPROPERTY()
+	TObjectPtr<UCraftingWidgetController> CraftingWidgetController;
+	
+	/**
 	 * Setting Menu
 	 * 
 	 */
@@ -86,4 +106,8 @@ private:
 	bool bBagOpen = false;
 	bool bSettingOpen = false;
 	bool bInventoryOpen = false;
+	bool bCraftingOpen = false;
+	
+	bool ShouldHideMouse() const;
+	void ToggleMouse();
 };

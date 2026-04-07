@@ -28,6 +28,11 @@ void UInventoryWidgetController::SetTargetInventoryComponent(UInventoryComponent
 	EventTargetControllerSet.Broadcast();
 }
 
+void UInventoryWidgetController::ToggleCraftingWidget()
+{
+	Cast<ASntpHUD>(PlayerController->GetHUD())->ToggleCraftingWidget(PlayerController);
+}
+
 const TArray<FItemInstance>& UInventoryWidgetController::GetItems() const
 {
 	return PlayerInventoryComponent->Items;

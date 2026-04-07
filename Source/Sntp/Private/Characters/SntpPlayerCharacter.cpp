@@ -56,6 +56,9 @@ ASntpPlayerCharacter::ASntpPlayerCharacter()
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>("InteractionComponent");
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent");
 	InventoryComponent->InitInventory();
+	
+	// 
+	CraftingComponent = CreateDefaultSubobject<UCraftingComponent>("CraftingComponent");
 }
 
 void ASntpPlayerCharacter::PossessedBy(AController* byController)
@@ -82,6 +85,7 @@ void ASntpPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	InteractionComponent->InitSphere(InteractionSphere);
+	CraftingComponent->Init(InventoryComponent);
 }
 
 void ASntpPlayerCharacter::InitAbilityActorInfo()

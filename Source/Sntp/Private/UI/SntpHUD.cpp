@@ -168,3 +168,68 @@ void ASntpHUD::ToggleSettingMenu(APlayerController* PlayerController)
 	}
 }
 
+void ASntpHUD::ToggleCraftingWidget(APlayerController* PlayerController)
+{
+	if (!PlayerController) return;
+	if (!CraftingWidget)
+	{
+		UUserWidget* Widget  = CreateWidget<UUserWidget>(GetWorld(), CraftingWidgetClass);
+		CraftingWidget = Cast<USntpUserWidget>(Widget);
+		
+		if (!CraftingWidgetController)
+		{
+			CraftingWidgetController = NewObject<UCraftingWidgetController>(this, CraftingWidgetControllerClass);
+			CraftingWidgetController->Init(PlayerController->GetPawn<ASntpPlayerCharacter>()->InventoryComponent, PlayerController->GetPawn<ASntpPlayerCharacter>()->CraftingComponent, PlayerController);
+		}
+		CraftingWidget->SetWidgetController(CraftingWidgetController);
+	}
+	
+	if (bCraftingOpen)
+	{
+		CraftingWidget->RemoveFromParent();
+		// PlayerController->SetInputMode(FInputModeGameOnly());
+		bCraftingOpen = false;
+	}
+	else
+	{
+		CraftingWidget->AddToViewport();
+		bCraftingOpen = true;
+	}
+	ToggleMouse();
+}
+
+bool ASntpHUD::ShouldHideMouse() const
+{
+	if (bSettingOpen || bSettingOpen || bInventoryOpen || bCraftingOpen)
+	{
+		return false;
+	}
+	return true;
+}
+
+void ASntpHUD::ToggleMouse()
+{
+	APlayerController* PlayerController = GetOwningPlayerController();
+	
+	if (!PlayerController)
+	{
+		return;
+	}
+	if (ShouldHideMouse())
+	{
+		PlayerController->bShowMouseCursor = true;
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetHideCursorDuringCapture(false);
+		PlayerController->SetInputMode(InputMode);
+	}
+	else
+	{
+		PlayerController->bShowMouseCursor = true;
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetHideCursorDuringCapture(false);
+		PlayerController->SetInputMode(InputMode);
+	}
+}
+
