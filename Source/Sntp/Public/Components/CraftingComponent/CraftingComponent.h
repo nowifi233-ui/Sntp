@@ -7,23 +7,12 @@
 #include "CraftingComponent.generated.h"
 
 
+struct FCraftingRecipe;
+class UCraftingRecipeDataAsset;
 class UInventoryComponent;
 class UItemDefinition;
 
-USTRUCT(BlueprintType)
-struct FCraftingRecipe
-{
-	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TMap<TObjectPtr<UItemDefinition>, int32> Inputs;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UItemDefinition> Output;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 OutputCount = 1;
-};
+
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCrafted, const FCraftingRecipe&, Recipe);
 
@@ -53,10 +42,14 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnCrafted OnCrafted;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TArray<FCraftingRecipe> Recipes;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UCraftingRecipeDataAsset> RecipeData;
 	
+	UFUNCTION()
+	const TArray<FCraftingRecipe>& GetRecipes() const;
 private:
 	UPROPERTY()
 	TObjectPtr<UInventoryComponent> Inventory;
+	
+	
 };

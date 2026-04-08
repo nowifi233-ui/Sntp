@@ -65,8 +65,6 @@ public:
 	int32 FindItemSlot(UItemDefinition* ItemDef);
 	bool RemoveItemByIndex(int32 Index, int32 Count);
 	
-	
-	
 	/**
 	 * Other Inventory component
 	 */

@@ -2,8 +2,8 @@
 
 
 #include "UI/WidgetController/CraftingWidgetController.h"
-
-#include "Components/CraftingComponent.h"
+#include "Components/CraftingComponent/CraftingComponent.h"
+#include "Components/CraftingComponent/CraftingTypes.h"
 #include "UI/SntpHUD.h"
 
 void UCraftingWidgetController::Init(UInventoryComponent* InInventory, UCraftingComponent* InCrafting, APlayerController* InPlayerController)
@@ -16,7 +16,7 @@ void UCraftingWidgetController::Init(UInventoryComponent* InInventory, UCrafting
 
 TArray<FCraftingRecipe> UCraftingWidgetController::GetRecipe()
 {
-	return CraftingComponent->Recipes;
+	return CraftingComponent->GetRecipes();
 }
 
 void UCraftingWidgetController::ToggleCrafting()

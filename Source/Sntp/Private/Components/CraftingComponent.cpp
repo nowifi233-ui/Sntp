@@ -1,9 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Components/CraftingComponent.h"
-
+#include "Components/CraftingComponent/CraftingComponent.h"
 #include "Components/InventoryComponent.h"
+#include "Components/CraftingComponent/CraftingTypes.h"
+#include "Components/CraftingComponent/CraftingRecipeDataAsset.h"
 
 // Sets default values for this component's properties
 UCraftingComponent::UCraftingComponent()
@@ -76,6 +77,11 @@ int32 UCraftingComponent::CraftMultiple(const FCraftingRecipe& Recipe, int32 Tim
 	}
 	Inventory->AddItem(Recipe.Output, Recipe.OutputCount * ActualTimes);
 	return ActualTimes;
+}
+
+const TArray<FCraftingRecipe>& UCraftingComponent::GetRecipes() const
+{
+	return RecipeData->Recipes;
 }
 
 

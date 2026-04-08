@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/InventoryComponent.h"
 #include "Characters/SntpCharacterBase.h"
-#include "Components/CraftingComponent.h"
+#include "Components/CraftingComponent/CraftingComponent.h"
 #include "Components/InteractionComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SntpPlayerCharacter.generated.h"

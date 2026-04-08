@@ -37,12 +37,6 @@ void ASntpHUD::InitOverlay(APlayerController* PlayerController, APlayerState* Pl
 	OverlayWidgetController->BroadcastInitialValue();
 	Widget->AddToViewport();
 	
-	// Init Bag
-	if (!InventoryWidgetController)
-	{
-		InventoryWidgetController = NewObject<UInventoryWidgetController>(this, InventoryWidgetControllerClass);
-		InventoryWidgetController->Init(PlayerController->GetPawn<ASntpPlayerCharacter>()->InventoryComponent, GetOwningPlayerController());
-	}
 }
 
 void ASntpHUD::ToggleBag(APlayerController* PlayerController)
@@ -66,27 +60,13 @@ void ASntpHUD::ToggleBag(APlayerController* PlayerController)
 		BagWidget->RemoveFromParent();
 		// PlayerController->SetInputMode(FInputModeGameOnly());
 		bBagOpen = false;
-		
-		// Set Mouse actions
-		PlayerController->bShowMouseCursor = false;
-		FInputModeGameOnly InputMode;
-		InputMode.SetConsumeCaptureMouseDown(true);
-		PlayerController->SetInputMode(InputMode);
-		PlayerController->SetIgnoreLookInput(false);
-		PlayerController->SetIgnoreMoveInput(false);
 	}
 	else
 	{
 		BagWidget->AddToViewport();
 		bBagOpen = true;
-		
-		// Set Mouse actions
-		PlayerController->bShowMouseCursor = true;
-		FInputModeGameAndUI InputMode;
-		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-		InputMode.SetHideCursorDuringCapture(false);
-		PlayerController->SetInputMode(InputMode);
 	}
+	ToggleMouse();
 }
 
 void ASntpHUD::ToggleInventoryUI(APlayerController* PlayerController, UInventoryComponent* TargetInventoryComponent)
@@ -111,29 +91,14 @@ void ASntpHUD::ToggleInventoryUI(APlayerController* PlayerController, UInventory
 		InventoryWidget->RemoveFromParent();
 		// PlayerController->SetInputMode(FInputModeGameOnly());
 		bInventoryOpen = false;
-		
-		// Set Mouse actions
-		PlayerController->bShowMouseCursor = false;
-		FInputModeGameOnly InputMode;
-		InputMode.SetConsumeCaptureMouseDown(true);
-		PlayerController->SetInputMode(InputMode);
-		PlayerController->SetIgnoreLookInput(false);
-		PlayerController->SetIgnoreMoveInput(false);
 	}
 	else
 	{
 		InventoryWidgetController->SetTargetInventoryComponent(TargetInventoryComponent);
 		InventoryWidget->AddToViewport();
 		bInventoryOpen = true;
-		
-		// Set Mouse actions
-		PlayerController->bShowMouseCursor = true;
-		FInputModeGameAndUI InputMode;
-		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-		InputMode.SetHideCursorDuringCapture(false);
-		PlayerController->SetInputMode(InputMode);
 	}
-	
+	ToggleMouse();
 }
 
 void ASntpHUD::ToggleSettingMenu(APlayerController* PlayerController)
@@ -147,25 +112,13 @@ void ASntpHUD::ToggleSettingMenu(APlayerController* PlayerController)
 		
 		SettingWidget->AddToViewport();
 		bSettingOpen = true;
-		
-		PlayerController->bShowMouseCursor = true;
-		FInputModeGameAndUI InputMode;
-		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-		InputMode.SetHideCursorDuringCapture(false);
-		PlayerController->SetInputMode(InputMode);
 	}
 	else
 	{
 		bSettingOpen = false;
 		SettingWidget->RemoveFromParent();
-		// Set Mouse actions
-		PlayerController->bShowMouseCursor = false;
-		FInputModeGameOnly InputMode;
-		InputMode.SetConsumeCaptureMouseDown(true);
-		PlayerController->SetInputMode(InputMode);
-		PlayerController->SetIgnoreLookInput(false);
-		PlayerController->SetIgnoreMoveInput(false);
 	}
+	ToggleMouse();
 }
 
 void ASntpHUD::ToggleCraftingWidget(APlayerController* PlayerController)
@@ -200,7 +153,7 @@ void ASntpHUD::ToggleCraftingWidget(APlayerController* PlayerController)
 
 bool ASntpHUD::ShouldHideMouse() const
 {
-	if (bSettingOpen || bSettingOpen || bInventoryOpen || bCraftingOpen)
+	if (bSettingOpen || bBagOpen || bInventoryOpen || bCraftingOpen)
 	{
 		return false;
 	}
@@ -217,11 +170,12 @@ void ASntpHUD::ToggleMouse()
 	}
 	if (ShouldHideMouse())
 	{
-		PlayerController->bShowMouseCursor = true;
-		FInputModeGameAndUI InputMode;
-		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-		InputMode.SetHideCursorDuringCapture(false);
+		PlayerController->bShowMouseCursor = false;
+		FInputModeGameOnly InputMode;
+		InputMode.SetConsumeCaptureMouseDown(true);
 		PlayerController->SetInputMode(InputMode);
+		PlayerController->SetIgnoreLookInput(false);
+		PlayerController->SetIgnoreMoveInput(false);
 	}
 	else
 	{

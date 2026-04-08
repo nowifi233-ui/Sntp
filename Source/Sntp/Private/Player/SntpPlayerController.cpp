@@ -88,8 +88,8 @@ void ASntpPlayerController::SetupInputComponent()
 	/**
 	 * Grid Build System: Place and Switch Build mode
 	 */
-	SntpInputComponent->BindAction(SwitchBuildModeAction, ETriggerEvent::Started, this, &ASntpPlayerController::ToggleBuildMode);
-	SntpInputComponent->BindAction(PlaceAction, ETriggerEvent::Started, this, &ASntpPlayerController::HandlePlace);
+	// SntpInputComponent->BindAction(SwitchBuildModeAction, ETriggerEvent::Started, this, &ASntpPlayerController::ToggleBuildMode);
+	// SntpInputComponent->BindAction(PlaceAction, ETriggerEvent::Started, this, &ASntpPlayerController::HandlePlace);
 	
 	/**
 	 * Setting Menu
