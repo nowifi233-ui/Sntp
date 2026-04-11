@@ -27,20 +27,6 @@ void ASntpPlayerController::PlayerTick(const float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 	CursorTrace();
 	
-	/**
-	 * Grid Building System Preview
-	 */
-	if (BuildState == EBuildModeState::Placing)
-	{
-		UpdatePreview();
-	}
-	/**
-	 * Look Control Smooth
-	 */
-	const FRotator CurrentRot = GetControlRotation();
-	const FRotator TargetRot = TargetControlRotation;
-	const FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, 15.0f);
-	SetControlRotation(NewRot);
 }
 
 void ASntpPlayerController::ShowDamageNumber_Implementation(const float DamageAmount, ACharacter* TargetCharacter, bool bCritical)
@@ -154,13 +140,15 @@ void ASntpPlayerController::HandleLook(const FInputActionValue& InputValue)
 	}
 	FVector2D RawInput = InputValue.Get<FVector2D>();
 	
+	/*
 	TargetControlRotation.Yaw += RawInput.X * 2.0f;
 	TargetControlRotation.Pitch -= RawInput.Y * 2.0f;
 	TargetControlRotation.Pitch = FMath::Clamp(TargetControlRotation.Pitch, -60, 80);
+	*/
 	
-	/*const FVector2D LookInput = InputValue.Get<FVector2D>();
+	const FVector2D LookInput = InputValue.Get<FVector2D>();
 	AddYawInput(LookInput.X);
-	AddPitchInput(LookInput.Y);*/
+	AddPitchInput(LookInput.Y);
 }
 
 void ASntpPlayerController::HandleScroll(const FInputActionValue& InputValue)
@@ -266,9 +254,9 @@ void ASntpPlayerController::UpdatePreview()
 	}
 	
 	ABuildingBase* BuildCDO = CurrentBuildClass->GetDefaultObject<ABuildingBase>();
-	if (BuildCDO && BuildCDO->Mesh)
+	if (BuildCDO && BuildCDO->BuildingMesh)
 	{
-		PreviewActor->Mesh->SetStaticMesh(BuildCDO->Mesh);
+		PreviewActor->Mesh->SetStaticMesh(BuildCDO->BuildingMesh);
 	}
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
@@ -308,7 +296,6 @@ void ASntpPlayerController::EnterBuildMode(TSubclassOf<AActor> BuildClass)
 	// Switch Camrea
 	ASntpPlayerCharacter* PlayerCharacter = GetPawn<ASntpPlayerCharacter>();
 	PlayerCharacter->FollowCamera->Deactivate();
-	PlayerCharacter->BuildCamera->Activate();
 	// PlayerCharacter->GetCharacterMovement()->DisableMovement();
 	
 	// Set Mouse actions
@@ -331,7 +318,6 @@ void ASntpPlayerController::ExitBuildMode()
 	GridManager->SetGridMeshVisible(false);
 	
 	ASntpPlayerCharacter* PlayerCharacter = GetPawn<ASntpPlayerCharacter>();
-	PlayerCharacter->BuildCamera->Deactivate();
 	PlayerCharacter->FollowCamera->Activate();
 	// PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	

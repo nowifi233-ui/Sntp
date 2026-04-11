@@ -11,7 +11,7 @@ AFieldPlot::AFieldPlot()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	
-	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
+	
 	
 }
 
@@ -88,17 +88,17 @@ void AFieldPlot::Interact(AActor* Interactor, FName OptionName)
 
 void AFieldPlot::UpdateCropMesh()
 {
-	if (!StaticMeshComponent) return;
+	if (!BuildingMeshComponent) return;
 	switch (FieldPlotStatus)
 	{
 		case EFieldPlotStatus::Empty:
-			StaticMeshComponent->SetStaticMesh(SeedMesh);
+			BuildingMeshComponent->SetStaticMesh(SeedMesh);
 			break;
 		case EFieldPlotStatus::Planting:
-			StaticMeshComponent->SetStaticMesh(GrowthMesh);
+			BuildingMeshComponent->SetStaticMesh(GrowthMesh);
 			break;
 		case EFieldPlotStatus::Mature:
-			StaticMeshComponent->SetStaticMesh(MatureMesh);
+			BuildingMeshComponent->SetStaticMesh(MatureMesh);
 			break;
 	}
 }

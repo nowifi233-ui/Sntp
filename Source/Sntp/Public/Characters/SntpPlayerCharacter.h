@@ -7,15 +7,17 @@
 #include "Characters/SntpCharacterBase.h"
 #include "Components/CraftingComponent/CraftingComponent.h"
 #include "Components/InteractionComponent.h"
+#include "Components/BuildingComponent/BuildableCharacterInterface.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SntpPlayerCharacter.generated.h"
 
+class UBuildableManagerComponent;
 class UCameraComponent;
 /**
  * 
  */
 UCLASS()
-class SNTP_API ASntpPlayerCharacter : public ASntpCharacterBase, public IAbilitySystemInterface
+class SNTP_API ASntpPlayerCharacter : public ASntpCharacterBase, public IAbilitySystemInterface, public IBuildableCharacterInterface
 {
 	GENERATED_BODY()
 public:
@@ -27,12 +29,6 @@ public:
 	
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* FollowCamera;
-	
-	UPROPERTY(VisibleAnywhere)
-	USceneComponent* BuildCameraRoot;
-	
-	UPROPERTY(VisibleAnywhere)
-	UCameraComponent* BuildCamera;
 	
 	//
 	
@@ -49,7 +45,16 @@ public:
 	TObjectPtr<UInventoryComponent> InventoryComponent;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="InteractionComponent")
-	TObjectPtr<UCraftingComponent> CraftingComponent;	
+	TObjectPtr<UCraftingComponent> CraftingComponent;
+
+	/**
+	 * Buildable Component
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="InteractionComponent")
+	TObjectPtr<UBuildableManagerComponent> BuildManager;
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void DestroyBuildableComponent_Implementation(UStaticMeshComponent* BuildableMesh) override;
 protected:
 	virtual void InitAbilityActorInfo() override;
 	

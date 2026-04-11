@@ -7,6 +7,7 @@
 #include "AbilitySystem/SntpAttributeSet.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/BuildingComponent/BuildableManagerComponent.h"
 #include "Player/SntpPlayerController.h"
 #include "Player/SntpPlayerState.h"
 #include "UI/SntpHUD.h"
@@ -25,17 +26,9 @@ ASntpPlayerCharacter::ASntpPlayerCharacter()
 	FollowCamera->SetupAttachment(SpringArm);
 	FollowCamera->bUsePawnControlRotation = false;
 	
-	// Build Camera
-	BuildCameraRoot = CreateDefaultSubobject<UCameraComponent>("BuildCameraRoot");
-	BuildCameraRoot->SetupAttachment(RootComponent);
-	
-	BuildCameraRoot->SetRelativeLocation(FVector(0, 0, 0));
-	BuildCameraRoot->SetRelativeRotation(FRotator(-60.f, 0, 0));
-	
-	BuildCamera = CreateDefaultSubobject<UCameraComponent>("BuildCamera");
-	BuildCamera->SetupAttachment(BuildCameraRoot);
-	BuildCamera->SetRelativeLocation(FVector(0, 0, 1500));
-	
+	// 位置平滑滞后（移动时）
+	SpringArm->bEnableCameraLag = true;
+	SpringArm->CameraLagSpeed = 10.f;  // 数值越大越跟手
 	//
 	InteractionSphere = CreateDefaultSubobject<UCapsuleComponent>(TEXT("InteractionSphere"));
 	InteractionSphere->SetupAttachment(RootComponent);
@@ -59,6 +52,10 @@ ASntpPlayerCharacter::ASntpPlayerCharacter()
 	
 	// 
 	CraftingComponent = CreateDefaultSubobject<UCraftingComponent>("CraftingComponent");
+	
+	//
+	BuildManager = CreateDefaultSubobject<UBuildableManagerComponent>("BuildManager");
+	BuildManager->InitialBuildableManagerComponent(FollowCamera);
 }
 
 void ASntpPlayerCharacter::PossessedBy(AController* byController)
@@ -86,6 +83,12 @@ void ASntpPlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 	InteractionComponent->InitSphere(InteractionSphere);
 	CraftingComponent->Init(InventoryComponent);
+}
+
+
+void ASntpPlayerCharacter::DestroyBuildableComponent_Implementation(UStaticMeshComponent* BuildableMesh)
+{
+	BuildableMesh->DestroyComponent();
 }
 
 void ASntpPlayerCharacter::InitAbilityActorInfo()

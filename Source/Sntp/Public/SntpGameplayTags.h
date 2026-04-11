@@ -25,6 +25,17 @@ public:
 	FGameplayTag Damage;
 	FGameplayTag Effects_HitReact;
 	
+	// Buildable
+	FGameplayTag Buildable_Door_Metal;
+	FGameplayTag Buildable_Door_Stone;
+	FGameplayTag Buildable_Door_Wood;
+	
+	FGameplayTag Buildable_Wall_Metal;
+	FGameplayTag Buildable_Wall_Stone;
+	FGameplayTag Buildable_Wall_Wood;
+	
+	FGameplayTag Event_OpenDoor;
+	
 	// Interactable
 	FGameplayTag Interact;
 private:

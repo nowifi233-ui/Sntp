@@ -64,8 +64,6 @@ private:
 	/**
 	 *  Mesh
 	 */
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* StaticMeshComponent;
 	
 	UPROPERTY(EditDefaultsOnly)
 	UStaticMesh* SeedMesh;

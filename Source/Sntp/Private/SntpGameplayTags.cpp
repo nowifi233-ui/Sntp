@@ -49,6 +49,39 @@ void FSntpGameplayTags::InitializeNativeGameplayTags()
 		FName("Interact"),
 		FString("Interact"));
 	
+	
+	/**
+	 * Buildable
+	 */
+	
+	GameplayTags.Buildable_Door_Metal = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("Buildable.Door.Metal"),
+	   FString("Buildable"));
+	
+	GameplayTags.Buildable_Door_Stone = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("Buildable.Door.Stone"),
+	   FString("Buildable"));
+	
+	GameplayTags.Buildable_Door_Wood = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("Buildable.Door.Wood"),
+	   FString("Buildable"));
+	
+	GameplayTags.Buildable_Wall_Metal = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("Buildable.Wall.Metal"),
+	   FString("Buildable"));
+	
+	GameplayTags.Buildable_Wall_Stone = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("Buildable.Wall.Stone"),
+	   FString("Buildable"));
+	
+	GameplayTags.Buildable_Wall_Wood = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("Buildable.Wall.Wood"),
+	   FString("Buildable"));
+	
+	GameplayTags.Event_OpenDoor = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("Event.OpenDoor"),
+	   FString("Buildable"));
+	
 }
 
 

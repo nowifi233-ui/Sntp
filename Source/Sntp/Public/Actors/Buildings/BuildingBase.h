@@ -3,12 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
+#include "Components/BuildingComponent/Buildable.h"
 #include "GameFramework/Actor.h"
 #include "Interaction/Interactable.h"
 #include "BuildingBase.generated.h"
 
 UCLASS()
-class SNTP_API ABuildingBase : public AActor
+class SNTP_API ABuildingBase : public AActor, public IBuildable
 {
 	GENERATED_BODY()
 	
@@ -20,7 +22,22 @@ public:
 	virtual void Recall(ACharacter* Player);
 
 	UPROPERTY()
-	UStaticMesh* Mesh;
+	UStaticMesh* BuildingMesh;
+	
+	UPROPERTY()
+	UStaticMeshComponent* BuildingMeshComponent;
+	
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag BuildingTag;
+	
+	virtual void OnConstruction(const FTransform& Transform) override;
+	
+	/**
+	 * IBuildable
+	 */
+	virtual FGameplayTag GetBuildableTag() override;
+	virtual UPrimitiveComponent* GetSocket() override;
+	
 protected:
 	UPROPERTY(EditAnywhere)
 	float Health;
