@@ -3,7 +3,9 @@
 
 #include "Components/ComboComponent/ComboComponent.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "Characters/SntpPlayerCharacter.h"
 #include "Components/ComboComponent/ComboDataAsset.h"
 
 // Sets default values for this component's properties
@@ -16,10 +18,9 @@ UComboComponent::UComboComponent()
 	// ...
 }
 
-void UComboComponent::Init(UAbilitySystemComponent* InASC, UComboDataAsset* InData)
+void UComboComponent::Init(UAbilitySystemComponent* InASC)
 {
 	ASC = InASC;
-	ComboData = InData;
 	CurrentNode = ComboData? ComboData->StartNode : NAME_None;
 }
 
@@ -164,6 +165,132 @@ void UComboComponent::Interrupt()
 	ResetCombo();
 	
 }
+
+void UComboComponent::HitScan()
+{
+	USkeletalMeshComponent* Weapon = GetOwner<ASntpPlayerCharacter>()->GetWeaponMesh();
+	if (!Weapon) return;
+	
+	FVector CurrentWeaponStart = Weapon->GetSocketLocation(FName("Start"));
+	FVector CurrentWeaponMid = Weapon->GetSocketLocation(FName("Mid"));
+	FVector CurrentWeaponEnd = Weapon->GetSocketLocation(FName("End"));
+	
+	if (!bHasLastFrame)
+	{
+		LastWeaponStart = CurrentWeaponStart;
+		LastWeaponMid = CurrentWeaponMid;
+		LastWeaponEnd = CurrentWeaponEnd;
+		bHasLastFrame = true;
+		return;
+	}
+	
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetOwner());
+	Params.bTraceComplex = false;
+	
+	float Radius = 50.f;
+	
+	TArray<FHitResult> Hits;
+	
+	GetWorld()->SweepMultiByChannel(
+		Hits,
+		LastWeaponStart,
+		CurrentWeaponStart,
+		FQuat::Identity,
+		ECC_Pawn,
+		FCollisionShape::MakeSphere(Radius),
+		Params);
+	
+	GetWorld()->SweepMultiByChannel(
+		Hits,
+		LastWeaponMid,
+		CurrentWeaponMid,
+		FQuat::Identity,
+		ECC_Pawn,
+		FCollisionShape::MakeSphere(Radius),
+		Params);
+	
+	GetWorld()->SweepMultiByChannel(
+		Hits,
+		LastWeaponEnd,
+		CurrentWeaponEnd,
+		FQuat::Identity,
+		ECC_Pawn,
+		FCollisionShape::MakeSphere(Radius),
+		Params
+	);
+	
+	
+	// Debug
+	DrawDebugLine(GetWorld(), LastWeaponStart, CurrentWeaponStart, FColor::Red, false, 1.f, 0, 2);
+	DrawDebugLine(GetWorld(), LastWeaponMid, CurrentWeaponMid, FColor::Red, false, 1.f, 0, 2);
+	DrawDebugLine(GetWorld(), LastWeaponEnd, CurrentWeaponEnd, FColor::Red, false, 1.f, 0, 2);
+
+
+	for (const FHitResult& Hit : Hits)
+	{
+		AActor* HitActor = Hit.GetActor();
+		if (!HitActor) continue;
+
+		if (HitActors.Contains(HitActor))
+		{
+			continue;
+		}
+		HitActors.AddUnique(HitActor);
+		
+		// Give the projectile a Gameplay Effect to Cause Damage;
+		if (GetOwner()->HasAuthority())
+		{
+			if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitActor))
+			{
+				if (!WeaponTraceEffectHandle.Data)
+				{
+					return;
+				}
+				TargetASC->ApplyGameplayEffectSpecToSelf(*WeaponTraceEffectHandle.Data.Get());
+			}
+		}
+	}
+	LastWeaponStart = CurrentWeaponStart;
+	LastWeaponMid = CurrentWeaponMid;
+	LastWeaponEnd = CurrentWeaponEnd;
+}
+
+void UComboComponent::HitScanStart(FGameplayEffectSpecHandle DamageEffectSpecHandle)
+{
+	USkeletalMeshComponent* Weapon = GetOwner<ASntpPlayerCharacter>()->GetWeaponMesh();
+	if (!Weapon) return;
+	
+	WeaponTraceEffectHandle = DamageEffectSpecHandle;
+	if (!WeaponTraceEffectHandle.Data)
+	{
+		return;
+	}
+	HitActors.Reset();
+	
+	LastWeaponStart = Weapon->GetSocketLocation(FName("Start"));
+	LastWeaponMid = Weapon->GetSocketLocation(FName("Mid"));
+	LastWeaponEnd = Weapon->GetSocketLocation(FName("End"));
+	bHasLastFrame = false;
+	
+	if (!GetWorld()) return;
+
+	GetWorld()->GetTimerManager().SetTimer(
+		WeaponHitTimer,
+		this,
+		&UComboComponent::HitScan,
+		1.f / 60.f,
+		true
+	);
+}
+
+void UComboComponent::HitScanEnd()
+{
+	GetWorld()->GetTimerManager().ClearTimer(WeaponHitTimer);
+	bHasLastFrame = false;
+}
+
+
 
 
 

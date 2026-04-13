@@ -20,8 +20,8 @@ public:
 	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	virtual UAnimMontage* GetHitReacMontage_Implementation() override;
+	
 protected:
 	virtual void BeginPlay() override;
 	
@@ -59,4 +59,8 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
+	
+public:
+	UFUNCTION(BlueprintCallable)
+	USkeletalMeshComponent* GetWeaponMesh(){ return Weapon; }
 };

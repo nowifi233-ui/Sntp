@@ -41,7 +41,7 @@ public:
 
 	/**
 	 * Components:
-	 * InteractionComponent / Inventory Component / Crafting Component / Buildable Component
+	 * InteractionComponent / Inventory Component / Crafting Component / Buildable Component / Combo Component
 	 */
 	
 	// Interaction Component
@@ -68,33 +68,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void DestroyBuildableComponent_Implementation(UStaticMeshComponent* BuildableMesh) override;
-	
-	/**
-	 * Weapon Trace
-	 */
-	void HitScan();
-	
-	UFUNCTION(BlueprintCallable)
-	void HitScanStart(FGameplayEffectSpecHandle DamageEffectSpecHandle);
-	
-	UFUNCTION(BlueprintCallable)
-	void HitScanEnd();
-	
-	UPROPERTY()
-	FTimerHandle WeaponHitTimer;
-	
-	UPROPERTY()
-	TArray<AActor*> HitActors;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
-private:
-	FGameplayEffectSpecHandle WeaponTraceEffectHandle;
-	FVector LastWeaponStart;
-	FVector LastWeaponMid;
-	FVector LastWeaponEnd;
-	bool bHasLastFrame = false; 
-	
+
 protected:
 	virtual void InitAbilityActorInfo() override;
 
@@ -105,9 +79,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UComboComponent* GetComboComponent() const {return ComboComponent;}
 protected:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UComboDataAsset* ComboDataAsset;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UComboComponent* ComboComponent;
 };
