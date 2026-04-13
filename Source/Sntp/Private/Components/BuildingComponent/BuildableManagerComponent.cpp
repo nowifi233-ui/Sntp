@@ -95,6 +95,7 @@ void UBuildableManagerComponent::BuildPreviewTrace()
 		DrawDebugLine(GetWorld(),StartLocation,EndLocation,FColor::Yellow,false,0.2f,0, 3.0f);
 	}
 	
+	// TODO: change this
 	if (bHit)
 	{
 		UpdateBuildPreview(EBuildPreviewStatus::CanPlace);
@@ -119,6 +120,8 @@ void UBuildableManagerComponent::UpdateBuildPreview(EBuildPreviewStatus InBuildP
 {
 	int32 MaterialNumber = PreviewStaticComponent->GetNumMaterials();
 	UMaterialInterface* Material = CanBuildMaterial;
+	
+	// If it can build: add your code there to change the situation
 	switch (InBuildPreviewStatus)
 	{
 	case EBuildPreviewStatus::CanPlace:
@@ -193,6 +196,10 @@ void UBuildableManagerComponent::TryPlaceBuildable(const int32 Index)
 	}
 	
 	FBuildableData Data = GetBuildableDataByIndex(Index);
+	
+	// Consume Materials
+	
+	// Custom End
 	
 	FActorSpawnParameters SpawnParameters;
 	// SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;

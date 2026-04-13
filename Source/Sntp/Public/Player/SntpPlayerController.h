@@ -7,21 +7,12 @@
 #include "InputMappingContext.h"
 #include "AbilitySystem/SntpAbilitySystemComponent.h"
 #include "Actors/Buildings/BuildingBase.h"
-#include "GridSystem/GridManager.h"
 #include "SntpPlayerController.generated.h"
 
-class APreviewActor;
+class UComboComponent;
 class UDamageTextComponent;
 class USntpInputConfig;
 class IEnemyInterface;
-
-
-UENUM()
-enum class EBuildModeState : uint8
-{
-	None,
-	Placing
-};
 
 /**
  * 
@@ -35,20 +26,23 @@ public:
 	ASntpPlayerController();
 	virtual void PlayerTick(const float DeltaTime) override;
 
-	UFUNCTION(Client, Reliable)
-	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bCritical);
-	
 protected:
 	virtual void BeginPlay() override;
 	
-	// Bind input actions and functions 
+	/**
+	 * Enhanced Input Component
+	 */
+protected:
 	virtual void SetupInputComponent() override;
 	
 private:
-	// Enhanced Input Subsystem
 	UPROPERTY(EditAnywhere, Category="Input")
 	TSoftObjectPtr<UInputMappingContext> InputMapping;
-	
+
+	/**
+	 * Basic Control:
+	 * Include Basic Move and Look
+	 */
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MoveAction;
 
@@ -66,6 +60,7 @@ private:
 	 * Interaction System: 
 	 * Scroll / Interaction / Toggle Inventory
 	 */
+private:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* ScrollAction;
 	
@@ -80,18 +75,23 @@ private:
 	void ToggleInventory(const FInputActionValue& InputValue);
 	
 	/**
-	 *  Setting Menu
+	 *  Setting Menu: Handle setting menu;
 	 */
+private:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* SettingMenuAction;
 	
 	void HandleSettingMenu(const FInputActionValue& InputValue);
-	
-	float Speed = 375.f;
 
 	/**
 	 * Ability System Bind
 	 */
+private:
+	UPROPERTY()
+	TObjectPtr<USntpAbilitySystemComponent> SntpAbilitySystemComponent;
+	
+	USntpAbilitySystemComponent* GetASC();
+	
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<USntpInputConfig> InputConfig;
 	
@@ -99,55 +99,50 @@ private:
 	void AbilityInputTagReleased(FGameplayTag InputTag);
 	void AbilityInputTagHeld(FGameplayTag InputTag);
 	
-	UPROPERTY()
-	TObjectPtr<USntpAbilitySystemComponent> SntpAbilitySystemComponent;
-	
-	USntpAbilitySystemComponent* GetASC();
-	
-	// Highlight enemies
+	/**
+	 * Highlight Enemy by Cursor
+	 */
+private:
 	void CursorTrace();
 	IEnemyInterface* CurrentActor;
 	IEnemyInterface* LastActor;
 	
-	// Damage Text
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
-
-	/**
-	 *  Grid System
+	/** 
+	 * Show Damage Text
 	 */
 public:
-	UPROPERTY()
-	AGridManager* GridManager;
-	
-	UPROPERTY()
-	APreviewActor* PreviewActor;
-	
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<APreviewActor> PreviewClass;
-	
-	void UpdatePreview();
-	
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<ABuildingBase> CurrentBuildClass;
-	
-	EBuildModeState BuildState = EBuildModeState::None;
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bCritical);
 	
 private:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
 	
-	void EnterBuildMode(TSubclassOf<AActor> BuildClass);
-	void ExitBuildMode();
-	
+	/**
+	 * Build Component
+	 * Switch Build Mode / Place Buildable
+	 */
+private:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* SwitchBuildModeAction;
 	
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* PlaceAction;
-	
+
 	UFUNCTION()
 	void ToggleBuildMode();
 	
 	UFUNCTION()
 	void HandlePlace();
+	
+	/**
+	 * Combat System
+	 */
+public:
+	UPROPERTY(BlueprintReadWrite)
+	bool CanPreInput = false;
+	
+	UPROPERTY(BlueprintReadWrite)
+	FGameplayTag PreInputTag;
 	
 };

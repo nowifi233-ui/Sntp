@@ -11,6 +11,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "SntpPlayerCharacter.generated.h"
 
+class UComboDataAsset;
+class UComboComponent;
 class UBuildableManagerComponent;
 class UCameraComponent;
 /**
@@ -30,35 +32,82 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* FollowCamera;
 	
-	//
+	// Virtual Functions of Character
 	
 	virtual void PossessedBy(AController* byController) override;
 	virtual void OnRep_PlayerState() override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual void BeginPlay() override;
+
+	/**
+	 * Components:
+	 * InteractionComponent / Inventory Component / Crafting Component / Buildable Component
+	 */
 	
-	// Interaction
+	// Interaction Component
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="InteractionComponent")
 	TObjectPtr<UInteractionComponent> InteractionComponent;
 	
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UCapsuleComponent> InteractionSphere;
+	
+	// Inventory Component
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="InteractionComponent")
 	TObjectPtr<UInventoryComponent> InventoryComponent;
 	
+	// Crafting Component
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="InteractionComponent")
 	TObjectPtr<UCraftingComponent> CraftingComponent;
 
-	/**
-	 * Buildable Component
-	 */
+	// Buildable Component
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="InteractionComponent")
 	TObjectPtr<UBuildableManagerComponent> BuildManager;
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void DestroyBuildableComponent_Implementation(UStaticMeshComponent* BuildableMesh) override;
+	
+	/**
+	 * Weapon Trace
+	 */
+	void HitScan();
+	
+	UFUNCTION(BlueprintCallable)
+	void HitScanStart(FGameplayEffectSpecHandle DamageEffectSpecHandle);
+	
+	UFUNCTION(BlueprintCallable)
+	void HitScanEnd();
+	
+	UPROPERTY()
+	FTimerHandle WeaponHitTimer;
+	
+	UPROPERTY()
+	TArray<AActor*> HitActors;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
+private:
+	FGameplayEffectSpecHandle WeaponTraceEffectHandle;
+	FVector LastWeaponStart;
+	FVector LastWeaponMid;
+	FVector LastWeaponEnd;
+	bool bHasLastFrame = false; 
+	
 protected:
 	virtual void InitAbilityActorInfo() override;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UCapsuleComponent> InteractionSphere;
-	
+
+	/**
+	 * Combo Component
+	 */
+public:
+	UFUNCTION(BlueprintCallable)
+	UComboComponent* GetComboComponent() const {return ComboComponent;}
+protected:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UComboDataAsset* ComboDataAsset;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UComboComponent* ComboComponent;
 };

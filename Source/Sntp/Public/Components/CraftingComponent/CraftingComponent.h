@@ -24,7 +24,7 @@ class SNTP_API UCraftingComponent : public UActorComponent
 public:	
 	UCraftingComponent();
 	
-	// injure Inventory Component
+	// Get Inventory Component
 	void Init(UInventoryComponent* InInventory);
 	
 	UFUNCTION(BlueprintCallable)

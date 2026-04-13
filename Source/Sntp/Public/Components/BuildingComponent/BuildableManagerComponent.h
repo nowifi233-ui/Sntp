@@ -38,7 +38,49 @@ class SNTP_API UBuildableManagerComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UBuildableManagerComponent();
+protected:
+	// Called when the game starts
+	virtual void BeginPlay() override;
+	
+public:
+	/**
+	 * Variables
+	 */
+	UPROPERTY(BlueprintReadOnly)
+	int32 CurrentBuildPreviewIndex = 0;
+	
+	UPROPERTY(BlueprintReadOnly)
+	bool IsBuildModeActive = false;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	bool EnableDebug = false;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	float BuildPreviewTickRate = 0.02f;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	float BuildPreviewTraceDistance = 1200.f;
+	
+private:
+	UPROPERTY()
+	FGameplayTagContainer AllBuildableTags;
+	
+	FTransform BuildPreviewTransform;
+	
+	UPROPERTY()
+	UStaticMeshComponent* PreviewStaticComponent;
+	
+	FTimerHandle BuildPreviewTimerHandle;
+	
+	UPROPERTY()
+	UCameraComponent* OwnerCameraComponent;
+	
+
+	/**
+	 * Initialize 
+	 * Update All Buildable Tags / Initialize Build Preview / Get Camera Component
+	 */
+public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateAllBuildableTags();
 	
@@ -50,11 +92,8 @@ public:
 	
 	void InitialBuildableManagerComponent(UCameraComponent* InCameraComponent);
 	
-	FBuildableData GetBuildableDataByIndex(int32 Index);
-	
-
 	/**
-	 * Set Preview Materials in Blueprint
+	 * Preview
 	 */
 	void BuildPreviewTrace();
 	
@@ -73,16 +112,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateCurrentBuildPreviewIndex(EBuildPreviewUpdateIndex Method);
 	
-	UPROPERTY(BlueprintReadOnly)
-	int32 CurrentBuildPreviewIndex = 0;
 	
 	/**
 	 * Place
 	 */
 	UFUNCTION(BlueprintCallable)
 	void TryPlaceBuildable(int32 Index);
-	
-	// Events
+
+	/**
+	 * Toggle Build Mode
+	 */
 	UFUNCTION(BlueprintCallable)
 	void ActivateBuildMode();
 	
@@ -94,39 +133,16 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void ActivateBuildPreviewTrace();
-	
-public:
-	
-	UPROPERTY(BlueprintReadOnly)
-	bool IsBuildModeActive = false;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	bool EnableDebug = false;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	float BuildPreviewTickRate = 0.02f;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	float BuildPreviewTraceDistance = 1200.f;
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-	
+
+	/**
+	 * Tools
+	 */
 private:
-	UPROPERTY()
-	FGameplayTagContainer AllBuildableTags;
-	
-	FTransform BuildPreviewTransform;
-	
-	UPROPERTY()
-	UStaticMeshComponent* PreviewStaticComponent;
-	
-	FTimerHandle BuildPreviewTimerHandle;
-	
-	UPROPERTY()
-	UCameraComponent* OwnerCameraComponent;
+
 	
 	void SetBuildPreviewTransform();
 	int32 GetAllBuildableTagsLength();
 	EBuildPreviewStatus BuildPreviewStatus;
+	FBuildableData GetBuildableDataByIndex(int32 Index);
 };
