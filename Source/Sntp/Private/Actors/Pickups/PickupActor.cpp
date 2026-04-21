@@ -12,6 +12,13 @@ APickupActor::APickupActor()
 	PrimaryActorTick.bCanEverTick = false;
 }
 
+APickupActor::APickupActor(UItemDefinition* InItemDef, int32 InCount)
+{
+	ItemDef	= InItemDef;
+	ItemName = *InItemDef->Name.ToString();
+	Count = InCount;
+}
+
 TArray<FInteractionOption> APickupActor::GetInteractionOptions()
 {
 	TArray<FInteractionOption> Options;
@@ -38,6 +45,13 @@ void APickupActor::Interact(AActor* Interactor, FName OptionName)
 		Inv->AddItem(ItemDef, Count);
 		Destroy();
 	}
+}
+
+void APickupActor::SetItem(UItemDefinition* InItemDef, int32 InCount)
+{
+	ItemDef	= InItemDef;
+	ItemName = *InItemDef->Name.ToString();
+	Count = InCount;
 }
 
 

@@ -123,3 +123,33 @@ void ASntpPlayerCharacter::InitAbilityActorInfo()
 	InitializePrimaryAttributes();
 	InitializeVitalAttributes();
 }
+
+void ASntpPlayerCharacter::DissolveWeapon()
+{
+	if (bWeaponSpawned == false)
+	{
+		return;
+	}
+	if (IsValid(WeaponDissolveMaterialInstance))
+	{
+		UMaterialInstanceDynamic* DynamicMatInst = UMaterialInstanceDynamic::Create(WeaponDissolveMaterialInstance, this);
+		Weapon->SetMaterial(0, DynamicMatInst);
+		StartWeaponDissolveTimeline(DynamicMatInst);
+	}
+	bWeaponSpawned = false;
+}
+
+void ASntpPlayerCharacter::SpawnWeapon()
+{
+	if (bWeaponSpawned == true)
+	{
+		return;
+	}
+	if (IsValid(WeaponDissolveMaterialInstance))
+	{
+		UMaterialInstanceDynamic* DynamicMatInst = UMaterialInstanceDynamic::Create(WeaponDissolveMaterialInstance, this);
+		Weapon->SetMaterial(0, DynamicMatInst);
+		StartSpawnWeaponTimeline(DynamicMatInst);
+	}
+	bWeaponSpawned = true;
+}

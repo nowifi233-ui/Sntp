@@ -28,6 +28,8 @@ public:
 	void UpdateFacingTarget(const FVector& TargetLocation);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	UAnimMontage* GetHitReacMontage();
+	UAnimMontage* GetHitReactMontage();
 	
+	virtual void Die() = 0;
+	virtual void Drop() {}
 };

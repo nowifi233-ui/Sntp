@@ -9,6 +9,7 @@
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "SntpEnemyCharacter.generated.h"
 
+class APickupActor;
 enum class ECharacterClass : uint8;
 class UWidgetComponent;
 /**
@@ -25,7 +26,7 @@ public:
 	virtual void UnHighlightActor() override;
 	
 	virtual void BeginPlay() override;
-	
+	virtual void Die();
 
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeSignature OnMaxHealthChange;
@@ -57,4 +58,18 @@ protected:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<UWidgetComponent> HealthBarComponent;
+	
+	/* Drop */
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TObjectPtr<UItemDefinition> DropItemDef;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<APickupActor> PickupActorClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 DropAmount = 1;
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void Drop() override;
 };

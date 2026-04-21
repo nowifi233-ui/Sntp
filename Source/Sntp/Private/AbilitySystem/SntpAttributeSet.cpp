@@ -8,6 +8,7 @@
 #include "SntpGameplayTags.h"
 #include "AbilitySystem/SntpAbilitySystemLibrary.h"
 #include "GameFramework/Character.h"
+#include "Interaction/CombatInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/SntpPlayerController.h"
 
@@ -42,7 +43,8 @@ void USntpAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		UE_LOG(LogTemp, Warning, TEXT("Change Health on %s, Health = %f."), *Props.TargetAvatarActor->GetName(), GetHealth());
 		if (NewHealth <= 0.f)
 		{
-			// Character Die
+			// Character 
+			
 		}
 		
 	}
@@ -64,6 +66,12 @@ void USntpAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		else
 		{
 			// Die
+			ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor);
+			if (CombatInterface)
+			{
+				CombatInterface->Die();
+				CombatInterface->Drop();
+			}
 		}
 			
 		const bool bCritical = USntpAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);

@@ -2,15 +2,14 @@
 
 
 #include "Characters/SntpEnemyCharacter.h"
-
-#include "NavigationSystemTypes.h"
 #include "SntpGameplayTags.h"
 #include "AbilitySystem/SntpAbilitySystemComponent.h"
 #include "AbilitySystem/SntpAbilitySystemLibrary.h"
 #include "AbilitySystem/SntpAttributeSet.h"
-#include "Components/Widget.h"
+#include "Actors/Pickups/PickupActor.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/Widgets/SntpUserWidget.h"
 
 ASntpEnemyCharacter::ASntpEnemyCharacter()
@@ -78,8 +77,12 @@ void ASntpEnemyCharacter::BeginPlay()
 		OnHealthChange.Broadcast(SntpAttributeSet->GetHealth());
 		OnMaxHealthChange.Broadcast(SntpAttributeSet->GetMaxHealth());
 	}
-	
-	
+}
+
+void ASntpEnemyCharacter::Die()
+{
+	SetLifeSpan(5.f);
+	Super::Die();
 }
 
 void ASntpEnemyCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
@@ -95,10 +98,33 @@ void ASntpEnemyCharacter::InitAbilityActorInfo()
 	Cast<USntpAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 	
 	InitializeDefaultAttributes();
-	
 }
 
 void ASntpEnemyCharacter::InitializeDefaultAttributes() const
 {
 	USntpAbilitySystemLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
+}
+
+void ASntpEnemyCharacter::Drop()
+{
+	if (!DropItemDef)
+	{
+		return;
+	}
+	FTransform SpawnTransform;
+	SpawnTransform.SetLocation(GetActorLocation() + FVector(0, 0, 30.0f));
+	SpawnTransform.SetRotation(GetActorRotation().Quaternion());
+	// Spawn
+	APickupActor* NewPickup = GetWorld()->SpawnActorDeferred<APickupActor>(
+		PickupActorClass,
+		SpawnTransform,
+		this,
+		nullptr,
+		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
+	);
+	if (NewPickup)
+	{
+		NewPickup->SetItem(DropItemDef, DropAmount);
+	}
+	UGameplayStatics::FinishSpawningActor(NewPickup, SpawnTransform);
 }

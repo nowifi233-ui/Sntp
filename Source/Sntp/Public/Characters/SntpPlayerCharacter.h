@@ -81,4 +81,22 @@ public:
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UComboComponent* ComboComponent;
+	
+	/* Weapon Dissolve */
+	
+public:
+	UFUNCTION(BlueprintCallable)
+	void DissolveWeapon();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartWeaponDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
+	
+	UFUNCTION(BlueprintCallable)
+	void SpawnWeapon();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartSpawnWeaponTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
+	
+	UPROPERTY(EditAnywhere)
+	bool bWeaponSpawned = false;
 };
