@@ -29,6 +29,8 @@ void ABuildingBase::OnConstruction(const FTransform& Transform)
 	
 }
 
+
+
 FGameplayTag ABuildingBase::GetBuildableTag()
 {
 	return BuildingTag;

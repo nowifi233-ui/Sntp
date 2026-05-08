@@ -23,6 +23,7 @@ public:
 	FGameplayTag Attributes_Primary_CriticalChance;
 	
 	FGameplayTag Damage;
+	FGameplayTag Resilience;
 	FGameplayTag Effects_HitReact;
 	
 	// Buildable
@@ -38,6 +39,13 @@ public:
 	
 	// Interactable
 	FGameplayTag Interact;
+	
+	// Item Types
+	FGameplayTag ItemType_Material;
+	FGameplayTag ItemType_Consume;
+	FGameplayTag ItemType_Building;
+	FGameplayTag ItemType_Sell;
+
 private:
 	
 protected:

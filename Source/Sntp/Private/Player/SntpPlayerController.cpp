@@ -19,6 +19,9 @@
 ASntpPlayerController::ASntpPlayerController()
 {
 	bReplicates = true;
+	
+	bAutoManageActiveCameraTarget = true;
+	
 }
 
 void ASntpPlayerController::PlayerTick(const float DeltaTime)
@@ -81,6 +84,12 @@ void ASntpPlayerController::SetupInputComponent()
 	 * Setting Menu
 	 */
 	SntpInputComponent->BindAction(SettingMenuAction, ETriggerEvent::Started, this, &ASntpPlayerController::HandleSettingMenu);
+	
+	/**
+	 * Alt
+	 */
+	SntpInputComponent->BindAction(AltPressedAction, ETriggerEvent::Started, this, &ASntpPlayerController::EnterUIMode);
+	// SntpInputComponent->BindAction(AltReleasedAction, ETriggerEvent::Completed, this, &ASntpPlayerController::ExitUIMode);
 }
 
 void ASntpPlayerController::BeginPlay()
@@ -110,6 +119,11 @@ void ASntpPlayerController::BeginPlay()
 
 void ASntpPlayerController::HandleMove(const FInputActionValue& InputValue)
 {
+	if (bIgnoreMoveInput)
+	{
+		return;
+	}
+	
 	const FVector2D MoveInput = InputValue.Get<FVector2D>();
 	
 	APawn* PawnCharacter = GetPawn();
@@ -261,4 +275,74 @@ void ASntpPlayerController::HandlePlace()
 {
 	GetPawn<ASntpPlayerCharacter>()->BuildManager->TryPlaceBuildable(GetPawn<ASntpPlayerCharacter>()->BuildManager->CurrentBuildPreviewIndex);
 	
+}
+
+void ASntpPlayerController::EnterUIMode()
+{
+	/*bShowMouseCursor = true;
+	FInputModeGameAndUI InputMode;
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	InputMode.SetHideCursorDuringCapture(false);
+	SetInputMode(InputMode);
+	
+	SetIgnoreLookInput(true);
+	SetIgnoreMoveInput(true);*/
+	
+	if (bIsInUIMode == false)
+	{
+		ToggleUIMode(true);
+	}
+	else
+	{
+		ToggleUIMode(false);
+	}
+}
+
+void ASntpPlayerController::ExitUIMode()
+{
+	/*bShowMouseCursor = false;
+	FInputModeGameOnly InputMode;
+	InputMode.SetConsumeCaptureMouseDown(true);
+	SetInputMode(InputMode);
+	SetIgnoreLookInput(false);
+	SetIgnoreMoveInput(false);*/
+	
+	ToggleUIMode(false);
+
+}
+
+void ASntpPlayerController::ToggleUIMode(bool bEnable)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ToggleUIMode: if this refresh too often, check the player controller."))
+	if (bEnable == bIsInUIMode) return;
+	if (!bEnable)
+	{
+		bShowMouseCursor = false;
+		FInputModeGameOnly InputMode;
+		InputMode.SetConsumeCaptureMouseDown(true);
+		SetInputMode(InputMode);
+		SetIgnoreLookInput(false);
+		SetIgnoreMoveInput(false);
+		bIsInUIMode = false;
+	}
+	else
+	{
+		bShowMouseCursor = true;
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetHideCursorDuringCapture(false);
+		SetInputMode(InputMode);
+		// 将鼠标移动到屏幕中心
+		if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+		{
+			FVector2D ViewportSize;
+			GEngine->GameViewport->GetViewportSize(ViewportSize);
+
+			float CenterX = ViewportSize.X / 2.0f;
+			float CenterY = ViewportSize.Y / 2.0f;
+
+			PC->SetMouseLocation(CenterX, CenterY);
+		}
+		bIsInUIMode = true;
+	}
 }

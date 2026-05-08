@@ -99,4 +99,7 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	bool bWeaponSpawned = false;
+	
+	UFUNCTION(BlueprintCallable)
+	void SetIgnoreMoveInput(bool IgnoreMoveInput);
 };

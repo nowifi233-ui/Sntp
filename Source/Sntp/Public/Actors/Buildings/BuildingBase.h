@@ -24,7 +24,7 @@ public:
 	UPROPERTY()
 	UStaticMesh* BuildingMesh;
 	
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly)
 	UStaticMeshComponent* BuildingMeshComponent;
 	
 	UPROPERTY(EditDefaultsOnly)
@@ -40,7 +40,7 @@ public:
 	
 protected:
 	UPROPERTY(EditAnywhere)
-	float Health;
+	float Health = 100.f;
 	
 	UPROPERTY(EditAnywhere)
 	bool bCanRecall;

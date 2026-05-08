@@ -11,6 +11,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/BuildingComponent/BuildableManagerComponent.h"
 #include "Components/ComboComponent/ComboComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Player/SntpPlayerController.h"
 #include "Player/SntpPlayerState.h"
 #include "UI/SntpHUD.h"
@@ -152,4 +153,19 @@ void ASntpPlayerCharacter::SpawnWeapon()
 		StartSpawnWeaponTimeline(DynamicMatInst);
 	}
 	bWeaponSpawned = true;
+}
+
+void ASntpPlayerCharacter::SetIgnoreMoveInput(bool IgnoreMoveInput)
+{
+	ASntpPlayerController* PC = GetController<ASntpPlayerController>();
+	if(PC)
+	{
+		PC->ResetIgnoreMoveInput();
+		PC->SetIgnoreMoveInput(IgnoreMoveInput);
+		PC->bIgnoreMoveInput = IgnoreMoveInput;
+	}
+	if (IgnoreMoveInput)
+	{
+		PC->StopMovement();
+	}
 }

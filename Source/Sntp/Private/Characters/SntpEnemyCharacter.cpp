@@ -68,6 +68,19 @@ void ASntpEnemyCharacter::BeginPlay()
 			{
 				OnHealthChange.Broadcast(Data.NewValue);
 			});
+		// Resilience
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetMaxResilienceAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnMaxResilienceChange.Broadcast(Data.NewValue);
+		});
+		
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetResilienceAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnResilienceChange.Broadcast(Data.NewValue);
+		});
+			
 		
 		FSntpGameplayTags SntpGameplayTags = FSntpGameplayTags::Get();
 		AbilitySystemComponent->RegisterGameplayTagEvent(SntpGameplayTags.Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
@@ -76,6 +89,8 @@ void ASntpEnemyCharacter::BeginPlay()
 		
 		OnHealthChange.Broadcast(SntpAttributeSet->GetHealth());
 		OnMaxHealthChange.Broadcast(SntpAttributeSet->GetMaxHealth());
+		OnResilienceChange.Broadcast(SntpAttributeSet->GetResilience());
+		OnMaxResilienceChange.Broadcast(SntpAttributeSet->GetMaxResilience());
 	}
 }
 
@@ -107,7 +122,7 @@ void ASntpEnemyCharacter::InitializeDefaultAttributes() const
 
 void ASntpEnemyCharacter::Drop()
 {
-	if (!DropItemDef)
+	if (DropItemDefs.IsEmpty())
 	{
 		return;
 	}
@@ -115,16 +130,20 @@ void ASntpEnemyCharacter::Drop()
 	SpawnTransform.SetLocation(GetActorLocation() + FVector(0, 0, 30.0f));
 	SpawnTransform.SetRotation(GetActorRotation().Quaternion());
 	// Spawn
-	APickupActor* NewPickup = GetWorld()->SpawnActorDeferred<APickupActor>(
+	for (auto DropItemDef : DropItemDefs)
+	{
+		APickupActor* NewPickup = GetWorld()->SpawnActorDeferred<APickupActor>(
 		PickupActorClass,
 		SpawnTransform,
 		this,
 		nullptr,
 		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
 	);
-	if (NewPickup)
-	{
-		NewPickup->SetItem(DropItemDef, DropAmount);
+		if (NewPickup)
+		{
+			NewPickup->SetItem(DropItemDef.ItemDef, DropItemDef.Amount);
+		}
+		UGameplayStatics::FinishSpawningActor(NewPickup, SpawnTransform);
 	}
-	UGameplayStatics::FinishSpawningActor(NewPickup, SpawnTransform);
+	
 }

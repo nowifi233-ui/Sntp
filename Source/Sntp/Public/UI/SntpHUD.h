@@ -55,6 +55,11 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<UOverlayWidgetController> OverlayWidgetController;
+	
+public:
+	TSharedPtr<SWidget> OverlaySlateWidget;
+	
+private:
 
 	/*
 	 * Inventory Widget Controller
@@ -107,7 +112,9 @@ private:
 	bool bSettingOpen = false;
 	bool bInventoryOpen = false;
 	bool bCraftingOpen = false;
+	bool bIsUIOpen = false;
 	
+public:
 	bool ShouldHideMouse() const;
 	void ToggleMouse();
 };

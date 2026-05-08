@@ -145,4 +145,23 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FGameplayTag PreInputTag;
 	
+	UPROPERTY(BlueprintReadWrite)
+	bool bIgnoreMoveInput = false;
+	
+	/**
+	 * Press Alt to Show mouse curser
+	 */
+public:
+	bool bUIInteractionMode = false;
+	void EnterUIMode();
+	void ExitUIMode();
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* AltPressedAction;
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* AltReleasedAction;
+	
+	void ToggleUIMode(bool bEnable);
+	bool bIsInUIMode = false;
 };

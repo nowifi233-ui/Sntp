@@ -4,6 +4,7 @@
 #include "UI/SntpHUD.h"
 
 #include "Characters/SntpPlayerCharacter.h"
+#include "Player/SntpPlayerController.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 
 UOverlayWidgetController* ASntpHUD::GetOverlayWidgetController(const FWidgetControllerParams& Params)
@@ -36,6 +37,7 @@ void ASntpHUD::InitOverlay(APlayerController* PlayerController, APlayerState* Pl
 	
 	OverlayWidgetController->BroadcastInitialValue();
 	Widget->AddToViewport();
+	OverlaySlateWidget = OverlayWidget->TakeWidget();
 	
 }
 
@@ -151,6 +153,7 @@ void ASntpHUD::ToggleCraftingWidget(APlayerController* PlayerController)
 	ToggleMouse();
 }
 
+
 bool ASntpHUD::ShouldHideMouse() const
 {
 	if (bSettingOpen || bBagOpen || bInventoryOpen || bCraftingOpen)
@@ -170,20 +173,13 @@ void ASntpHUD::ToggleMouse()
 	}
 	if (ShouldHideMouse())
 	{
-		PlayerController->bShowMouseCursor = false;
-		FInputModeGameOnly InputMode;
-		InputMode.SetConsumeCaptureMouseDown(true);
-		PlayerController->SetInputMode(InputMode);
-		PlayerController->SetIgnoreLookInput(false);
-		PlayerController->SetIgnoreMoveInput(false);
+		ASntpPlayerController* SntpPlayerController = Cast<ASntpPlayerController>(PlayerController);
+		SntpPlayerController->ToggleUIMode(false);
 	}
 	else
 	{
-		PlayerController->bShowMouseCursor = true;
-		FInputModeGameAndUI InputMode;
-		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-		InputMode.SetHideCursorDuringCapture(false);
-		PlayerController->SetInputMode(InputMode);
+		ASntpPlayerController* SntpPlayerController = Cast<ASntpPlayerController>(PlayerController);
+		SntpPlayerController->ToggleUIMode(true);
 	}
 }
 

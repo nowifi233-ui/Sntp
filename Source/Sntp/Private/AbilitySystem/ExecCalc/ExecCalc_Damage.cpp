@@ -59,6 +59,11 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		SntpContext->SetIsCritical(false);
 	}
 	
+	float Resilience = Spec.GetSetByCallerMagnitude(FSntpGameplayTags::Get().Resilience);
+	
 	FGameplayModifierEvaluatedData EvaluatedData(USntpAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, Damage);
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);
+	
+	FGameplayModifierEvaluatedData EvaluatedData1(USntpAttributeSet::GetResilienceAttribute(), EGameplayModOp::Additive, -Resilience);
+	OutExecutionOutput.AddOutputModifier(EvaluatedData1);
 }

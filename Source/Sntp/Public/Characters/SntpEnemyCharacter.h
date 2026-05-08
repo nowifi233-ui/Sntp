@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Actors/FItemDropPair.h"
 #include "Data/CharacterClassInfo.h"
 #include "Characters/SntpCharacterBase.h"
 #include "Interaction/EnemyInterface.h"
@@ -12,6 +13,10 @@
 class APickupActor;
 enum class ECharacterClass : uint8;
 class UWidgetComponent;
+
+// Drop items
+
+
 /**
  * 
  */
@@ -33,6 +38,12 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeSignature OnHealthChange;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnAttributeSignature OnResilienceChange;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnAttributeSignature OnMaxResilienceChange;
 	
 	/*
 	 * Hit react
@@ -62,13 +73,10 @@ protected:
 	/* Drop */
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TObjectPtr<UItemDefinition> DropItemDef;
+	TArray<FItemDropPair> DropItemDefs;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<APickupActor> PickupActorClass;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 DropAmount = 1;
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void Drop() override;

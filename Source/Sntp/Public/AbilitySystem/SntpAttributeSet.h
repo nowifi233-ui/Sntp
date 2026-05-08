@@ -73,6 +73,16 @@ public:
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, MaxMana)
 	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Resilience, Category="Vital Attributes")
+	FGameplayAttributeData Resilience;
+	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, Resilience)
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxResilience, Category="Vital Attributes")
+	FGameplayAttributeData MaxResilience;
+	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, MaxResilience)
+	
+	//
+	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana, Category="Primary Attributes")
 	FGameplayAttributeData CriticalChance;
 	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, CriticalChance)
@@ -97,6 +107,12 @@ public:
 	
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldValue) const;
+	
+	UFUNCTION()
+	void OnRep_Resilience(const FGameplayAttributeData& OldValue) const;
+	
+	UFUNCTION()
+	void OnRep_MaxResilience(const FGameplayAttributeData& OldValue) const;
 	
 	UFUNCTION()
 	void OnRep_CriticalChance(const FGameplayAttributeData& OldValue) const;

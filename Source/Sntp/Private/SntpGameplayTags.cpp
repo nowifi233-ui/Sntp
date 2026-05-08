@@ -35,6 +35,10 @@ void FSntpGameplayTags::InitializeNativeGameplayTags()
 		FName("Damage"),
 		FString("Damage"));
 	
+	GameplayTags.Resilience = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Resilience"),
+		FString("Resilience"));
+	
 	/*
 	 * Effects grant
 	 */
@@ -82,6 +86,28 @@ void FSntpGameplayTags::InitializeNativeGameplayTags()
 	   FName("Event.OpenDoor"),
 	   FString("Buildable"));
 	
+	/**
+	 * Item Types
+	 */
+	
+	GameplayTags.ItemType_Material = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("ItemType.Material"),
+	   FString("Material"));
+	
+		
+	GameplayTags.ItemType_Consume = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("ItemType.Consume"),
+	   FString("Consume"));
+	
+		
+	GameplayTags.ItemType_Building = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("ItemType.Building"),
+	   FString("Building"));
+	
+		
+	GameplayTags.ItemType_Sell = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("ItemType.Sell"),
+	   FString("Sell"));
 }
 
 

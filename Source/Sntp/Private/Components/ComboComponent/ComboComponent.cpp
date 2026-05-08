@@ -5,8 +5,12 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "SntpGameplayTags.h"
+#include "Actors/Buildings/BuildingBase.h"
+#include "Actors/Buildings/DestructibleBuilding.h"
 #include "Characters/SntpPlayerCharacter.h"
 #include "Components/ComboComponent/ComboDataAsset.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values for this component's properties
 UComboComponent::UComboComponent()
@@ -26,6 +30,9 @@ void UComboComponent::Init(UAbilitySystemComponent* InASC)
 
 void UComboComponent::OnInput(EInputType Input)
 {
+	ASntpPlayerCharacter* OwnerCharacter = Cast<ASntpPlayerCharacter>(GetOwner());
+	if (!OwnerCharacter) return;
+	
 	if (!bIsInCombo)
 	{
 		StartCombo(Input);
@@ -156,14 +163,23 @@ void UComboComponent::StartCombo(EInputType Input)
 
 void UComboComponent::Interrupt()
 {
+	if (CanInterrupt == false)
+	{
+		return;
+	}
 	if (ASC)
 	{
 		FGameplayTagContainer Tags;
 		Tags.AddTag(FGameplayTag::RequestGameplayTag("Ability.Attack"));
 		ASC->CancelAbilities(&Tags);
 	}
+	InterruptEvent();
 	ResetCombo();
-	
+}
+
+void UComboComponent::InterruptEvent()
+{
+	GetOwner<ASntpPlayerCharacter>()->DissolveWeapon();
 }
 
 void UComboComponent::HitScan()
@@ -248,6 +264,13 @@ void UComboComponent::HitScan()
 					return;
 				}
 				TargetASC->ApplyGameplayEffectSpecToSelf(*WeaponTraceEffectHandle.Data.Get());
+			}
+			else if (ADestructibleBuilding* Building = Cast<ADestructibleBuilding>(HitActor))
+			{
+				FGameplayEffectSpec* Spec = WeaponTraceEffectHandle.Data.Get();
+				// 从 SetByCaller 获取伤害
+				float Damage = Spec->GetSetByCallerMagnitude(FSntpGameplayTags::Get().Resilience, true);
+				Building->BuildingTakeDamage(Damage);
 			}
 		}
 	}

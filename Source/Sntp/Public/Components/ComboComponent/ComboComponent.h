@@ -53,6 +53,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void Interrupt();
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool CanInterrupt = true;
+	
+	// Events
+	void InterruptEvent();
 private:
 	UPROPERTY()
 	UAbilitySystemComponent* ASC;
