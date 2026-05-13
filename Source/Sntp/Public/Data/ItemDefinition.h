@@ -25,6 +25,9 @@ public:
 	FText Name;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag Rarity;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UTexture2D> Icon;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

@@ -33,6 +33,7 @@ TArray<FInteractionOption> APickupActor::GetInteractionOptions()
 	Option.Type = EInteractionType::Pickup;
 	Option.Count = Count;
 	Option.SourceActor = this;
+	Option.ItemRarity = ItemDef->Rarity;
 	Options.Add(Option);
 	return Options;
 }

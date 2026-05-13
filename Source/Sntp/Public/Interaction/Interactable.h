@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Components/WidgetComponent.h"
 #include "UObject/Interface.h"
 #include "Interactable.generated.h"
@@ -50,6 +51,9 @@ struct FInteractionOption
 	
 	UPROPERTY(BlueprintReadOnly)
 	TWeakObjectPtr<AActor> SourceActor;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag ItemRarity;
 };
 
 /**

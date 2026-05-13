@@ -5,6 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "SntpAbilityTypes.h"
+#include "SntpGameplayTags.h"
 #include "Data/CharacterClassInfo.h"
 #include "Game/SntpGameModeBase.h"
 #include "Interaction/Interactable.h"
@@ -119,4 +120,48 @@ bool USntpAbilitySystemLibrary::IsEnemy(AActor* Source, AActor* Target)
 bool USntpAbilitySystemLibrary::IsSameInteractionOption(const FInteractionOption& A, const FInteractionOption& B)
 {
 	return (A.SourceActor == B.SourceActor && A.OptionName == B.OptionName);
+}
+
+FText USntpAbilitySystemLibrary::GetItemTypeFromTag(const FGameplayTag& Tag)
+{
+	FSntpGameplayTags SntpTags = FSntpGameplayTags::Get();
+	if (Tag.MatchesTagExact(SntpTags.ItemType_Building))
+	{
+		return FText::FromString(TEXT("建筑"));
+	}
+	if (Tag.MatchesTagExact(SntpTags.ItemType_Consume))
+	{
+		return FText::FromString(TEXT("消耗品"));
+	}
+	if (Tag.MatchesTagExact(SntpTags.ItemType_Material))
+	{
+		return FText::FromString(TEXT("材料"));
+	}
+	if (Tag.MatchesTagExact(SntpTags.ItemType_Sell))
+	{
+		return FText::FromString(TEXT("售卖品"));
+	}
+	return FText::FromString(TEXT(""));
+}
+
+FLinearColor USntpAbilitySystemLibrary::GetLinearColorFromRarity(const FGameplayTag& Rarity)
+{
+	FSntpGameplayTags SntpTags = FSntpGameplayTags::Get();
+	if (Rarity.MatchesTagExact(SntpTags.Rarity_White))
+	{
+		return FLinearColor(0.3f, 0.3f, 0.3f);
+	}
+	if (Rarity.MatchesTagExact(SntpTags.Rarity_Green))
+	{
+		return FLinearColor(0.01f, 0.3f, 0.01f);
+	}
+	if (Rarity.MatchesTagExact(SntpTags.Rarity_Blue))
+	{
+		return FLinearColor(0.f, 0.45f, 0.8f);
+	}
+	if (Rarity.MatchesTagExact(SntpTags.Rarity_Yellow))
+	{
+		return FLinearColor(0.7f, 0.55f, 0.0f);
+	}
+	return FLinearColor(1.0f, 1.0f, 1.0f);
 }

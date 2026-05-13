@@ -45,6 +45,13 @@ public:
 	FGameplayTag ItemType_Consume;
 	FGameplayTag ItemType_Building;
 	FGameplayTag ItemType_Sell;
+	
+	// Item Rarity
+	FGameplayTag Rarity_Null;
+	FGameplayTag Rarity_White;
+	FGameplayTag Rarity_Green;
+	FGameplayTag Rarity_Blue;
+	FGameplayTag Rarity_Yellow;
 
 private:
 	

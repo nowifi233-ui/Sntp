@@ -40,4 +40,10 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category="SntpAttributeSystemLibrary")
 	static bool IsSameInteractionOption(const FInteractionOption& A, const FInteractionOption& B);
+	
+	UFUNCTION(BlueprintPure, Category="SntpAttributeSystemLibrary")
+	static FText GetItemTypeFromTag(const FGameplayTag& Tag);
+	
+	UFUNCTION(BlueprintPure, Category="SntpAttributeSystemLibrary")
+	static FLinearColor GetLinearColorFromRarity(const FGameplayTag& Rarity);
 };

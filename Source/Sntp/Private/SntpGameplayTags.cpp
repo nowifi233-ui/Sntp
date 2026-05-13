@@ -108,6 +108,30 @@ void FSntpGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.ItemType_Sell = UGameplayTagsManager::Get().AddNativeGameplayTag(
 	   FName("ItemType.Sell"),
 	   FString("Sell"));
+	
+	/* Item Rarity */
+				
+	GameplayTags.Rarity_Null = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("Rarity.Null"),
+	   FString("Rarity Null"));
+		
+			
+	GameplayTags.Rarity_White = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("Rarity.White"),
+	   FString("Rarity White"));
+			
+	GameplayTags.Rarity_Green = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("Rarity.Green"),
+	   FString("Rarity Green"));
+			
+	GameplayTags.Rarity_Blue = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("Rarity.Blue"),
+	   FString("Rarity Blue"));
+			
+	GameplayTags.Rarity_Yellow = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("Rarity.Yellow"),
+	   FString("Rarity Yellow"));
+	
 }
 
 
