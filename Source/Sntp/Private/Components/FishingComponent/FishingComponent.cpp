@@ -3,6 +3,8 @@
 
 #include "Components/FishingComponent/FishingComponent.h"
 
+#include "Characters/SntpPlayerCharacter.h"
+
 // Sets default values for this component's properties
 UFishingComponent::UFishingComponent()
 {
@@ -48,9 +50,10 @@ void UFishingComponent::StartFishing()
 	BarVelocity = 0.f;
 	
 	FishTargetPosition = 0.5f;
-	FishPosition = 0.f;
+	FishPosition = 0.2f;
 	
-	CatchProgress = 0.1f;
+	CatchProgress = 0.2f;
+	SetInputPressed(false);
 }
 
 void UFishingComponent::StopFishing()
@@ -61,6 +64,22 @@ void UFishingComponent::StopFishing()
 void UFishingComponent::SetInputPressed(bool bPressed)
 {
 	bHoldingInput = bPressed;
+}
+
+void UFishingComponent::FishingSuccess()
+{
+	UInventoryComponent* InventoryComponent = Cast<UInventoryComponent>(Cast<ASntpPlayerCharacter>(GetOwner())->GetComponentByClass(UInventoryComponent::StaticClass()));
+	if (InventoryComponent != nullptr)
+	{
+		InventoryComponent->AddItem(FishingItemDefinition, 1);
+	}
+	StopFishing();
+	OnFishSuccess.Broadcast();
+}
+
+void UFishingComponent::CloseFishing()
+{
+	OnFishClosed.Broadcast();
 }
 
 void UFishingComponent::UpdateBar(float DeltaTime)
@@ -118,10 +137,12 @@ void UFishingComponent::UpdateCatchProgress(float DeltaTime)
 	if (CatchProgress >= 1.f)
 	{
 		FishingState = EFishingState::Success;
+		FishingSuccess();
 	}
-	if (CatchProgress < 0.f)
+	if (CatchProgress <= 0.f)
 	{
 		FishingState = EFishingState::Failed;
+		OnFishFailed.Broadcast();
 	}
 }
 

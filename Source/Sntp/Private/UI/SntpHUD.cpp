@@ -197,7 +197,7 @@ UInventoryWidgetController* ASntpHUD::GetInventoryWidgetController(APlayerContro
 
 bool ASntpHUD::ShouldHideMouse() const
 {
-	if (bSettingOpen || bBagOpen || bInventoryOpen || bCraftingOpen)
+	if (bSettingOpen || bBagOpen || bInventoryOpen || bCraftingOpen || bFishOpen)
 	{
 		return false;
 	}

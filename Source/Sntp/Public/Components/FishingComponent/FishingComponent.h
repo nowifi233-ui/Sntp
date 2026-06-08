@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "FishingComponent.generated.h"
 
+class UItemDefinition;
+
 UENUM(BlueprintType)
 enum class EFishingState : uint8
 {
@@ -27,6 +29,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
 	float, FishTarget,
 	float, FishSpeed,
 	float, FishMoveTimer);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFishSuccess);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SNTP_API UFishingComponent : public UActorComponent
@@ -52,6 +56,14 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnFishDebug OnFishDebug;
 	
+	UPROPERTY(BlueprintAssignable)
+	FOnFishSuccess OnFishSuccess;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnFishSuccess OnFishFailed;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnFishSuccess OnFishClosed;
 	
 	// player bar
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Fishing|Bar")
@@ -82,6 +94,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Fishing|Fish")
 	float FishMoveInterval = 1.f;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Fishing|Fish")
+	UItemDefinition* FishingItemDefinition;
+	
 	// Catch
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Fishing|Catch")
 	float CatchProgress = 0.5f;
@@ -102,6 +117,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="Fishing|Fish")
 	void SetInputPressed(bool bPressed);
+	
+	UFUNCTION()
+	void FishingSuccess();
+	
+	UFUNCTION(BlueprintCallable, Category="Fishing|Fish")
+	void CloseFishing();
 
 protected:
 	void UpdateBar(float DeltaTime);
