@@ -313,27 +313,31 @@ void ASntpPlayerController::ExitUIMode()
 
 void ASntpPlayerController::ToggleUIMode(bool bEnable)
 {
-	UE_LOG(LogTemp, Warning, TEXT("ToggleUIMode: if this refresh too often, check the player controller."))
+	// UE_LOG(LogTemp, Warning, TEXT("ToggleUIMode: if this refresh too often, check the player controller."))
 	if (bEnable == bIsInUIMode) return;
 	if (!bEnable)
 	{
 		bShowMouseCursor = false;
 		FInputModeGameOnly InputMode;
 		InputMode.SetConsumeCaptureMouseDown(true);
+		
 		SetInputMode(InputMode);
 		SetIgnoreLookInput(false);
 		SetIgnoreMoveInput(false);
 		bIsInUIMode = false;
+		
+		bEnableClickEvents = true;
+		bEnableMouseOverEvents = true;
 	}
 	else
 	{
 		bShowMouseCursor = true;
 		FInputModeGameAndUI InputMode;
+		
 		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-		InputMode.SetHideCursorDuringCapture(false);
+		// InputMode.SetHideCursorDuringCapture(false);
 		SetInputMode(InputMode);
-		// 将鼠标移动到屏幕中心
-		if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+		// if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
 		{
 			FVector2D ViewportSize;
 			GEngine->GameViewport->GetViewportSize(ViewportSize);
@@ -341,8 +345,11 @@ void ASntpPlayerController::ToggleUIMode(bool bEnable)
 			float CenterX = ViewportSize.X / 2.0f;
 			float CenterY = ViewportSize.Y / 2.0f;
 
-			PC->SetMouseLocation(CenterX, CenterY);
+			SetMouseLocation(CenterX, CenterY);
 		}
 		bIsInUIMode = true;
+		
+		bEnableClickEvents = false;
+		bEnableMouseOverEvents = false;
 	}
 }

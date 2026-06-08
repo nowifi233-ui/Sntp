@@ -43,6 +43,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ToggleCraftingWidget(APlayerController* PlayerController);
 	
+	UFUNCTION(BlueprintCallable)
+	void ToggleFishingWidget(APlayerController* PlayerController);
+	
 private:
 	/*
 	 * Overlay Widget Controller
@@ -82,6 +85,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<USntpUserWidget> InventoryWidget;
 	
+	UFUNCTION(BlueprintCallable)
+	UInventoryWidgetController* GetInventoryWidgetController(APlayerController* InPlayerController);
+	
 	/**
 	 * Crafting Widget
 	 */
@@ -99,7 +105,6 @@ private:
 	
 	/**
 	 * Setting Menu
-	 * 
 	 */
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> SettingWidgetClass;
@@ -107,12 +112,22 @@ private:
 	UPROPERTY()
 	TObjectPtr<UUserWidget> SettingWidget;
 	
+	/**
+	* Fishing Widget 
+	*/ 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> FishWidgetClass;
+	
+	UPROPERTY()
+	TObjectPtr<USntpUserWidget> FishWidget;
+	
 private:
 	bool bBagOpen = false;
 	bool bSettingOpen = false;
 	bool bInventoryOpen = false;
 	bool bCraftingOpen = false;
 	bool bIsUIOpen = false;
+	bool bFishOpen = false;
 	
 public:
 	bool ShouldHideMouse() const;

@@ -39,6 +39,28 @@ void FSntpGameplayTags::InitializeNativeGameplayTags()
 		FName("Resilience"),
 		FString("Resilience"));
 	
+	
+	GameplayTags.Attributes_Primary_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Primary.Attack"),
+		FString("Attack"));
+		
+	GameplayTags.Attributes_Primary_CriticalChance = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Primary.CriticalChance"),
+		FString("CriticalChance"));
+		
+	GameplayTags.Attributes_Primary_CriticalDamage = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Primary.CriticalDamage"),
+		FString("CriticalDamage"));
+		
+	GameplayTags.Attributes_Primary_DamageBonus = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Primary.DamageBonus"),
+		FString("DamageBonus"));
+	
+			
+	GameplayTags.Attributes_Primary_Defense = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Primary.Defense"),
+		FString("Defense"));
+	
 	/*
 	 * Effects grant
 	 */

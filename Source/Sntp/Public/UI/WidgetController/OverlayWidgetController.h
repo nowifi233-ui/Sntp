@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/InventoryComponent.h"
 #include "Interaction/Interactable.h"
+#include "UI/SntpHUD.h"
 #include "UI/WidgetController/SntpWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
@@ -36,6 +37,33 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
 	FOnAttributeSignature OnManaChanged;
 	
+	// Attributes
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnAttributeSignature OnAttackChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnAttributeSignature OnDefenseChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnAttributeSignature OnElementalMasteryChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnAttributeSignature OnCriticalChanceChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnAttributeSignature OnCriticalDamageChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnAttributeSignature OnDamageBonusChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnAttributeSignature OnMaxResilienceChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnAttributeSignature OnResilienceChanged;
+	
+	// Other Delegates
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
 	FScrollDelegate OnScrollDelegate;
 	
@@ -65,10 +93,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RequestToggleHUD();
 	
+	UPROPERTY(BlueprintReadWrite)
+	ASntpHUD* SntpHUD;
+	
 private:
 	UFUNCTION()
 	void OnInventoryChanged();
 	
 	UFUNCTION()
 	void OnInteractedOptionSelected(FInteractionOption Option);
+
+
+private:
+	void BindAttributeChangedDelegate();
 };

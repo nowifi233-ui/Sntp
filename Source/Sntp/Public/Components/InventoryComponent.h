@@ -26,6 +26,7 @@ struct FItemInstance
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryItemChanged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryItemAdd, UItemDefinition*, ItemDef, int32, Count);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemUsed, int32, Index);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -45,6 +46,9 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnInventoryItemChanged OnInventoryChanged;
+	
+	UPROPERTY(BlueprintAssignable)
+	FInventoryItemAdd OnItemAdded;
 	
 	void InitInventory();
 	/*

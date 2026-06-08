@@ -13,6 +13,7 @@ UOverlayWidgetController* ASntpHUD::GetOverlayWidgetController(const FWidgetCont
 	{
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
 		OverlayWidgetController->SetWidgetControllerParams(Params);
+		OverlayWidgetController->SntpHUD = this;
 	}
 	return OverlayWidgetController;
 }
@@ -151,6 +152,46 @@ void ASntpHUD::ToggleCraftingWidget(APlayerController* PlayerController)
 		bCraftingOpen = true;
 	}
 	ToggleMouse();
+}
+
+void ASntpHUD::ToggleFishingWidget(APlayerController* PlayerController)
+{
+	if (!PlayerController) return;
+	if (!FishWidget)
+	{
+		UUserWidget* Widget  = CreateWidget<UUserWidget>(GetWorld(), FishWidgetClass);
+		FishWidget = Cast<USntpUserWidget>(Widget);
+		// Set Widget Controller
+		FishWidget->SetWidgetController(PlayerController->GetPawn()->GetComponentByClass(UFishingComponent::StaticClass()));
+	}
+	
+	if (!FishWidget) return;
+	
+	if (bFishOpen)
+	{
+		FishWidget->RemoveFromParent();
+		bFishOpen = false;
+	}
+	else
+	{
+		FishWidget->AddToViewport(0);
+		bFishOpen = true;
+	}
+	ToggleMouse();
+}
+
+UInventoryWidgetController* ASntpHUD::GetInventoryWidgetController(APlayerController* InPlayerController)
+{
+	if (!InPlayerController)
+	{
+		return nullptr;
+	}
+	if (!InventoryWidgetController)
+	{
+		InventoryWidgetController = NewObject<UInventoryWidgetController>(this, InventoryWidgetControllerClass);
+		InventoryWidgetController->Init(InPlayerController->GetPawn<ASntpPlayerCharacter>()->InventoryComponent, GetOwningPlayerController());
+	}
+	return InventoryWidgetController;
 }
 
 

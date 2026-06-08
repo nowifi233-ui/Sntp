@@ -8,6 +8,7 @@
 #include "InventoryWidgetController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInventoryChangedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryItemDelegate, UItemDefinition*, ItemDef, int32, Count);
 
 /**
  * 
@@ -29,6 +30,9 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FInventoryChangedDelegate OnInventoryChanged;
+	
+	UPROPERTY(BlueprintAssignable)
+	FInventoryItemDelegate OnInventoryGetItem;
 	
 	UPROPERTY(BlueprintReadOnly)
 	TWeakObjectPtr<UInventoryComponent> PlayerInventoryComponent;
@@ -64,4 +68,7 @@ private:
 	
 	UFUNCTION()
 	void HandleInventoryChanged();
+	
+	UFUNCTION()
+	void HandleItemAdded(UItemDefinition* ItemDef, int32 Count);
 };

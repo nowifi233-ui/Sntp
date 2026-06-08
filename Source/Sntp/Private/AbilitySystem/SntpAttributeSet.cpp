@@ -28,6 +28,12 @@ void USntpAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimePropert
 	DOREPLIFETIME_CONDITION_NOTIFY(USntpAttributeSet, CriticalChance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(USntpAttributeSet, Resilience, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(USntpAttributeSet, MaxResilience, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(USntpAttributeSet, CriticalDamage, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(USntpAttributeSet, DamageBonus, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(USntpAttributeSet, Attack, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(USntpAttributeSet, Defense, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(USntpAttributeSet, ElementalMastery, COND_None, REPNOTIFY_Always);
+	
 }
 
 void USntpAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -167,6 +173,31 @@ void USntpAttributeSet::OnRep_MaxResilience(const FGameplayAttributeData& OldVal
 void USntpAttributeSet::OnRep_CriticalChance(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(USntpAttributeSet, CriticalChance, OldValue);
+}
+
+void USntpAttributeSet::OnRep_CriticalDamage(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USntpAttributeSet, CriticalDamage, OldValue);
+}
+
+void USntpAttributeSet::OnRep_DamageBonus(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USntpAttributeSet, DamageBonus, OldValue);
+}
+
+void USntpAttributeSet::OnRep_Attack(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USntpAttributeSet, Attack, OldValue);
+}
+
+void USntpAttributeSet::OnRep_Defense(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USntpAttributeSet, Defense, OldValue);
+}
+
+void USntpAttributeSet::OnRep_ElementalMastery(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USntpAttributeSet, ElementalMastery, OldValue);
 }
 
 

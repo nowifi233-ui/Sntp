@@ -21,6 +21,12 @@ public:
 	FGameplayTag Attributes_Vital_Mana;
 	
 	FGameplayTag Attributes_Primary_CriticalChance;
+	FGameplayTag Attributes_Primary_CriticalDamage;
+	FGameplayTag Attributes_Primary_Attack;
+	FGameplayTag Attributes_Primary_Defense;
+	FGameplayTag Attributes_Primary_DamageBonus;
+	FGameplayTag Attributes_ElementalMastery;
+	
 	
 	FGameplayTag Damage;
 	FGameplayTag Resilience;

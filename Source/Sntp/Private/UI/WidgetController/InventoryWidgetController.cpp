@@ -13,6 +13,7 @@ void UInventoryWidgetController::Init(UInventoryComponent* InInventoryComponent,
 	if (InInventoryComponent)
 	{
 		InInventoryComponent->OnInventoryChanged.AddDynamic(this, &ThisClass::HandleInventoryChanged);
+		InInventoryComponent->OnItemAdded.AddDynamic(this, &ThisClass::HandleItemAdded);
 		PlayerController = InPlayerController;
 	}
 }
@@ -89,3 +90,10 @@ void UInventoryWidgetController::HandleInventoryChanged()
 {
 	OnInventoryChanged.Broadcast();
 }
+
+void UInventoryWidgetController::HandleItemAdded(UItemDefinition* ItemDef, int32 Count)
+{
+	OnInventoryGetItem.Broadcast(ItemDef, Count);
+}
+
+

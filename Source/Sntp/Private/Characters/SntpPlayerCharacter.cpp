@@ -63,6 +63,9 @@ ASntpPlayerCharacter::ASntpPlayerCharacter()
 
 	// Combo
 	ComboComponent = CreateDefaultSubobject<UComboComponent>("ComboComponent");
+	
+	// Fish
+	FishingComponent = CreateDefaultSubobject<UFishingComponent>("FishingComponent");
 }
 
 void ASntpPlayerCharacter::PossessedBy(AController* byController)

@@ -8,6 +8,7 @@
 #include "Components/CraftingComponent/CraftingComponent.h"
 #include "Components/InteractionComponent.h"
 #include "Components/BuildingComponent/BuildableCharacterInterface.h"
+#include "Components/FishingComponent/FishingComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SntpPlayerCharacter.generated.h"
 
@@ -69,6 +70,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void DestroyBuildableComponent_Implementation(UStaticMeshComponent* BuildableMesh) override;
 
+	// Fishing Component
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="InteractionComponent")
+	TObjectPtr<UFishingComponent> FishingComponent;
 protected:
 	virtual void InitAbilityActorInfo() override;
 

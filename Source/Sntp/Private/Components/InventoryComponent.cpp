@@ -24,9 +24,11 @@ int32 UInventoryComponent::AddItem(UItemDefinition* ItemDef, int32 Count)
 {
 	if (!ItemDef || Count <= 0) return Count;
 
+	OnItemAdded.Broadcast(ItemDef, Count);
 	Count = AddToExistingStacks(ItemDef, Count);
 	Count = AddToEmptySlots(ItemDef, Count);
 	OnInventoryChanged.Broadcast();
+	
 	return Count;
 }
 

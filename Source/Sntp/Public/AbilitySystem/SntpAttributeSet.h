@@ -81,11 +81,31 @@ public:
 	FGameplayAttributeData MaxResilience;
 	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, MaxResilience)
 	
-	//
+	// 
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Attack, Category="Vital Attributes")
+	FGameplayAttributeData Attack;
+	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, Attack)
 	
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana, Category="Primary Attributes")
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Defense, Category="Vital Attributes")
+	FGameplayAttributeData Defense;
+	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, Defense)
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_ElementalMastery, Category="Vital Attributes")
+	FGameplayAttributeData ElementalMastery;
+	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, ElementalMastery)
+	
+	//
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_CriticalChance, Category="Primary Attributes")
 	FGameplayAttributeData CriticalChance;
 	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, CriticalChance)
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_CriticalDamage, Category="Primary Attributes")
+	FGameplayAttributeData CriticalDamage;
+	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, CriticalDamage)
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_DamageBonus, Category="Primary Attributes")
+	FGameplayAttributeData DamageBonus;
+	ATTRIBUTE_ACCESSORS_BASIC(USntpAttributeSet, DamageBonus)
 	
 	/**
 	 * Meta Attributes
@@ -116,6 +136,21 @@ public:
 	
 	UFUNCTION()
 	void OnRep_CriticalChance(const FGameplayAttributeData& OldValue) const;
+	
+	UFUNCTION()
+	void OnRep_CriticalDamage(const FGameplayAttributeData& OldValue) const;
+	
+	UFUNCTION()
+	void OnRep_DamageBonus(const FGameplayAttributeData& OldValue) const;
+	
+	UFUNCTION()
+	void OnRep_Attack(const FGameplayAttributeData& OldValue) const;
+	
+	UFUNCTION()
+	void OnRep_Defense(const FGameplayAttributeData& OldValue) const;
+	
+	UFUNCTION()
+	void OnRep_ElementalMastery(const FGameplayAttributeData& OldValue) const;
 	
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props);

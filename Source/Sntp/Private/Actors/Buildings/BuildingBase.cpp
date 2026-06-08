@@ -26,7 +26,6 @@ void ABuildingBase::OnConstruction(const FTransform& Transform)
 	UStaticMesh* Mesh = UBuildingSystemBlueprintLibrary::GetBuildableMeshByTag(BuildingTag);
 	BuildingMesh = Mesh;
 	BuildingMeshComponent->SetStaticMesh(Mesh);
-	
 }
 
 

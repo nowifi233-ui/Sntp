@@ -38,6 +38,10 @@ void UOverlayWidgetController::BindCallbackToDependencies()
 		{
 			OnMaxHealthChanged.Broadcast(Data.NewValue);
 		});
+	
+	BindAttributeChangedDelegate();
+	
+	// Bind AbilitySystemComponent Attribute Changed
 
 	Cast<USntpAbilitySystemComponent>(AbilitySystemComponent)->OnEffectApplied.AddLambda(
 		[](const FGameplayTagContainer& TagContainer)
@@ -69,5 +73,60 @@ void UOverlayWidgetController::OnInventoryChanged()
 void UOverlayWidgetController::OnInteractedOptionSelected(FInteractionOption Option)
 {
 	OnOptionSelected.Broadcast(Option);
+}
+
+
+void UOverlayWidgetController::BindAttributeChangedDelegate()
+{
+	const USntpAttributeSet* SntpAttributeSet = CastChecked<USntpAttributeSet>(AttributeSet);
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetAttackAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnAttackChanged.Broadcast(Data.NewValue);
+		});
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetDefenseAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnDefenseChanged.Broadcast(Data.NewValue);
+		});
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetElementalMasteryAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnElementalMasteryChanged.Broadcast(Data.NewValue);
+		});
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetDamageBonusAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnDamageBonusChanged.Broadcast(Data.NewValue);
+		});
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetCriticalChanceAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnCriticalChanceChanged.Broadcast(Data.NewValue);
+		});
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetCriticalDamageAttribute()).AddLambda(
+	[this](const FOnAttributeChangeData& Data)
+		{
+			OnCriticalDamageChanged.Broadcast(Data.NewValue);
+		});
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetMaxResilienceAttribute()).AddLambda(
+	[this](const FOnAttributeChangeData& Data)
+		{
+			OnMaxResilienceChanged.Broadcast(Data.NewValue);
+		});
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SntpAttributeSet->GetResilienceAttribute()).AddLambda(
+	[this](const FOnAttributeChangeData& Data)
+		{
+			OnResilienceChanged.Broadcast(Data.NewValue);
+		});
+	
 }
 

@@ -7,6 +7,7 @@ Build/
 Plugins/
 Content/Interaction/
 
+
 **/Assets
 **/LevelPrototyping
 **/TopDown
@@ -17,6 +18,7 @@ Content/Interaction/
 **/__ExternalActors__
 **/SciFi_BioLaboratory
 **/IdaFaber
+**/Mega_Survival_Tools
 
 # Compiler 
 .idea/
