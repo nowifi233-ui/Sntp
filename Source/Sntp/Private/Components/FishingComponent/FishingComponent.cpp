@@ -8,11 +8,7 @@
 // Sets default values for this component's properties
 UFishingComponent::UFishingComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 
@@ -20,8 +16,6 @@ UFishingComponent::UFishingComponent()
 void UFishingComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
 }
 
 
@@ -44,14 +38,18 @@ void UFishingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 void UFishingComponent::StartFishing()
 {
+	// Initial
 	FishingState = EFishingState::Fighting;
 	
+	// Bar
 	BarPosition = 0.f;
 	BarVelocity = 0.f;
 	
+	// Fish
 	FishTargetPosition = 0.5f;
 	FishPosition = 0.2f;
 	
+	// Progress
 	CatchProgress = 0.2f;
 	SetInputPressed(false);
 }
@@ -59,6 +57,7 @@ void UFishingComponent::StartFishing()
 void UFishingComponent::StopFishing()
 {
 	FishingState = EFishingState::Idle;
+	
 }
 
 void UFishingComponent::SetInputPressed(bool bPressed)

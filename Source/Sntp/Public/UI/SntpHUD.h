@@ -121,6 +121,10 @@ private:
 	UPROPERTY()
 	TObjectPtr<USntpUserWidget> FishWidget;
 	
+	/**
+	 * 
+	 */
+	
 private:
 	bool bBagOpen = false;
 	bool bSettingOpen = false;

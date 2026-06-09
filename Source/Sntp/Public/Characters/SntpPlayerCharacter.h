@@ -12,6 +12,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "SntpPlayerCharacter.generated.h"
 
+class USntpUserWidget;
 class UComboDataAsset;
 class UComboComponent;
 class UBuildableManagerComponent;
@@ -19,6 +20,13 @@ class UCameraComponent;
 /**
  * 
  */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+	FDialogueDelegate,
+	FName, Name,
+	FText, Text
+	);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNextLineDelegate);
+
 UCLASS()
 class SNTP_API ASntpPlayerCharacter : public ASntpCharacterBase, public IAbilitySystemInterface, public IBuildableCharacterInterface
 {
@@ -73,6 +81,31 @@ public:
 	// Fishing Component
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="InteractionComponent")
 	TObjectPtr<UFishingComponent> FishingComponent;
+	
+	/**
+	 * Dialogue
+	 */
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> DialogueWidgetClass;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TObjectPtr<USntpUserWidget> DialogueWidget;
+	
+	UPROPERTY(BlueprintAssignable)
+	FDialogueDelegate DialogueDelegate;
+	
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
+	FNextLineDelegate NextLineDelegate;
+	
+	UFUNCTION(BlueprintCallable)
+	void NextDialogueLine();
+	
+	UFUNCTION(BlueprintCallable)
+	void StopDialogue();
+	
+	UFUNCTION(BlueprintCallable)
+	void Dialogue(FName Name, FText Text);
+	
 protected:
 	virtual void InitAbilityActorInfo() override;
 
