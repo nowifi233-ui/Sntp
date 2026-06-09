@@ -27,12 +27,13 @@ void UDialogueComponent::StartDialogue(UDialogueDataAsset* Data)
 {
 	CurrentDialogue = Data;
 	CurrentIndex = 0;
-	ShowCurrentLine();	
+	ShowCurrentLine();
+	
 }
 
 void UDialogueComponent::ShowCurrentLine()
 {
-	
+	DialogueDelegate.Broadcast(GetCurrentName(), GetCurrentLine());
 }
 
 FText UDialogueComponent::GetCurrentLine()
@@ -45,6 +46,16 @@ FText UDialogueComponent::GetCurrentLine()
 	return CurrentDialogue->Lines[CurrentIndex].Context;
 }
 
+FText UDialogueComponent::GetCurrentName()
+{
+	if (CurrentIndex >= CurrentDialogue->Lines.Num())
+	{
+		CurrentIndex = 0;
+		return FText();
+	}
+	return CurrentDialogue->Lines[CurrentIndex].SpeakerName;
+}
+
 void UDialogueComponent::Next()
 {
 	CurrentIndex++;
@@ -54,6 +65,7 @@ void UDialogueComponent::Next()
 		return;
 	}
 	ShowCurrentLine();
+	
 }
 
 void UDialogueComponent::EndDialogue()

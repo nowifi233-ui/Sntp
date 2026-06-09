@@ -5,6 +5,7 @@
 
 #include "Characters/SntpPlayerCharacter.h"
 #include "Player/SntpPlayerController.h"
+#include "UI/WidgetController/DialogueWidgetController.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 
 UOverlayWidgetController* ASntpHUD::GetOverlayWidgetController(const FWidgetControllerParams& Params)
@@ -39,7 +40,6 @@ void ASntpHUD::InitOverlay(APlayerController* PlayerController, APlayerState* Pl
 	OverlayWidgetController->BroadcastInitialValue();
 	Widget->AddToViewport();
 	OverlaySlateWidget = OverlayWidget->TakeWidget();
-	
 }
 
 void ASntpHUD::ToggleBag(APlayerController* PlayerController)
@@ -180,6 +180,39 @@ void ASntpHUD::ToggleFishingWidget(APlayerController* PlayerController)
 	ToggleMouse();
 }
 
+void ASntpHUD::ToggleDialogueWidget(APlayerController* PlayerController, UDialogueComponent* InDialogueComponent)
+{
+	if (!PlayerController) return;
+	if (!DialogueWidget)
+	{
+		UUserWidget* Widget  = CreateWidget<UUserWidget>(GetWorld(), DialogueWidgetClass);
+		DialogueWidget = Cast<USntpUserWidget>(Widget);
+		
+		if (!DialogueWidgetController)
+		{
+			DialogueWidgetController = NewObject<UDialogueWidgetController>(this, DialogueWidgetControllerClass);
+			DialogueWidgetController->Init(InDialogueComponent, PlayerController);
+		}
+		DialogueWidget->SetWidgetController(DialogueWidgetController);
+	}
+	
+	if (bDialogueOpen)
+	{
+		DialogueWidget->RemoveFromParent();
+		
+		// PlayerController->SetInputMode(FInputModeGameOnly());
+		
+		bDialogueOpen = false;
+	}
+	else
+	{
+		DialogueWidgetController->SetDialogueComponent(InDialogueComponent);
+		DialogueWidget->AddToViewport();
+		bDialogueOpen = true;
+	}
+	ToggleMouse();
+}
+
 UInventoryWidgetController* ASntpHUD::GetInventoryWidgetController(APlayerController* InPlayerController)
 {
 	if (!InPlayerController)
@@ -197,7 +230,7 @@ UInventoryWidgetController* ASntpHUD::GetInventoryWidgetController(APlayerContro
 
 bool ASntpHUD::ShouldHideMouse() const
 {
-	if (bSettingOpen || bBagOpen || bInventoryOpen || bCraftingOpen || bFishOpen)
+	if (bSettingOpen || bBagOpen || bInventoryOpen || bCraftingOpen || bFishOpen || bDialogueOpen)
 	{
 		return false;
 	}

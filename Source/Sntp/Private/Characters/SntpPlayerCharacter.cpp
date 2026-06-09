@@ -110,29 +110,12 @@ void ASntpPlayerCharacter::NextDialogueLine()
 
 void ASntpPlayerCharacter::StopDialogue()
 {
-	if (DialogueWidget)
-	{
-		DialogueWidget->RemoveFromParent();
-	}
+
 }
 
 void ASntpPlayerCharacter::Dialogue(FName Name, FText Text)
 {
-	if (Text.IsEmpty()) return;
-	if (!DialogueWidget)
-	{
-		if (DialogueWidgetClass)
-		{
-			USntpUserWidget* Widget = CreateWidget<USntpUserWidget>(GetWorld(), DialogueWidgetClass);
-			DialogueWidget = Widget;
-			DialogueWidget->SetWidgetController(this);
-		}
-	}
-	if (DialogueWidget)
-	{
-		DialogueWidget->AddToViewport();
-		DialogueDelegate.Broadcast(Name, Text);
-	}
+
 }
 
 void ASntpPlayerCharacter::InitAbilityActorInfo()

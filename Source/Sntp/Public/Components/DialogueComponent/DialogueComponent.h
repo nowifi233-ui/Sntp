@@ -10,6 +10,12 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopDialogueDelegate);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+	FDialogueDelegate,
+	FText, Name,
+	FText, Text
+	);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SNTP_API UDialogueComponent : public UActorComponent
 {
@@ -33,6 +39,9 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FStopDialogueDelegate StopDialogue;
 	
+	UPROPERTY(BlueprintAssignable)
+	FDialogueDelegate DialogueDelegate;
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	void StartDialogue(UDialogueDataAsset* Data);
@@ -42,6 +51,10 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	FText GetCurrentLine();
+	
+	UFUNCTION(BlueprintCallable)
+	FText GetCurrentName();
+	
 	
 	UFUNCTION(BlueprintCallable)
 	void Next();

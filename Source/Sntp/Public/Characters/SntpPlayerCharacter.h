@@ -20,11 +20,7 @@ class UCameraComponent;
 /**
  * 
  */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
-	FDialogueDelegate,
-	FName, Name,
-	FText, Text
-	);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNextLineDelegate);
 
 UCLASS()
@@ -85,15 +81,7 @@ public:
 	/**
 	 * Dialogue
 	 */
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> DialogueWidgetClass;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TObjectPtr<USntpUserWidget> DialogueWidget;
-	
-	UPROPERTY(BlueprintAssignable)
-	FDialogueDelegate DialogueDelegate;
-	
+
 	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
 	FNextLineDelegate NextLineDelegate;
 	

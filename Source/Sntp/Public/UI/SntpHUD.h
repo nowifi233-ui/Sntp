@@ -9,6 +9,7 @@
 #include "WidgetController/InventoryWidgetController.h"
 #include "SntpHUD.generated.h"
 
+class UDialogueWidgetController;
 class UAttributeSet;
 class UAbilitySystemComponent;
 struct FWidgetControllerParams;
@@ -45,6 +46,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void ToggleFishingWidget(APlayerController* PlayerController);
+	
+	UFUNCTION(BlueprintCallable)
+	void ToggleDialogueWidget(APlayerController* PlayerController, UDialogueComponent* InDialogueComponent);
 	
 private:
 	/*
@@ -122,8 +126,19 @@ private:
 	TObjectPtr<USntpUserWidget> FishWidget;
 	
 	/**
-	 * 
+	 * Dialogue Component
 	 */
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USntpUserWidget> DialogueWidgetClass;
+	
+	UPROPERTY()
+	TObjectPtr<USntpUserWidget> DialogueWidget;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UDialogueWidgetController> DialogueWidgetControllerClass; 
+	
+	UPROPERTY()
+	TObjectPtr<UDialogueWidgetController> DialogueWidgetController;
 	
 private:
 	bool bBagOpen = false;
@@ -132,6 +147,7 @@ private:
 	bool bCraftingOpen = false;
 	bool bIsUIOpen = false;
 	bool bFishOpen = false;
+	bool bDialogueOpen = false;
 	
 public:
 	bool ShouldHideMouse() const;

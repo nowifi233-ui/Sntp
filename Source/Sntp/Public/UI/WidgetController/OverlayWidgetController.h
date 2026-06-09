@@ -103,7 +103,6 @@ private:
 	UFUNCTION()
 	void OnInteractedOptionSelected(FInteractionOption Option);
 
-
 private:
 	void BindAttributeChangedDelegate();
 };
