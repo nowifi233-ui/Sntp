@@ -23,6 +23,11 @@ void UDialogueWidgetController::NextDialogue()
 	DialogueComponent->Next();
 }
 
+void UDialogueWidgetController::DialogueOptionChosen(FDialogueChoice Choice)
+{
+	DialogueComponent->ChooseChoice(Choice);
+}
+
 void UDialogueWidgetController::StartDialogue()
 {
 	
@@ -37,7 +42,7 @@ void UDialogueWidgetController::StopDialogue()
 	}
 }
 
-void UDialogueWidgetController::OnDialogueChanged(FText Name, FText Text)
+void UDialogueWidgetController::OnDialogueChanged(FText Name, FText Text, TArray<FDialogueChoice> Choices)
 {
-	OnDialogueChangedDelegate.Broadcast(Name, Text);
+	OnDialogueChangedDelegate.Broadcast(Name, Text, FChoiceList{Choices});
 }

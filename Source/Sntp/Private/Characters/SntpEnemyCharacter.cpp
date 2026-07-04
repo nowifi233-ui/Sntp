@@ -2,6 +2,7 @@
 
 
 #include "Characters/SntpEnemyCharacter.h"
+
 #include "SntpGameplayTags.h"
 #include "AbilitySystem/SntpAbilitySystemComponent.h"
 #include "AbilitySystem/SntpAbilitySystemLibrary.h"
@@ -10,7 +11,11 @@
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "MonsterPool/MonsterPoolSubsystem.h"
+#include "Runtime/AIModule/Classes/AIController.h"
 #include "UI/Widgets/SntpUserWidget.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "Perception/AIPerceptionComponent.h"
 
 ASntpEnemyCharacter::ASntpEnemyCharacter()
 {
@@ -25,6 +30,9 @@ ASntpEnemyCharacter::ASntpEnemyCharacter()
 	
 	HealthBarComponent = CreateDefaultSubobject<UWidgetComponent>("HealthBarComponent");
 	HealthBarComponent->SetupAttachment(RootComponent);
+	
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	AIControllerClass = AAIController::StaticClass();
 }
 
 void ASntpEnemyCharacter::HighlightActor()
@@ -44,6 +52,8 @@ void ASntpEnemyCharacter::UnHighlightActor()
 void ASntpEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	CachedAIController = Cast<AAIController>(GetController());
 	
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
@@ -98,6 +108,15 @@ void ASntpEnemyCharacter::Die()
 {
 	SetLifeSpan(5.f);
 	Super::Die();
+	
+	UGameInstance* GI = GetGameInstance();
+	if (GI)
+	{
+		if (auto Pool = GI->GetSubsystem<UMonsterPoolSubsystem>())
+		{
+			Pool->ReleaseMonster(this);
+		}
+	}
 }
 
 void ASntpEnemyCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
@@ -105,6 +124,50 @@ void ASntpEnemyCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int
 	bHitReacting = NewCount > 0;
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting? 0.f : BaseWalkSpeed;
 	
+}
+
+void ASntpEnemyCharacter::ActivateMonster(FVector Location)
+{
+	bActive = true;
+	SetActorLocation(Location);
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+	SetActorTickEnabled(true);
+	
+	AAIController* AI = Cast<AAIController>(GetController());
+	if (!AI)
+	{
+		AI = GetWorld()->SpawnActor<AAIController>(AAIController::StaticClass());
+		AI->Possess(this);
+	}
+	else if (AI->GetPawn() != this)
+	{
+		AI->Possess(this);
+	}
+}
+
+void ASntpEnemyCharacter::DeactivateMonster()
+{
+	bActive = false;
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
+	if (CachedAIController)
+	{
+		
+		CachedAIController->ClearFocus(EAIFocusPriority::Gameplay);
+		CachedAIController->StopMovement();
+	}
+}
+
+void ASntpEnemyCharacter::ResetAIState()
+{
+	if (!CachedAIController) return;
+	UBlackboardComponent* BB = CachedAIController->GetBlackboardComponent();
+	if (BB)
+	{
+		// Clear All Values
+	}
 }
 
 void ASntpEnemyCharacter::InitAbilityActorInfo()

@@ -8,11 +8,20 @@
 #include "UI/WidgetController/SntpWidgetController.h"
 #include "DialogueWidgetController.generated.h"
 
+USTRUCT(BlueprintType, Blueprintable)
+struct FChoiceList
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<FDialogueChoice> Choices;
+};
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
 	FDialogueWidgetDelegate,
 	FText, Name,
-	FText, Text
+	FText, Text,
+	FChoiceList, ChoiceList
 	);
 /**
  * 
@@ -37,13 +46,16 @@ public:
 	void NextDialogue();
 	
 	UFUNCTION(BlueprintCallable)
+	void DialogueOptionChosen(FDialogueChoice Choice);
+	
+	UFUNCTION(BlueprintCallable)
 	void StartDialogue();
 	
 	UFUNCTION(BlueprintCallable)
 	void StopDialogue();
 	
 	UFUNCTION()
-	void OnDialogueChanged(FText Name, FText Text);
+	void OnDialogueChanged(FText Name, FText Text, TArray<FDialogueChoice> Choices);
 	
 	UPROPERTY(BlueprintAssignable)
 	FDialogueWidgetDelegate OnDialogueChangedDelegate;

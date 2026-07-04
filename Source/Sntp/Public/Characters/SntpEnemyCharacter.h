@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Actors/FItemDropPair.h"
+#include "BehaviorTree/BehaviorTree.h"
 #include "Data/CharacterClassInfo.h"
 #include "Characters/SntpCharacterBase.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "SntpEnemyCharacter.generated.h"
+
 
 class APickupActor;
 enum class ECharacterClass : uint8;
@@ -55,6 +57,24 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, Category="Combat")
 	float BaseWalkSpeed = 250.f;
+	
+	/**
+	 * Pool
+	 */
+public:
+	void ActivateMonster(FVector Location);
+	void DeactivateMonster();
+	bool IsActive() const {return bActive;}
+	UPROPERTY(EditAnywhere)
+	UBehaviorTree* BehaviorTreeAsset;
+	
+	void ResetAIState();
+protected:
+	UPROPERTY()
+	bool bActive = true;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<AAIController> CachedAIController;
 	
 protected:
 	virtual void InitAbilityActorInfo() override;

@@ -8,12 +8,14 @@
 #include "DialogueComponent.generated.h"
 
 
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopDialogueDelegate);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
 	FDialogueDelegate,
 	FText, Name,
-	FText, Text
+	FText, Text,
+	TArray<FDialogueChoice>, Choices
 	);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -32,6 +34,9 @@ protected:
 public:
 	UPROPERTY()
 	int CurrentIndex;
+	
+	UPROPERTY()
+	FName CurrentID;
 	
 	UPROPERTY()
 	UDialogueDataAsset* CurrentDialogue;
@@ -61,4 +66,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void EndDialogue();
+	
+	UFUNCTION(BlueprintCallable)
+	void ChooseChoice(const FDialogueChoice& Choice);
 };

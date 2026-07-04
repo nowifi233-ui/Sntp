@@ -10,7 +10,6 @@ UDialogueComponent::UDialogueComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	// ...
 }
 
 
@@ -18,59 +17,74 @@ UDialogueComponent::UDialogueComponent()
 void UDialogueComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
 	
 }
 
 void UDialogueComponent::StartDialogue(UDialogueDataAsset* Data)
 {
 	CurrentDialogue = Data;
-	CurrentIndex = 0;
+	CurrentID = "1";
 	ShowCurrentLine();
 	
 }
 
 void UDialogueComponent::ShowCurrentLine()
 {
-	DialogueDelegate.Broadcast(GetCurrentName(), GetCurrentLine());
+	DialogueDelegate.Broadcast(GetCurrentName(), GetCurrentLine(), CurrentDialogue->GetNodeByID(CurrentID).Choices);
 }
 
 FText UDialogueComponent::GetCurrentLine()
 {
-	if (CurrentIndex >= CurrentDialogue->Lines.Num())
+	if (CurrentDialogue->GetNodeByID(CurrentID) == FDialogueNode())
 	{
-		CurrentIndex = 0;
+		CurrentID = "1";
 		return FText();
 	}
-	return CurrentDialogue->Lines[CurrentIndex].Context;
+	return CurrentDialogue->GetNodeByID(CurrentID).Content;
 }
 
 FText UDialogueComponent::GetCurrentName()
 {
-	if (CurrentIndex >= CurrentDialogue->Lines.Num())
+	if (CurrentDialogue->GetNodeByID(CurrentID) == FDialogueNode())
 	{
-		CurrentIndex = 0;
+		CurrentID = "1";
 		return FText();
 	}
-	return CurrentDialogue->Lines[CurrentIndex].SpeakerName;
+	return CurrentDialogue->GetNodeByID(CurrentID).Speaker;
 }
 
 void UDialogueComponent::Next()
 {
-	CurrentIndex++;
-	if (CurrentIndex >= CurrentDialogue->Lines.Num())
+	if (!CurrentDialogue->GetNodeByID(CurrentID).Choices.IsEmpty())
+	{
+		// Has choice
+		return;
+	}
+	CurrentID = CurrentDialogue->GetNodeByID(CurrentID).NextID;
+	if (CurrentDialogue->GetNodeByID(CurrentID) == FDialogueNode())
 	{
 		EndDialogue();
 		return;
 	}
 	ShowCurrentLine();
-	
 }
+
+
 
 void UDialogueComponent::EndDialogue()
 {
 	StopDialogue.Broadcast();
+}
+
+void UDialogueComponent::ChooseChoice(const FDialogueChoice& Choice)
+{
+	CurrentID = Choice.NextNodeID;
+	if (CurrentDialogue->GetNodeByID(CurrentID) == FDialogueNode())
+	{
+		EndDialogue();
+		return;
+	}
+	ShowCurrentLine();
 }
 
 
