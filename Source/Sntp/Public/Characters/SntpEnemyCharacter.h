@@ -11,7 +11,8 @@
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "SntpEnemyCharacter.generated.h"
 
-
+class UBehaviorTree;
+class ASntpAIController;
 class APickupActor;
 enum class ECharacterClass : uint8;
 class UWidgetComponent;
@@ -29,6 +30,8 @@ class SNTP_API ASntpEnemyCharacter : public ASntpCharacterBase, public IEnemyInt
 	
 public:
 	ASntpEnemyCharacter();
+	virtual void PossessedBy(AController* NewController) override;
+	
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
 	
@@ -65,15 +68,12 @@ public:
 	void ActivateMonster(FVector Location);
 	void DeactivateMonster();
 	bool IsActive() const {return bActive;}
-	UPROPERTY(EditAnywhere)
-	UBehaviorTree* BehaviorTreeAsset;
-	
 	void ResetAIState();
 protected:
 	UPROPERTY()
 	bool bActive = true;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	TObjectPtr<AAIController> CachedAIController;
 	
 protected:
@@ -100,4 +100,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void Drop() override;
+	
+	/* AI Controller */
+protected:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="AI")
+	TObjectPtr<UBehaviorTree> BehaviorTreeAsset;
+	
+	UPROPERTY()
+	TObjectPtr<ASntpAIController> SntpAIController;
 };

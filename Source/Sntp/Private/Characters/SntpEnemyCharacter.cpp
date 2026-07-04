@@ -8,6 +8,7 @@
 #include "AbilitySystem/SntpAbilitySystemLibrary.h"
 #include "AbilitySystem/SntpAttributeSet.h"
 #include "Actors/Pickups/PickupActor.h"
+#include "AI/SntpAIController.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -33,6 +34,16 @@ ASntpEnemyCharacter::ASntpEnemyCharacter()
 	
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	AIControllerClass = AAIController::StaticClass();
+}
+
+void ASntpEnemyCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	if (!HasAuthority()) return;
+	
+	SntpAIController = Cast<ASntpAIController>(NewController);
+	SntpAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTreeAsset->BlackboardAsset);
+	SntpAIController->RunBehaviorTree(BehaviorTreeAsset);
 }
 
 void ASntpEnemyCharacter::HighlightActor()
