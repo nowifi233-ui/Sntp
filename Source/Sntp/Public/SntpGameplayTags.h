@@ -51,6 +51,7 @@ public:
 	FGameplayTag ItemType_Consume;
 	FGameplayTag ItemType_Building;
 	FGameplayTag ItemType_Sell;
+	FGameplayTag ItemType_Equipment;
 	
 	// Item Rarity
 	FGameplayTag Rarity_Null;

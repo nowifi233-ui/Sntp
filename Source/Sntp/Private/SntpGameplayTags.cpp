@@ -131,6 +131,10 @@ void FSntpGameplayTags::InitializeNativeGameplayTags()
 	   FName("ItemType.Sell"),
 	   FString("Sell"));
 	
+	
+	GameplayTags.ItemType_Equipment = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	   FName("ItemType.Equipment"),
+	   FString("Equipment"));
 	/* Item Rarity */
 				
 	GameplayTags.Rarity_Null = UGameplayTagsManager::Get().AddNativeGameplayTag(

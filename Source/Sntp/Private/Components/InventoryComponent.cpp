@@ -4,6 +4,7 @@
 #include "Components/InventoryComponent.h"
 
 #include "AbilitySystemGlobals.h"
+#include "SntpGameplayTags.h"
 #include "Data/ItemDefinition.h"
 #include "Abilities/GameplayAbility.h"
 #include "Characters/SntpPlayerCharacter.h"
@@ -64,18 +65,28 @@ void UInventoryComponent::UseItem(int32 Index)
 	FItemInstance& Item = Items[Index];
 	if (Item.Count <= 0) return;
 	// 调用物品逻辑
-	if (Item.ItemDef->UseAbility)
+	if (Item.ItemDef->ItemType.MatchesTagExact(FSntpGameplayTags::Get().ItemType_Consume))
 	{
-		UAbilitySystemComponent* ASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwner());
-		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Item.ItemDef->UseAbility);
-		ASC->GiveAbilityAndActivateOnce(AbilitySpec);
+		if (Item.ItemDef->UseAbility)
+		{
+			UAbilitySystemComponent* ASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwner());
+			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Item.ItemDef->UseAbility);
+			ASC->GiveAbilityAndActivateOnce(AbilitySpec);
+		}
+		if (Item.ItemDef->UseEffect)
+		{
+			UAbilitySystemComponent* ASC = Cast<ASntpPlayerCharacter>(GetOwner())->GetAbilitySystemComponent();
+			FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
+			FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(Item.ItemDef->UseEffect, 1, EffectContext);
+			ASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data);
+		}
 	}
-	if (Item.ItemDef->UseEffect)
+	else if (Item.ItemDef->ItemType.MatchesTagExact(FSntpGameplayTags::Get().ItemType_Equipment))
 	{
-		UAbilitySystemComponent* ASC = Cast<ASntpPlayerCharacter>(GetOwner())->GetAbilitySystemComponent();
-		FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
-		FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(Item.ItemDef->UseEffect, 1, EffectContext);
-		ASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data);
+		if (ASntpPlayerCharacter* SntpPlayer = Cast<ASntpPlayerCharacter>(GetOwner()))
+		{
+			SntpPlayer->EquipmentComponent->EquipItem(this, Index);
+		}
 	}
 	
 	Item.Count -= 1;

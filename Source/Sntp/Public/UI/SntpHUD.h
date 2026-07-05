@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/DialogueComponent/DialogueComponent.h"
 #include "UI/Widgets/SntpUserWidget.h"
 #include "GameFramework/HUD.h"
 #include "WidgetController/CraftingWidgetController.h"
+#include "WidgetController/EquipmentWidgetController.h"
 #include "WidgetController/InventoryWidgetController.h"
 #include "SntpHUD.generated.h"
 
@@ -50,6 +52,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ToggleDialogueWidget(APlayerController* PlayerController, UDialogueComponent* InDialogueComponent);
 	
+	UFUNCTION(BlueprintCallable)
+	void ToggleEquipmentWidget(APlayerController* PlayerController);
 private:
 	/*
 	 * Overlay Widget Controller
@@ -140,6 +144,22 @@ private:
 	UPROPERTY()
 	TObjectPtr<UDialogueWidgetController> DialogueWidgetController;
 	
+	/*
+	 * Equipment Component
+	 */
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USntpUserWidget> EquipmentWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<USntpUserWidget> EquipmentWidget;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UEquipmentWidgetController> EquipmentWidgetControllerClass; 
+	
+	UPROPERTY()
+	TObjectPtr<UEquipmentWidgetController> EquipmentWidgetController;
+	
+
 private:
 	bool bBagOpen = false;
 	bool bSettingOpen = false;
@@ -148,6 +168,7 @@ private:
 	bool bIsUIOpen = false;
 	bool bFishOpen = false;
 	bool bDialogueOpen = false;
+	bool bEquipmentOpen = false;
 	
 public:
 	bool ShouldHideMouse() const;

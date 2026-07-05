@@ -213,6 +213,36 @@ void ASntpHUD::ToggleDialogueWidget(APlayerController* PlayerController, UDialog
 	ToggleMouse();
 }
 
+void ASntpHUD::ToggleEquipmentWidget(APlayerController* PlayerController)
+{
+	if (!PlayerController) return;
+	if (!EquipmentWidget)
+	{
+		UUserWidget* Widget  = CreateWidget<UUserWidget>(GetWorld(), EquipmentWidgetClass);
+		EquipmentWidget = Cast<USntpUserWidget>(Widget);
+		
+		if (!EquipmentWidgetController)
+		{
+			EquipmentWidgetController = NewObject<UEquipmentWidgetController>(this, EquipmentWidgetControllerClass);
+			EquipmentWidgetController->Init(PlayerController->GetPawn<ASntpPlayerCharacter>()->EquipmentComponent, PlayerController);
+		}
+		EquipmentWidget->SetWidgetController(EquipmentWidgetController);
+	}
+	
+	if (bEquipmentOpen)
+	{
+		EquipmentWidget->RemoveFromParent();
+		// PlayerController->SetInputMode(FInputModeGameOnly());
+		bEquipmentOpen = false;
+	}
+	else
+	{
+		EquipmentWidget->AddToViewport();
+		bEquipmentOpen = true;
+	}
+	ToggleMouse();
+}
+
 UInventoryWidgetController* ASntpHUD::GetInventoryWidgetController(APlayerController* InPlayerController)
 {
 	if (!InPlayerController)
@@ -230,7 +260,7 @@ UInventoryWidgetController* ASntpHUD::GetInventoryWidgetController(APlayerContro
 
 bool ASntpHUD::ShouldHideMouse() const
 {
-	if (bSettingOpen || bBagOpen || bInventoryOpen || bCraftingOpen || bFishOpen || bDialogueOpen)
+	if (bSettingOpen || bBagOpen || bInventoryOpen || bCraftingOpen || bFishOpen || bDialogueOpen || bEquipmentOpen)
 	{
 		return false;
 	}

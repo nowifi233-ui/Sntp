@@ -8,6 +8,7 @@
 #include "Components/CraftingComponent/CraftingComponent.h"
 #include "Components/InteractionComponent.h"
 #include "Components/BuildingComponent/BuildableCharacterInterface.h"
+#include "Components/EquipmentComponent/EquipmentComponent.h"
 #include "Components/FishingComponent/FishingComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SntpPlayerCharacter.generated.h"
@@ -93,7 +94,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void Dialogue(FName Name, FText Text);
-	
+
 protected:
 	virtual void InitAbilityActorInfo() override;
 
@@ -106,6 +107,14 @@ public:
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UComboComponent* ComboComponent;
+	
+	/**
+	 * Equipment
+	 */
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="InteractionComponent")
+	TObjectPtr<UEquipmentComponent> EquipmentComponent;
+	
 	
 	/* Weapon Dissolve */
 	

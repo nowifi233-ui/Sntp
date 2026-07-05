@@ -66,6 +66,9 @@ ASntpPlayerCharacter::ASntpPlayerCharacter()
 	
 	// Fish
 	FishingComponent = CreateDefaultSubobject<UFishingComponent>("FishingComponent");
+
+	// Equipment
+	EquipmentComponent = CreateDefaultSubobject<UEquipmentComponent>("EquipmentComponent");
 }
 
 void ASntpPlayerCharacter::PossessedBy(AController* byController)
