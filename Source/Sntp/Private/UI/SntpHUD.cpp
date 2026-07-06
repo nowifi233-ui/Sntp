@@ -233,11 +233,13 @@ void ASntpHUD::ToggleEquipmentWidget(APlayerController* PlayerController)
 	{
 		EquipmentWidget->RemoveFromParent();
 		// PlayerController->SetInputMode(FInputModeGameOnly());
+		
 		bEquipmentOpen = false;
 	}
 	else
 	{
 		EquipmentWidget->AddToViewport();
+		PlayerController->GetPawn<ASntpPlayerCharacter>()->EquipmentComponent->OnEquipmentChanged.Broadcast();
 		bEquipmentOpen = true;
 	}
 	ToggleMouse();

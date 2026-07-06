@@ -55,8 +55,11 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FEquipmentSlotData> EquipmentSlots;
 
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
 	FOnEquipmentChanged OnEquipmentChanged;
+	
+	UFUNCTION(BlueprintCallable)
+	void BroadCastOnEquipmentChanged();
 
 public:
 

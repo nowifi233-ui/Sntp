@@ -11,10 +11,12 @@ struct SntpDamageStatics
 {
 	DECLARE_ATTRIBUTE_CAPTUREDEF(MaxHealth);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalChance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalDamage);
 	SntpDamageStatics()
 	{
 		DEFINE_ATTRIBUTE_CAPTUREDEF(USntpAttributeSet, MaxHealth, Target, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(USntpAttributeSet, CriticalChance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(USntpAttributeSet, CriticalDamage, Target, false);
 	}
 };
 
@@ -28,6 +30,7 @@ UExecCalc_Damage::UExecCalc_Damage()
 {
 	RelevantAttributesToCapture.Add(DamageStatics().MaxHealthDef);
 	RelevantAttributesToCapture.Add(DamageStatics().CriticalChanceDef);
+	RelevantAttributesToCapture.Add(DamageStatics().CriticalDamageDef);
 }
 
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
@@ -48,10 +51,14 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	float CriticalChance = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalChanceDef, EvaluationParameters, CriticalChance);
 	
+	float CriticalDamage = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalDamageDef, EvaluationParameters, CriticalDamage);
+	
+	
 	float Damage = Spec.GetSetByCallerMagnitude(FSntpGameplayTags::Get().Damage);
 	if (const int32 Temp = FMath::RandRange(0, 100); Temp < CriticalChance)
 	{
-		Damage = Damage * 2.f;
+		Damage = Damage * CriticalDamage / 100.f;
 		SntpContext->SetIsCritical(true);
 	}
 	else

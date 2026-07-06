@@ -3,6 +3,7 @@
 
 #include "Components/EquipmentComponent/EquipmentComponent.h"
 
+#include "Characters/SntpPlayerCharacter.h"
 #include "Data/ItemDefinition.h"
 #include "Components/InventoryComponent.h"
 
@@ -83,6 +84,11 @@ bool UEquipmentComponent::IsSlotOccupied(EEquipmentSlot Slot) const
     return Data && Data->ItemDef != nullptr;
 }
 
+void UEquipmentComponent::BroadCastOnEquipmentChanged()
+{
+    OnEquipmentChanged.Broadcast();
+}
+
 bool UEquipmentComponent::EquipItem(UInventoryComponent* Inventory, int32 InventoryIndex)
 {
     if (!Inventory)
@@ -117,13 +123,8 @@ bool UEquipmentComponent::EquipItem(UInventoryComponent* Inventory, int32 Invent
     // 已有装备，先放回背包
     if (Slot->ItemDef)
     {
-        if (Inventory->AddItem(Slot->ItemDef, 1) < 1)
-        {
-            return false;
-        }
-
+        Inventory->AddItem(Slot->ItemDef, 1);
         RemoveEquipEffect(*Slot);
-
         Slot->ItemDef = nullptr;
     }
 
@@ -157,15 +158,9 @@ bool UEquipmentComponent::Unequip(EEquipmentSlot SlotType, UInventoryComponent* 
         return false;
     }
 
-    if (Inventory->AddItem(Slot->ItemDef, 1) < 1)
-    {
-        return false;
-    }
-
+    Inventory->AddItem(Slot->ItemDef, 1);
     RemoveEquipEffect(*Slot);
-
     Slot->ItemDef = nullptr;
-
     OnEquipmentChanged.Broadcast();
 
     return true;
@@ -174,11 +169,48 @@ bool UEquipmentComponent::Unequip(EEquipmentSlot SlotType, UInventoryComponent* 
 bool UEquipmentComponent::ApplyEquipEffect(UItemDefinition* Item, FEquipmentSlotData& SlotData)
 {
     // 下一步实现 GAS
-    return true;
+    ASntpPlayerCharacter* Character = GetOwner<ASntpPlayerCharacter>();
+    if (!Character)
+    {
+        return false;
+    }
+    UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent();
+    if (!ASC)
+    {
+        return false;
+    }
+    
+    if (!Item || !Item->UseEffect)
+    {
+        return false;
+    }
+    SlotData.EffectHandle = ASC->ApplyGameplayEffectSpecToSelf(*ASC->MakeOutgoingSpec(Item->UseEffect, 1.f, ASC->MakeEffectContext()).Data);
+    
+    return SlotData.EffectHandle.IsValid();
 }
 
 void UEquipmentComponent::RemoveEquipEffect(FEquipmentSlotData& SlotData)
 {
     // 下一步实现 GAS
+    ASntpPlayerCharacter* Character = Cast<ASntpPlayerCharacter>(GetOwner());
+
+    if (!Character)
+    {
+        return;
+    }
+
+    UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent();
+
+    if (!ASC)
+    {
+        return;
+    }
+
+    if (SlotData.EffectHandle.IsValid())
+    {
+        ASC->RemoveActiveGameplayEffect(SlotData.EffectHandle);
+
+        SlotData.EffectHandle.Invalidate();
+    }
 }
 
