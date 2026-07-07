@@ -15,8 +15,8 @@ struct SntpDamageStatics
 	SntpDamageStatics()
 	{
 		DEFINE_ATTRIBUTE_CAPTUREDEF(USntpAttributeSet, MaxHealth, Target, false);
-		DEFINE_ATTRIBUTE_CAPTUREDEF(USntpAttributeSet, CriticalChance, Target, false);
-		DEFINE_ATTRIBUTE_CAPTUREDEF(USntpAttributeSet, CriticalDamage, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(USntpAttributeSet, CriticalChance, Source, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(USntpAttributeSet, CriticalDamage, Source, false);
 	}
 };
 
