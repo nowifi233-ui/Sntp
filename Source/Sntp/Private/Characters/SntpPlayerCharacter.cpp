@@ -175,12 +175,16 @@ void ASntpPlayerCharacter::SpawnWeapon()
 void ASntpPlayerCharacter::SetIgnoreMoveInput(bool IgnoreMoveInput)
 {
 	ASntpPlayerController* PC = GetController<ASntpPlayerController>();
-	if(PC)
+	if (!PC)
 	{
-		PC->ResetIgnoreMoveInput();
-		PC->SetIgnoreMoveInput(IgnoreMoveInput);
-		PC->bIgnoreMoveInput = IgnoreMoveInput;
+		UE_LOG(LogTemp, Verbose, TEXT("SetIgnoreMoveInput PC is null! Pawn: %s"), *GetName());
+		return;
 	}
+
+	// PC->ResetIgnoreMoveInput();
+	PC->SetIgnoreMoveInput(IgnoreMoveInput);
+	// PC->bIgnoreMoveInput = IgnoreMoveInput;
+
 	if (IgnoreMoveInput)
 	{
 		PC->StopMovement();

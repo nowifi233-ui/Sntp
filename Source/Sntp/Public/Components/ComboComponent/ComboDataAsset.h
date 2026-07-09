@@ -50,7 +50,6 @@ struct FPendingInput
 		bIsValid = false;
 	}
 };
-
 /**
  * 
  */
