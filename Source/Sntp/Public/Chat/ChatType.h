@@ -4,34 +4,50 @@
 #include "CoreMinimal.h"
 #include "ChatType.generated.h"
 
+
 UENUM(BlueprintType)
 enum class EChatChannel : uint8
 {
-	World       UMETA(DisplayName="World"),
-	Private     UMETA(DisplayName="Private"),
-	System      UMETA(DisplayName="System"),
-	Team        UMETA(DisplayName="Team"),
-	Guild       UMETA(DisplayName="Guild")
+	World,
+	Private,
+	System,
+	Team,
+	Guild
 };
 
 
+
 USTRUCT(BlueprintType)
-struct SNTP_API FChatMessage
+struct FChatMessage
 {
 	GENERATED_BODY()
 
+public:
+
+	//发送者
 	UPROPERTY(BlueprintReadOnly)
 	FString SenderName;
-
+	
+	//接收者
 	UPROPERTY(BlueprintReadOnly)
 	FString ReceiverName;
-
+	
+	//内容
 	UPROPERTY(BlueprintReadOnly)
 	FString Content;
 
 	UPROPERTY(BlueprintReadOnly)
 	EChatChannel Channel;
-
+	
 	UPROPERTY(BlueprintReadOnly)
-	FString Time;
+	FDateTime Time;
+	
+
+	/*
+		消息唯一ID
+		后续数据库使用
+	*/
+	UPROPERTY(BlueprintReadOnly)
+	int64 MessageID = 0;
+	
 };

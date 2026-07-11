@@ -23,7 +23,7 @@ void UUChatManagerSubsystem::HandleWorldMessage(AActor* Sender, const FString& C
 	{
 		if (Component)
 		{
-			Component->ClientReceiveChat(Message);
+			Component->ClientReceiveMessage(Message);
 		}
 	}
 }
@@ -46,14 +46,14 @@ void UUChatManagerSubsystem::HandlePrivateMessage(AActor* Sender, const FString&
 		
 		if (PlayerName == TargetName)
 		{
-			Component->ClientReceiveChat(Message);
+			Component->ClientReceiveMessage(Message);
 			break;
 		}
 	}
 	UChatComponent* SenderComponent = Sender->FindComponentByClass<UChatComponent>();
 	if (SenderComponent)
 	{
-		SenderComponent->ClientReceiveChat(Message);
+		SenderComponent->ClientReceiveMessage(Message);
 	}
 }
 
@@ -70,7 +70,7 @@ void UUChatManagerSubsystem::BroadcastSystemMessage(const FString& Content)
 	
 	for (auto Component : Components)
 	{
-		Component->ClientReceiveChat(Message);
+		Component->ClientReceiveMessage(Message);
 	}
 }
 
@@ -106,6 +106,6 @@ FChatMessage UUChatManagerSubsystem::MakeMessage(AActor* Sender, const FString& 
 			Message.SenderName = PC->PlayerState->GetPlayerName();
 		}
 	}
-	Message.Time = FDateTime::Now().ToString();
+	Message.Time = FDateTime::Now();
 	return Message;
 }

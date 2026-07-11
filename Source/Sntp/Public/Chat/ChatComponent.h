@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ChatManagerSubsystem.h"
 #include "Components/ActorComponent.h"
 #include "ChatType.h"
 #include "UChatManagerSubsystem.h"
@@ -28,6 +29,8 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
 	UPROPERTY(BlueprintAssignable)
@@ -42,7 +45,7 @@ public:
 	
 	// 服务器->客户端
 	UFUNCTION(Client, Reliable)
-	void ClientReceiveChat(const FChatMessage& Message);
+	void ClientReceiveMessage(const FChatMessage& Message);
 
 private:
 	UFUNCTION(Server, Reliable)
@@ -52,5 +55,5 @@ private:
 	void ServerSendPrivateMessage(const FString& TargetPlayer, const FString& Message);
 	
 private:
-	UUChatManagerSubsystem* GetChatManager() const;
+	UChatManagerSubsystem* GetChatManager() const;
 };

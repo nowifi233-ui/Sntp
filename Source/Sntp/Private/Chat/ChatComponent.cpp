@@ -3,6 +3,9 @@
 
 #include "Chat/ChatComponent.h"
 
+#include "Chat/ChatManagerSubsystem.h"
+#include "Chat/ChatSubsystem.h"
+
 // Sets default values for this component's properties
 UChatComponent::UChatComponent()
 {
@@ -18,6 +21,31 @@ UChatComponent::UChatComponent()
 void UChatComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	if(GetOwner()->HasAuthority())
+	{
+		UChatManagerSubsystem* Manager = GetChatManager();
+		
+		if(Manager)
+		{
+			Manager->RegisterPlayer(this);
+		}
+	}
+
+}
+
+void UChatComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if(GetOwner()->HasAuthority())
+	{
+		UChatManagerSubsystem* Manager = GetChatManager();
+		
+		if(Manager)
+		{
+			Manager->UnregisterPlayer(this);
+		}
+	}
+	Super::EndPlay(EndPlayReason);
 }
 
 void UChatComponent::SendWorldMessage(const FString& Message)
@@ -34,34 +62,40 @@ void UChatComponent::SendPrivateMessage(const FString& TargetPlayer, const FStri
 	
 }
 
-UUChatManagerSubsystem* UChatComponent::GetChatManager() const
+UChatManagerSubsystem* UChatComponent::GetChatManager() const
 {
-	return GetWorld()->GetSubsystem<UUChatManagerSubsystem>();
+	if(!GetOwner()->GetGameInstance()) return nullptr;
+	
+	return GetOwner()->GetGameInstance()->GetSubsystem<UChatManagerSubsystem>();
 }
 
-void UChatComponent::ClientReceiveChat_Implementation(const FChatMessage& Message)
+void UChatComponent::ClientReceiveMessage_Implementation(const FChatMessage& Message)
 {
 	/*
 	 * 通知 UI
 	 */
-	OnChatMessageReceived.Broadcast(Message);
+	UChatSubsystem* ChatSubsystem = GetOwner()->GetGameInstance()->GetSubsystem<UChatSubsystem>();
+	if (ChatSubsystem)
+	{
+		ChatSubsystem->AddMessage(Message);
+	}
 }
 
 void UChatComponent::ServerSendWorldMessage_Implementation(const FString& Message)
 {
-	UUChatManagerSubsystem* Manager = GetWorld()->GetSubsystem<UUChatManagerSubsystem>();
+	UChatManagerSubsystem* Manager = GetChatManager();
 	if (Manager)
 	{
-		Manager->HandleWorldMessage(GetOwner(), Message);
+		Manager->HandleWorldChat(this, Message);
 	}
 }
 
 void UChatComponent::ServerSendPrivateMessage_Implementation(const FString& TargetPlayer, const FString& Message)
 {
-	UUChatManagerSubsystem* Manager = GetWorld()->GetSubsystem<UUChatManagerSubsystem>();
+	UChatManagerSubsystem* Manager = GetChatManager();
 	if (Manager)
 	{
-		Manager->HandlePrivateMessage(GetOwner(), TargetPlayer, Message);
+		Manager->HandlePrivateChat(this, TargetPlayer, Message);
 	}
 }
 
