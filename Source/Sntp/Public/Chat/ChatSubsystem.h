@@ -1,85 +1,71 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ChatType.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+
+#include "Chat/ChatType.h"
+
 #include "ChatSubsystem.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChatMessageAdded, const FChatMessage&, ChatMessage);
+
 /**
- * 
+ * Client chat subsystem.
+ *
+ * 职责：
+ * - 保存聊天记录
+ * - 管理各频道消息
+ * - 管理私聊会话
+ * - 提供查询接口
+ *
+ * 不负责网络通信。
  */
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
-	FOnChatMessageAdded,
-	const FChatMessage&,
-	Message
-);
-
 UCLASS()
 class SNTP_API UChatSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
-	
+
 public:
-	
+
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
 	virtual void Deinitialize() override;
 
 public:
-	
-	/*
-		添加服务器消息
-	*/
+
+	/** 收到聊天消息 */
+	void HandleReceiveMessage(const FChatMessage& Message);
+
+	/** 添加聊天消息 */
 	void AddMessage(const FChatMessage& Message);
 
-public:
-
-	/*
-		获取全部聊天
-	*/
-	const TArray<FChatMessage>& GetAllMessages() const;
-	
-	/*
-		获取指定频道
-	*/
-	void GetMessagesByChannel(EChatChannel Channel, TArray<FChatMessage>& OutMessages) const;
-
-public:
-
-	/*
-		清空
-	*/
+	/** 清空聊天记录 */
 	void ClearHistory();
 
+	/** 获取全部聊天记录 */
+	const TArray<FChatMessage>& GetHistory() const;
+
+	/** 获取频道聊天记录 */
+	void GetChannelHistory(EChatChannel Channel, TArray<FChatMessage>& OutMessages) const;
+
 public:
 
-	/*
-		未读消息
-	*/
-	int32 GetUnreadCount(EChatChannel Channel) const;
-
-	void ClearUnread(EChatChannel Channel);
-public:
-	
+	/** UI监听 */
 	UPROPERTY(BlueprintAssignable)
 	FOnChatMessageAdded OnChatMessageAdded;
 
 private:
-	
-	/*
-		全部历史
-		最近100条
-	*/
-	UPROPERTY()
+
+	/** 全部聊天记录 */
 	TArray<FChatMessage> ChatHistory;
+
+	/** 每个频道历史 */
+	TMap<EChatChannel, TArray<FChatMessage>> ChannelHistory;
 	
-	/*
-		未读数量
-	*/
-	TMap<EChatChannel,int32> UnreadMap;
-private:
-	
-	int32 MaxHistoryCount = 100;
+public:
+	UFUNCTION(BlueprintCallable, Category = "Chat")
+	void SendMessage(
+		const FString& Content,
+		EChatChannel Channel = EChatChannel::World,
+		int64 TargetPlayerId = -1);
 };

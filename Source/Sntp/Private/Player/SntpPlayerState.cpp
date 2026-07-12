@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/SntpAbilitySystemComponent.h"
 #include "AbilitySystem/SntpAttributeSet.h"
+#include "Net/UnrealNetwork.h"
 
 ASntpPlayerState::ASntpPlayerState()
 {
@@ -18,6 +19,13 @@ ASntpPlayerState::ASntpPlayerState()
 	AbilitySystemComponent->AddAttributeSetSubobject(AttributeSet.Get());
 }
 
+void ASntpPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ASntpPlayerState, PlayerUid);
+	DOREPLIFETIME(ASntpPlayerState, PlayerDisplayName);
+}
+
 UAbilitySystemComponent* ASntpPlayerState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
@@ -26,4 +34,18 @@ UAbilitySystemComponent* ASntpPlayerState::GetAbilitySystemComponent() const
 UAttributeSet* ASntpPlayerState::GetAttributeSet() const
 {
 	return AttributeSet;
+}
+
+int64 ASntpPlayerState::GetPlayerUid() const
+{
+	if (PlayerUid != INDEX_NONE)
+	{
+		return PlayerUid;
+	}
+	return  GetPlayerId();
+}
+
+const FString& ASntpPlayerState::GetPlayerDisplayName() const
+{
+	return PlayerDisplayName;
 }

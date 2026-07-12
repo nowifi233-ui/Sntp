@@ -1,104 +1,135 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Chat/ChatComponent.h"
-
-#include "Chat/ChatManagerSubsystem.h"
 #include "Chat/ChatSubsystem.h"
+#include "Chat/ChatManagerSubsystem.h"
+#include "Engine/GameInstance.h"
+#include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
+#include "Player/SntpPlayerController.h"
+#include "Player/SntpPlayerState.h"
 
-// Sets default values for this component's properties
 UChatComponent::UChatComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = false;
-
-	SetIsReplicatedByDefault(true);
+    PrimaryComponentTick.bCanEverTick = false;
 }
 
-
-// Called when the game starts
 void UChatComponent::BeginPlay()
 {
-	Super::BeginPlay();
-	
-	if(GetOwner()->HasAuthority())
-	{
-		UChatManagerSubsystem* Manager = GetChatManager();
-		
-		if(Manager)
-		{
-			Manager->RegisterPlayer(this);
-		}
-	}
+    Super::BeginPlay();
 
+    if (GetOwner()->HasAuthority())
+    {
+        if (UChatManagerSubsystem* ChatManager = GetChatManager())
+        {
+            ChatManager->RegisterPlayer(this);
+        }
+    }
+    if (GetOwner()->HasAuthority())
+    {
+        // 每隔 0.1 秒尝试注册，直到成功
+        GetWorld()->GetTimerManager().SetTimer(
+            RegisterChatTimerHandle,
+            this,
+            &UChatComponent::TryRegisterChatComponent,
+            0.1f,
+            true
+        );
+    }    if (GetOwner()->HasAuthority())
+    {
+        // 每隔 0.1 秒尝试注册，直到成功
+        GetWorld()->GetTimerManager().SetTimer(
+            RegisterChatTimerHandle,
+            this,
+            &UChatComponent::TryRegisterChatComponent,
+            0.1f,
+            true
+        );
+    }
 }
 
 void UChatComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if(GetOwner()->HasAuthority())
-	{
-		UChatManagerSubsystem* Manager = GetChatManager();
-		
-		if(Manager)
-		{
-			Manager->UnregisterPlayer(this);
-		}
-	}
-	Super::EndPlay(EndPlayReason);
+    if (GetOwner()->HasAuthority())
+    {
+        if (UChatManagerSubsystem* ChatManager = GetChatManager())
+        {
+            ChatManager->UnregisterPlayer(this);
+        }
+    }
+
+    Super::EndPlay(EndPlayReason);
 }
 
-void UChatComponent::SendWorldMessage(const FString& Message)
+void UChatComponent::SendChatMessage(FChatMessage Message)
 {
-	if (Message.IsEmpty()) return;
-	ServerSendWorldMessage(Message);
+    if (!GetOwner()->HasAuthority())
+    {
+        ServerSendChatMessage(Message);
+        return;
+    }
+
+    if (UChatManagerSubsystem* ChatManager = GetChatManager())
+    {
+        ChatManager->HandleChatMessage(this, Message);
+    }
 }
 
-void UChatComponent::SendPrivateMessage(const FString& TargetPlayer, const FString& Message)
+void UChatComponent::ServerSendChatMessage_Implementation(FChatMessage Message)
 {
-	if (Message.IsEmpty()) return;
-	if (TargetPlayer.IsEmpty()) return;
-	ServerSendPrivateMessage(TargetPlayer, Message);
-	
-}
-
-UChatManagerSubsystem* UChatComponent::GetChatManager() const
-{
-	if(!GetOwner()->GetGameInstance()) return nullptr;
-	
-	return GetOwner()->GetGameInstance()->GetSubsystem<UChatManagerSubsystem>();
+    if (UChatManagerSubsystem* ChatManager = GetChatManager())
+    {
+        ChatManager->HandleChatMessage(this, Message);
+    }
 }
 
 void UChatComponent::ClientReceiveMessage_Implementation(const FChatMessage& Message)
 {
-	/*
-	 * 通知 UI
-	 */
-	UChatSubsystem* ChatSubsystem = GetOwner()->GetGameInstance()->GetSubsystem<UChatSubsystem>();
-	if (ChatSubsystem)
-	{
-		ChatSubsystem->AddMessage(Message);
-	}
+    OnChatMessageReceived.Broadcast(Message);
+
+    if (UGameInstance* GameInstance = GetWorld()->GetGameInstance())
+    {
+        if (UChatSubsystem* ChatSubsystem =
+            GameInstance->GetSubsystem<UChatSubsystem>())
+        {
+            ChatSubsystem->AddMessage(Message);
+        }
+    }
 }
 
-void UChatComponent::ServerSendWorldMessage_Implementation(const FString& Message)
+UChatManagerSubsystem* UChatComponent::GetChatManager() const
 {
-	UChatManagerSubsystem* Manager = GetChatManager();
-	if (Manager)
-	{
-		Manager->HandleWorldChat(this, Message);
-	}
+    if (UGameInstance* GameInstance = GetWorld()->GetGameInstance())
+    {
+        return GameInstance->GetSubsystem<UChatManagerSubsystem>();
+    }
+
+    return nullptr;
 }
 
-void UChatComponent::ServerSendPrivateMessage_Implementation(const FString& TargetPlayer, const FString& Message)
+void UChatComponent::TryRegisterChatComponent()
 {
-	UChatManagerSubsystem* Manager = GetChatManager();
-	if (Manager)
-	{
-		Manager->HandlePrivateChat(this, TargetPlayer, Message);
-	}
+    ASntpPlayerController* PC = Cast<ASntpPlayerController>(GetOwner());
+    // 1. 检查 PlayerState 是否存在
+    if (!PC->PlayerState)
+        return;
+
+    // 2. 转换为您的自定义 PlayerState（假设 ASntpPlayerState）
+    ASntpPlayerState* SntpPS = Cast<ASntpPlayerState>(PC->PlayerState);
+    if (!SntpPS) return;
+
+    // 3. 检查 PlayerId 是否已分配（>0 表示有效）
+    if (SntpPS->GetPlayerId() == 0) return;
+
+    // 4. 获取 ChatComponent
+    UChatComponent* ChatComp = PC->FindComponentByClass<UChatComponent>();
+    if (!ChatComp) return;
+
+    // 5. 获取 ChatManagerSubsystem 并注册
+    if (UChatManagerSubsystem* ChatManager = PC->GetGameInstance()->GetSubsystem<UChatManagerSubsystem>())
+    {
+        if (ChatManager->RegisterPlayer(ChatComp))
+        {
+            // 注册成功，清除定时器
+            GetWorld()->GetTimerManager().ClearTimer(RegisterChatTimerHandle);
+        }
+    }
 }
-
-
-
-

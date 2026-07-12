@@ -1,85 +1,120 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ChatType.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+
+#include "Chat/ChatType.h"
+#include "Chat/Server/ChatSessionManager.h"
+#include "Chat/Server/ChatChannelManager.h"
 #include "ChatManagerSubsystem.generated.h"
 
-enum class EChatChannel : uint8;
 class UChatComponent;
+class APlayerController;
+class APlayerState;
+
 /**
- * 
+ * Server-side chat manager.
+ *
+ * Responsibilities:
+ * - Register / Unregister players
+ * - Validate chat messages
+ * - Resolve receivers
+ * - Dispatch messages
+ *
+ * Does NOT own UI or chat history.
  */
 UCLASS()
 class SNTP_API UChatManagerSubsystem : public UGameInstanceSubsystem
 {
-	GENERATED_BODY()
-	
-public:
-	
-	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+    GENERATED_BODY()
 
 public:
-	/*
-		玩家进入服务器
-		ChatComponent BeginPlay调用
-	*/
-	void RegisterPlayer(UChatComponent* ChatComponent);
-	
-	/*
-		玩家离开服务器
-	*/
-	void UnregisterPlayer(UChatComponent* ChatComponent);
+
+    //~ Begin USubsystem Interface
+    virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+    virtual void Deinitialize() override;
+    //~ End USubsystem Interface
 
 public:
-	/*
-		公屏聊天
-	*/
-	void HandleWorldChat(UChatComponent* Sender, const FString& Content);
 
-	/*
-		私聊
-	*/
-	void HandlePrivateChat(UChatComponent* Sender, const FString& TargetName, const FString& Content);
-	
-	/*
-		系统公告
-	*/
-	void BroadcastSystemMessage(const FString& Content);
+    /** 注册聊天组件 */
+    bool RegisterPlayer(UChatComponent* ChatComponent);
 
-private:
-	/*
-		当前在线玩家聊天组件
-		Server Only
-	*/
-	UPROPERTY()
-	TArray<TObjectPtr<UChatComponent>>
-	OnlineChatComponents;
+    /** 注销聊天组件 */
+    void UnregisterPlayer(UChatComponent* ChatComponent);
 
-private:
-	
-	/*
-		创建消息
-	*/
-	FChatMessage CreateMessage(UChatComponent* Sender, const FString& Content, EChatChannel Channel);
-	
-	/*
-		查找玩家
-	*/
-	UChatComponent* FindPlayerByName(const FString& PlayerName);
+    /** 处理客户端发送的聊天消息 */
+    bool HandleChatMessage(UChatComponent* SenderComponent, FChatMessage& Message);
+
+    /** 获取玩家聊天组件 */
+    UChatComponent* GetChatComponent(int64 PlayerId);
+    
+    const UChatComponent* GetChatComponent(int64 PlayerId) const;
+
+    /** Session Manager */
+    FORCEINLINE FChatSessionManager& GetSessionManager()
+    {
+        return SessionManager;
+    }
+
+    const FChatSessionManager& GetSessionManager() const
+    {
+        return SessionManager;
+    }
+
+    /** Channel Manager */
+    FChatChannelManager& GetChannelManager();
+
+    const FChatChannelManager& GetChannelManager() const;
 
 private:
-	
-	/*
-		敏感词过滤
-	*/
-	FString FilterMessage(const FString& Content);
-	
-	/*
-		防刷
-	*/
-	bool CheckChatRate(UChatComponent* Sender);
 
+    /** 检查消息是否合法 */
+    bool ValidateMessage(UChatComponent* SenderComponent, const FChatMessage& Message) const;
+
+    /** 根据频道计算接收者 */
+    void RouteMessage(const FChatMessage& Message, TArray<int64>& OutReceivers) const;
+
+    /** 向目标玩家发送消息 */
+    void DispatchMessage(const FChatMessage& Message, const TArray<int64>& Receivers);
+
+    /** 世界频道 */
+    void DispatchWorld(const FChatMessage& Message, TArray<int64>& OutReceivers) const;
+
+    /** 私聊 */
+    void DispatchPrivate(const FChatMessage& Message, TArray<int64>& OutReceivers) const;
+
+    /** 队伍频道 */
+    void DispatchTeam(const FChatMessage& Message, TArray<int64>& OutReceivers) const;
+
+    /** 公会频道 */
+    void DispatchGuild(const FChatMessage& Message, TArray<int64>& OutReceivers) const;
+
+    /** 附近频道 */
+    void DispatchNearby(const FChatMessage& Message, TArray<int64>& OutReceivers) const;
+
+    /** 系统频道 */
+    void DispatchSystem(const FChatMessage& Message, TArray<int64>& OutReceivers) const;
+
+    /** 从 ChatComponent 获取 PlayerState */
+    APlayerState* GetPlayerState(UChatComponent* ChatComponent) const;
+
+    /** 填充服务器消息信息 */
+    bool FillServerMessage(UChatComponent* SenderComponent, FChatMessage& Message) const;
+
+private:
+
+    /** 在线玩家管理 */
+    FChatSessionManager SessionManager;
+
+    /** 聊天频道管理 */
+    FChatChannelManager ChannelManager;
+
+    /** 最大发言长度 */
+    UPROPERTY()
+    int32 MaxMessageLength = 200;
+
+    /** 发言冷却（秒） */
+    UPROPERTY()
+    float ChatCooldown = 0.5f;
 };

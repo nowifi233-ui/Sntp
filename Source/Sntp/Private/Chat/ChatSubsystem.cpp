@@ -1,97 +1,91 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Chat/ChatSubsystem.h"
+
+#include "Chat/ChatComponent.h"
 
 void UChatSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
-	
-	ChatHistory.Empty();
-	UnreadMap.Empty();
-	
-	// 未读消息
-	for (uint8 i = 0; i <= static_cast<uint8>(EChatChannel::Guild); i++)
-	{
-		UnreadMap.Add(static_cast<EChatChannel>(i), 0);
-	}
+
+	ChatHistory.Reset();
+	ChannelHistory.Reset();
 }
 
 void UChatSubsystem::Deinitialize()
 {
-	ChatHistory.Empty();
-	UnreadMap.Empty();
-	
+	ChatHistory.Reset();
+	ChannelHistory.Reset();
+
 	Super::Deinitialize();
+}
+
+void UChatSubsystem::HandleReceiveMessage(const FChatMessage& Message)
+{
+	AddMessage(Message);
 }
 
 void UChatSubsystem::AddMessage(const FChatMessage& Message)
 {
-	
-	/*
-		保存历史
-	*/
 	ChatHistory.Add(Message);
-	
-	if(ChatHistory.Num() > MaxHistoryCount)
-	{
-		ChatHistory.RemoveAt(0);
-	}
 
-	/*
-		未读+1
-		UI打开时再清除
-	*/
+	ChannelHistory.FindOrAdd(Message.Channel).Add(Message);
 
-	int32& Count = UnreadMap.FindOrAdd(Message.Channel);
-	Count++;
-	
-	/*
-		通知UI
-		WBP_Chat监听
-	*/
 	OnChatMessageAdded.Broadcast(Message);
-}
-
-const TArray<FChatMessage>& UChatSubsystem::GetAllMessages() const
-{
-	return ChatHistory;
-}
-
-void UChatSubsystem::GetMessagesByChannel(EChatChannel Channel, TArray<FChatMessage>& OutMessages) const
-{
-	OutMessages.Empty();
-	
-	for(const FChatMessage& Msg : ChatHistory)
-	{
-		if(Msg.Channel == Channel)
-		{
-			OutMessages.Add(Msg);
-		}
-	}
 }
 
 void UChatSubsystem::ClearHistory()
 {
-	ChatHistory.Empty();
+	ChatHistory.Reset();
+	ChannelHistory.Reset();
 }
 
-int32 UChatSubsystem::GetUnreadCount(EChatChannel Channel) const
+const TArray<FChatMessage>& UChatSubsystem::GetHistory() const
 {
-	const int32* Count = UnreadMap.Find(Channel);
-	
-	return Count ? *Count : 0;
+	return ChatHistory;
 }
 
-void UChatSubsystem::ClearUnread(EChatChannel Channel)
+void UChatSubsystem::GetChannelHistory(
+	EChatChannel Channel,
+	TArray<FChatMessage>& OutMessages) const
 {
-	UnreadMap.FindOrAdd(Channel) = 0;
+	OutMessages.Reset();
+
+	if (const TArray<FChatMessage>* Messages = ChannelHistory.Find(Channel))
+	{
+		OutMessages = *Messages;
+	}
 }
 
+void UChatSubsystem::SendMessage(const FString& Content, EChatChannel Channel, int64 TargetPlayerId)
+{
+	if (Content.IsEmpty())
+	{
+		return;
+	}
 
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
 
+	APlayerController* PC = World->GetFirstPlayerController();
+	if (!PC)
+	{
+		return;
+	}
 
+	UChatComponent* ChatComponent = PC->FindComponentByClass<UChatComponent>();
 
+	if (!ChatComponent)
+	{
+		return;
+	}
 
+	FChatMessage Message;
+	Message.Channel = Channel;
+	Message.TargetPlayerId = TargetPlayerId;
+	Message.Content = Content;
 
+	ChatComponent->SendChatMessage(Message);
+}
 

@@ -1,153 +1,318 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Chat/ChatManagerSubsystem.h"
-
 #include "Chat/ChatComponent.h"
-#include "Chat/ChatType.h"
-#include "GameFramework/PlayerState.h"
+#include "Player/SntpPlayerState.h"
+#include "GameFramework/PlayerController.h"
 
 void UChatManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
-	Super::Initialize(Collection);
-	
-	OnlineChatComponents.Empty();
+    Super::Initialize(Collection);
+
+    SessionManager.Clear();
+    ChannelManager.Clear();
+
+    // 默认世界频道
+    ChannelManager.CreateChannel(
+        TEXT("World"),
+        EChatChannel::World,
+        TEXT("World"),
+        false);
+
+    // 默认系统频道
+    ChannelManager.CreateChannel(
+        TEXT("System"),
+        EChatChannel::System,
+        TEXT("System"),
+        false);
 }
 
-void UChatManagerSubsystem::RegisterPlayer(UChatComponent* ChatComponent)
+void UChatManagerSubsystem::Deinitialize()
 {
-	if(!ChatComponent) return;
-	
-	if(!OnlineChatComponents.Contains(ChatComponent))
-	{
-		OnlineChatComponents.Add(ChatComponent);
-	}
+    SessionManager.Clear();
+    ChannelManager.Clear();
+
+    Super::Deinitialize();
+}
+
+bool UChatManagerSubsystem::RegisterPlayer(UChatComponent* ChatComponent)
+{
+    if (!IsValid(ChatComponent))
+    {
+        return false;
+    }
+
+    ASntpPlayerState* PlayerState = Cast<ASntpPlayerState>(GetPlayerState(ChatComponent));
+
+    if (!PlayerState)
+    {
+        return false;
+    }
+
+    const bool bSuccess = SessionManager.RegisterPlayer(ChatComponent, PlayerState);
+    
+    if (!bSuccess)
+    {
+        return false;
+    }
+    
+    const int64 PlayerId = PlayerState->GetPlayerId();
+    if (PlayerId != 0)
+    {
+        ChannelManager.JoinChannel(TEXT("World"), PlayerId);
+    }
+    return true;
 }
 
 void UChatManagerSubsystem::UnregisterPlayer(UChatComponent* ChatComponent)
 {
-	OnlineChatComponents.Remove(ChatComponent);
+    if (!IsValid(ChatComponent))
+    {
+        return;
+    }
+
+    ASntpPlayerState* PlayerState = Cast<ASntpPlayerState>(GetPlayerState(ChatComponent));
+    
+    if (PlayerState)
+    {
+        ChannelManager.LeaveAllChannels(
+            PlayerState->GetPlayerId());
+    }
+    
+    SessionManager.UnregisterPlayer(ChatComponent);
 }
 
-void UChatManagerSubsystem::HandleWorldChat(UChatComponent* Sender, const FString& Content)
+UChatComponent* UChatManagerSubsystem::GetChatComponent(int64 PlayerId)
 {
-	if(!CheckChatRate(Sender)) return;
-	
-	FString Filtered = FilterMessage(Content);
-	
-	FChatMessage Message = CreateMessage(Sender, Filtered, EChatChannel::World);
-	
-	for(UChatComponent* Component : OnlineChatComponents)
-	{
-		if(Component)
-		{
-			Component->ClientReceiveMessage(Message);
-		}
-	}
+    return SessionManager.GetChatComponent(PlayerId);
 }
 
-void UChatManagerSubsystem::HandlePrivateChat(UChatComponent* Sender, const FString& TargetName, const FString& Content)
+const UChatComponent* UChatManagerSubsystem::GetChatComponent(int64 PlayerId) const
 {
-	if(!Sender) return;
-	FString Filtered = FilterMessage(Content);
-	FChatMessage Message = CreateMessage(Sender, Filtered, EChatChannel::Private);
-	// 对方显示
-	UChatComponent* Target = FindPlayerByName(TargetName);
-	if (Target)
-	{
-		Target->ClientReceiveMessage(Message);
-	}
-	// 自己显示
-	Sender->ClientReceiveMessage(Message);
+    return SessionManager.GetChatComponent(PlayerId);
 }
 
-void UChatManagerSubsystem::BroadcastSystemMessage(const FString& Content)
+APlayerState* UChatManagerSubsystem::GetPlayerState(UChatComponent* ChatComponent) const
 {
-	FChatMessage Message;
-	Message.Channel = EChatChannel::System;
-	Message.SenderName = "System";
-	Message.Content = Content;
-	for (UChatComponent* Component : OnlineChatComponents)
-	{
-		if (Component)
-		{
-			Component->ClientReceiveMessage(Message);
-		}
-	}
+    if (!IsValid(ChatComponent))
+    {
+        return nullptr;
+    }
+
+    APlayerController* PlayerController =
+        Cast<APlayerController>(ChatComponent->GetOwner());
+
+    if (!PlayerController)
+    {
+        return nullptr;
+    }
+
+    return PlayerController->PlayerState;
 }
 
-FChatMessage UChatManagerSubsystem::CreateMessage(UChatComponent* Sender, const FString& Content, EChatChannel Channel)
+bool UChatManagerSubsystem::FillServerMessage(
+    UChatComponent* SenderComponent,
+    FChatMessage& Message) const
 {
-	FChatMessage Message;
-	Message.Channel = Channel;
-	Message.Content = Content;
-	Message.Time = FDateTime::Now();
-	
-	if(Sender)
-	{
-		APlayerController* PC = Cast<APlayerController>(Sender->GetOwner());
-		
-		if(PC && PC->PlayerState)
-		{
-			Message.SenderName = PC->PlayerState->GetPlayerName();
-		}
-	}
-	return Message;
+    ASntpPlayerState* PlayerState = Cast<ASntpPlayerState>(GetPlayerState(SenderComponent));
+
+
+    if (!PlayerState)
+    {
+        return false;
+    }
+    
+    Message.SenderId = PlayerState->GetPlayerId();
+    
+    Message.SenderName = PlayerState->GetPlayerName();
+    
+    Message.Time = FDateTime::UtcNow();
+    
+    return true;
 }
 
-UChatComponent* UChatManagerSubsystem::FindPlayerByName(const FString& PlayerName)
+bool UChatManagerSubsystem::HandleChatMessage(
+    UChatComponent* SenderComponent,
+    FChatMessage& Message)
 {
-	for(UChatComponent* Component : OnlineChatComponents)
-	{
-		APlayerController* PC = Cast<APlayerController>(Component->GetOwner());
-		
-		if(!PC) continue;
-		if(PC->PlayerState && PC->PlayerState->GetPlayerName() == PlayerName)
-		{
-			return Component;
-		}
-	}
-	return nullptr;
+    if (!FillServerMessage(SenderComponent, Message))
+    {
+        return false;
+    }
+
+    if (!ValidateMessage(SenderComponent, Message))
+    {
+        return false;
+    }
+
+    TArray<int64> Receivers;
+    RouteMessage(Message, Receivers);
+
+    if (Receivers.IsEmpty())
+    {
+        return false;
+    }
+
+    DispatchMessage(Message, Receivers);
+
+    SessionManager.UpdateLastChatTime(SenderComponent);
+
+    return true;
 }
 
-FString UChatManagerSubsystem::FilterMessage(const FString& Content)
+FChatChannelManager& UChatManagerSubsystem::GetChannelManager()
 {
-	FString Result = Content;
-
-	TArray<FString> BlockWords =
-	{
-		TEXT("xxx"),
-		TEXT("bad")
-	};
-	
-	for(auto& Word : BlockWords)
-	{
-		Result.ReplaceInline(*Word, TEXT("***"));
-	}
-	
-	return Result;
+    return ChannelManager;
 }
 
-bool UChatManagerSubsystem::CheckChatRate(UChatComponent* Sender)
+const FChatChannelManager& UChatManagerSubsystem::GetChannelManager() const
 {
-	/*
-		TODO:
-
-		TMap<PlayerID,LastChatTime>
-
-		例如:
-		2秒一次
-	*/
-	
-	return true;
+    return ChannelManager;
 }
 
+bool UChatManagerSubsystem::ValidateMessage(UChatComponent* SenderComponent, const FChatMessage& Message) const
+{
+    const FChatSession* Session = SessionManager.FindSession(SenderComponent);
+    
+    if (!Session)
+    {
+        return false;
+    }
+    
+    if (!Session->bOnline)
+    {
+        return false;
+    }
+    
+    if (Session->bMuted)
+    {
+        return false;
+    }
+
+    if (!SessionManager.CheckChatCooldown( SenderComponent, ChatCooldown))
+    {
+        return false;
+    }
 
 
+    if (Message.Content.TrimStartAndEnd().IsEmpty())
+    {
+        return false;
+    }
 
+    if (Message.Content.Len() > MaxMessageLength)
+    {
+        return false;
+    }
 
+    return true;
+}
 
+void UChatManagerSubsystem::RouteMessage(
+    const FChatMessage& Message,
+    TArray<int64>& OutReceivers) const
+{
+    OutReceivers.Reset();
 
+    switch (Message.Channel)
+    {
+    case EChatChannel::World:
+        DispatchWorld(Message, OutReceivers);
+        break;
 
+    case EChatChannel::Private:
+        DispatchPrivate(Message, OutReceivers);
+        break;
 
+    case EChatChannel::Team:
+        DispatchTeam(Message, OutReceivers);
+        break;
 
+    case EChatChannel::Guild:
+        DispatchGuild(Message, OutReceivers);
+        break;
+
+    case EChatChannel::Nearby:
+        DispatchNearby(Message, OutReceivers);
+        break;
+
+    case EChatChannel::System:
+    case EChatChannel::GM:
+        DispatchSystem(Message, OutReceivers);
+        break;
+
+    default:
+        break;
+    }
+}
+
+void UChatManagerSubsystem::DispatchMessage(
+    const FChatMessage& Message,
+    const TArray<int64>& Receivers)
+{
+    for (int64 PlayerId : Receivers)
+    {
+        if (UChatComponent* ChatComponent = SessionManager.GetChatComponent(PlayerId))
+        {
+            ChatComponent->ClientReceiveMessage(Message);
+        }
+    }
+}
+
+void UChatManagerSubsystem::DispatchWorld(
+    const FChatMessage& Message,
+    TArray<int64>& OutReceivers) const
+{
+    if (const TSet<int64>* Members = ChannelManager.GetMembers(TEXT("World")))
+    {
+        OutReceivers.Append(Members->Array());
+    }
+}
+
+void UChatManagerSubsystem::DispatchPrivate(
+    const FChatMessage& Message,
+    TArray<int64>& OutReceivers) const
+{
+    if (SessionManager.IsOnline(GetChatComponent(Message.TargetPlayerId)))
+    {
+        OutReceivers.Add(Message.TargetPlayerId);
+    }
+
+    OutReceivers.AddUnique(Message.SenderId);
+}
+
+void UChatManagerSubsystem::DispatchTeam(
+    const FChatMessage& Message,
+    TArray<int64>& OutReceivers) const
+{
+    if (const TSet<int64>* Members = ChannelManager.GetMembers(Message.ChannelId))
+    {
+        OutReceivers.Append(Members->Array());
+    }
+}
+
+void UChatManagerSubsystem::DispatchGuild(
+    const FChatMessage& Message,
+    TArray<int64>& OutReceivers) const
+{
+    if (const TSet<int64>* Members = ChannelManager.GetMembers(Message.ChannelId))
+    {
+        OutReceivers.Append(Members->Array());
+    }
+}
+
+void UChatManagerSubsystem::DispatchNearby(
+    const FChatMessage& Message,
+    TArray<int64>& OutReceivers) const
+{
+    // TODO:
+    // 根据距离筛选玩家
+}
+
+void UChatManagerSubsystem::DispatchSystem(
+    const FChatMessage& Message,
+    TArray<int64>& OutReceivers) const
+{
+    if (const TSet<int64>* Members = ChannelManager.GetMembers(TEXT("World")))
+    {
+        OutReceivers.Append(Members->Array());
+    }
+}

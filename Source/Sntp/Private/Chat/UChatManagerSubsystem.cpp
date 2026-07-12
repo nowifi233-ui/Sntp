@@ -28,10 +28,10 @@ void UUChatManagerSubsystem::HandleWorldMessage(AActor* Sender, const FString& C
 	}
 }
 
-void UUChatManagerSubsystem::HandlePrivateMessage(AActor* Sender, const FString& TargetName, const FString& Context)
+void UUChatManagerSubsystem::HandlePrivateMessage(AActor* Sender, int32 TargetID, const FString& Context)
 {
 	FChatMessage Message = MakeMessage(Sender, Context, EChatChannel::Private);
-	Message.ReceiverName = TargetName;
+	Message.TargetPlayerId = TargetID;
 	TArray<UChatComponent*> Components;
 	GetAllChatComponents(Components);
 	for (UChatComponent* Component : Components)
@@ -42,13 +42,13 @@ void UUChatManagerSubsystem::HandlePrivateMessage(AActor* Sender, const FString&
 			continue;
 		}
 		
-		FString PlayerName  = PC->PlayerState? PC->PlayerState->GetPlayerName() : "";
+		// FString PlayerName  = PC->PlayerState? PC->PlayerState->GetPlayerName() : "";
 		
-		if (PlayerName == TargetName)
+		/*if (PlayerName == TargetName)
 		{
 			Component->ClientReceiveMessage(Message);
 			break;
-		}
+		}*/
 	}
 	UChatComponent* SenderComponent = Sender->FindComponentByClass<UChatComponent>();
 	if (SenderComponent)

@@ -18,6 +18,7 @@ class SNTP_API ASntpPlayerState : public APlayerState, public IAbilitySystemInte
 	GENERATED_BODY()
 public:
 	ASntpPlayerState();
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const;
 
@@ -28,5 +29,18 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
 	TObjectPtr<UAttributeSet> AttributeSet;
 	
+public:
+
+	int64 GetPlayerUid() const;
+
+	const FString& GetPlayerDisplayName() const;
+
+private:
+
+	UPROPERTY(Replicated)
+	int64 PlayerUid = INDEX_NONE;
+
+	UPROPERTY(Replicated)
+	FString PlayerDisplayName;
 	
 };

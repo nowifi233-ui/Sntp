@@ -23,7 +23,7 @@ public:
 	/**/
 	void HandleWorldMessage(AActor* Sender, const FString& Context);
 	
-	void HandlePrivateMessage(AActor* Sender, const FString& TargetName, const FString& Context);
+	void HandlePrivateMessage(AActor* Sender,  int32 TargetID, const FString& Context);
 	
 	void BroadcastSystemMessage(const FString& Content);
 	
